@@ -1,0 +1,51 @@
+// propiedad-detalle.component.scss
+
+.detalle-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.header-section {
+  background-color: white;
+}
+
+.imagen-principal-container {
+  img {
+    max-height: 500px;
+    object-fit: cover;
+  }
+}
+
+.miniatura {
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 1 !important;
+    transform: scale(1.05);
+  }
+
+  &.active {
+    opacity: 1 !important;
+    border: 3px solid #0d6efd;
+  }
+}
+
+.card {
+  border: none;
+
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 991px) {
+  .col-lg-5 {
+    margin-top: 2rem;
+  }
+}

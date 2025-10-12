@@ -1,0 +1,155 @@
+.propiedades-page {
+  background-color: #EAEDEF;
+  min-height: 100vh;
+  padding-top: 1px; // Espacio para el header fijo
+}
+
+// Filtros compactos
+.filtros-card {
+  border: none;
+  border-radius: 12px;
+  background-color: #FEFDFE;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.form-label-sm {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #3B3B3F;
+  margin-bottom: 0.25rem;
+}
+
+.form-control,
+.form-control-sm {
+  border-color: #dee2e6;
+  font-size: 0.875rem;
+
+  &:focus {
+    border-color: #EB6D31;
+    box-shadow: 0 0 0 0.15rem rgba(235, 109, 49, 0.2);
+  }
+
+  &:disabled {
+    background-color: #f8f9fa;
+    opacity: 0.6;
+  }
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  font-size: 0.875rem;
+}
+
+// Botón filtrar
+.btn-filter {
+  background-color: #EB6D31;
+  color: #FEFDFE;
+  border: none;
+  font-weight: 600;
+  padding: 0.5rem 2rem;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+
+  &:hover:not(:disabled) {
+    background-color: #d65e28;
+    color: #FEFDFE;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(235, 109, 49, 0.3);
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+}
+
+.btn-outline-secondary {
+  font-size: 0.875rem;
+
+  &:hover:not(:disabled) {
+    background-color: #6c757d;
+    color: #FEFDFE;
+  }
+}
+
+// Tarjetas de propiedades
+.propiedad-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: #FEFDFE;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+.propiedad-img {
+  height: 220px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.precio-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #3B3B3F;
+  color: #FEFDFE;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-title {
+  color: #1B1C1D;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.card-text {
+  color: #3B3B3F;
+  font-size: 0.95rem;
+}
+
+// Botones de acción
+.btn-view {
+  background-color: #EB6D31;
+  color: #FEFDFE;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: #d65e28;
+    color: #FEFDFE;
+  }
+}
+
+.btn-whatsapp {
+  background-color: #25D366;
+  color: #FEFDFE;
+  border: none;
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: #1faa52;
+    color: #FEFDFE;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .propiedad-img {
+    height: 180px;
+  }
+
+  .btn-filter {
+    padding: 0.4rem 1.5rem;
+  }
+}

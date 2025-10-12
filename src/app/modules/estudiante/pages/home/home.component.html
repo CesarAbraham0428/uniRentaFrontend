@@ -1,1 +1,194 @@
-<p>Hola Mundo</p>
+<div class="propiedades-page">
+  <!-- Filtros Section Compactos -->
+  <div class="container pt-5 pb-4">
+    <div class="card shadow-sm filtros-card">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="bi bi-funnel me-2"></i>Filtrar Propiedades
+          </h5>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="limpiarFiltros()"
+            [disabled]="cargando">
+            <i class="bi bi-x-circle me-1"></i> Limpiar
+          </button>
+        </div>
+
+        <form (ngSubmit)="aplicarFiltros()">
+          <div class="row g-2">
+            <!-- Precio -->
+            <div class="col-lg-2 col-md-3 col-sm-6">
+              <label class="form-label form-label-sm">Precio Mínimo</label>
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="precioMin"
+                  name="precioMin"
+                  placeholder="0"
+                  min="0">
+              </div>
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-6">
+              <label class="form-label form-label-sm">Precio Máximo</label>
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="precioMax"
+                  name="precioMax"
+                  placeholder="10,000"
+                  min="0">
+              </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="col-lg-2 col-md-3 col-sm-6">
+              <label class="form-label form-label-sm">Colonia</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [(ngModel)]="colonia"
+                name="colonia"
+                placeholder="Ej: Centro">
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-6">
+              <label class="form-label form-label-sm">Municipio</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [(ngModel)]="municipio"
+                name="municipio"
+                placeholder="Ej: Dolores Hidalgo">
+            </div>
+
+            <!-- Universidad -->
+            <div class="col-lg-3 col-md-6 col-sm-8">
+              <label class="form-label form-label-sm">Cerca de universidad</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [(ngModel)]="universidadNombre"
+                name="universidadNombre"
+                placeholder="Ej: UTNG, UDHI">
+            </div>
+
+            <div class="col-lg-1 col-md-2 col-sm-4">
+              <label class="form-label form-label-sm">Rango (km)</label>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                [(ngModel)]="rangoKm"
+                name="rangoKm"
+                placeholder="2"
+                min="0.5"
+                step="0.5"
+                [disabled]="!universidadNombre">
+            </div>
+          </div>
+
+          <!-- Botón de filtrar separado -->
+          <div class="row mt-3">
+            <div class="col-12 text-center">
+              <button type="submit" class="btn btn-filter btn-sm px-4" [disabled]="cargando">
+                <i class="bi bi-funnel-fill me-1"></i> Filtrar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados Section -->
+  <div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">
+        <i class="bi bi-house-door me-2"></i>Propiedades Disponibles
+        <span class="badge bg-primary ms-2">{{ propiedades.length }}</span>
+      </h5>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-3 text-muted">Cargando propiedades...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+    </div>
+
+    <!-- Grid de Propiedades -->
+    <div class="row g-3" *ngIf="!cargando && !error">
+      <div class="col-lg-4 col-md-6" *ngFor="let propiedad of propiedades">
+        <div class="card propiedad-card h-100 shadow-sm">
+          <div class="position-relative">
+            <img
+              [src]="propiedad.imagenes[0] || 'assets/default-property.jpg'"
+              class="card-img-top propiedad-img"
+              [alt]="propiedad.nombre"
+              onerror="this.src='assets/default-property.jpg'">
+            <span class="badge precio-badge">
+              ${{ propiedad.precio | number:'1.0-0' }}/mes
+            </span>
+          </div>
+
+          <div class="card-body d-flex flex-column p-3">
+            <h6 class="card-title mb-2">{{ propiedad.nombre }}</h6>
+
+            <p class="text-muted mb-2 small">
+              <i class="bi bi-geo-alt-fill text-primary me-1"></i>
+              {{ propiedad.ubicacion.colonia || 'Ubicación no especificada' }}
+            </p>
+
+            <p class="card-text flex-grow-1 small">
+              {{ propiedad.descripcion.caracteristicas || 'Propiedad disponible' }}
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-auto">
+              <div class="rentero-info">
+                <small class="text-muted">
+                  <i class="bi bi-person-circle me-1"></i>
+                  {{ propiedad.rentero.nombre }}
+                </small>
+              </div>
+
+              <div class="btn-group btn-group-sm" role="group">
+                <button
+                  class="btn btn-view"
+                  [routerLink]="['propiedad', propiedad.id]">
+                  <i class="bi bi-eye me-1"></i> Ver
+                </button>
+                <button
+                  class="btn btn-whatsapp"
+                  (click)="contactarRentero(propiedad.rentero.telefono)"
+                  [disabled]="!propiedad.rentero.telefono">
+                  <i class="bi bi-whatsapp"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Results -->
+    <div *ngIf="!cargando && !error && propiedades.length === 0" class="text-center py-5">
+      <i class="bi bi-house-x-fill text-muted" style="font-size: 3rem;"></i>
+      <p class="text-muted mt-3">No se encontraron propiedades con los filtros seleccionados</p>
+      <button class="btn btn-primary btn-sm" (click)="limpiarFiltros()">
+        <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
+      </button>
+    </div>
+  </div>
+</div>

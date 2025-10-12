@@ -2,3 +2,49 @@
 @import "bootstrap/scss/bootstrap";
 @import 'ngx-toastr/toastr';
 @import 'ngx-toastr/toastr-bs5-alert';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #EAEDEF;
+  color: #1B1C1D;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Para que app-root ocupe todo el espacio */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* El contenedor principal debe crecer */
+.main-content {
+  flex: 1 0 auto;
+}
+
+.text-primary {
+  color: #EB6D31 !important;
+}
+
+.bg-primary {
+  background-color: #EB6D31 !important;
+}
+
+.btn-primary {
+  background-color: #EB6D31;
+  border-color: #EB6D31;
+}
+
+.btn-primary:hover {
+  background-color: #d65e28;
+  border-color: #d65e28;
+}
