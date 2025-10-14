@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Propiedad, PropiedadService } from '../../../../services/propiedad.service';
+import { Propiedad, PropiedadService } from '../../../../core/propiedad.service';
 
 @Component({
   selector: 'app-home',
