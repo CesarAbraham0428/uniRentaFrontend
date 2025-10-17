@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
 
 @Component({
   selector: 'app-header',
@@ -8,10 +6,19 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  searchQuery: string = '';
+  isMenuOpen: boolean = false;
 
-  onSearch(): void {
-    console.log('Buscando:', this.searchQuery);
+  /**
+   * Alterna el estado del menú móvil
+   */
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
+  /**
+   * Cierra el menú móvil
+   */
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
 }

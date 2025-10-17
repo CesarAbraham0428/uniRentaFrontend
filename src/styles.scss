@@ -5,6 +5,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+@import "mapbox-gl/dist/mapbox-gl.css";
+@import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
+
+
 html, body {
   height: 100%;
   margin: 0;
@@ -48,3 +52,4 @@ app-root {
   background-color: #d65e28;
   border-color: #d65e28;
 }
+

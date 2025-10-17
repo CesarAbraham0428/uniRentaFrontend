@@ -1,0 +1,37 @@
+.mapa-detalle {
+  width: 100%;
+  height: 370px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+
+  .btn-ruta {
+    position: absolute;
+    right: 20px;
+    bottom: 50px;
+    z-index: 3;
+    appearance: none;
+    border: 1px solid #000000;
+    background: #ffffff;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.5rem 0.875rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px; 
+    transition: all 0.2s ease-in-out;
+
+    i {
+      font-size: 1.2rem;
+      color: #000000;
+    }
+
+    &:hover {
+      background: #ffffff;
+      filter: brightness(1);
+      transform: scale(1.05);
+    }
+  }
+}
