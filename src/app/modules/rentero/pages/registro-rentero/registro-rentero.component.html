@@ -192,25 +192,13 @@
           [disabled]="!archivoValido || procesando"
           class="boton boton-primario"
         >
-          <span *ngIf="!procesando">
-            Registrar
-            <i class="bi bi-check-lg"></i>
-          </span>
-          <span *ngIf="procesando" class="texto-procesando">
-            <span class="spinner"></span>
-            Procesando...
-          </span>
+          Registrar
+          <i class="bi bi-check-lg"></i>
         </button>
       </div>
     </div>
 
-    <!-- Overlay de carga -->
-    <div *ngIf="procesando" class="overlay-carga">
-      <div class="contenedor-carga">
-        <div class="spinner-grande"></div>
-        <h3 class="texto-carga">Procesando tu registro</h3>
-        <p class="subtexto-carga">Esto puede tardar unos segundos...</p>
-      </div>
-    </div>
+    <!-- Procesamiento de documento -->
+    <app-procesamiento-documento [visible]="procesando" mensaje="Procesando tu registro..."></app-procesamiento-documento>
   </div>
 </div>

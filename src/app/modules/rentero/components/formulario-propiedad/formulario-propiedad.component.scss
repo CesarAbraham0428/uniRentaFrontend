@@ -1,0 +1,77 @@
+// Variables de colores basadas en la paleta proporcionada
+$color-fondo-pantalla: #EAEDEF;
+$color-div: #FEFDFE;
+$color-letras: #1B1C1D;
+$color-header-footer: #1A3B55;
+$color-agregar: #228B22;
+$color-blanco: #FEFDFE;
+
+// Estilos generales
+.container {
+  background-color: $color-fondo-pantalla;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.card {
+  background-color: $color-div;
+  color: $color-letras;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: $color-header-footer;
+  color: $color-blanco;
+  border: none;
+}
+
+.form-label {
+  color: $color-letras;
+  font-weight: bold;
+}
+
+.form-control {
+  border: 1px solid #ccc;
+  &:focus {
+    border-color: $color-header-footer;
+    box-shadow: 0 0 0 0.2rem rgba($color-header-footer, 0.25);
+  }
+}
+
+.text-danger {
+  color: #DC143C;  // Color de error consistente con eliminar
+}
+
+// Botones con colores específicos
+.btn {
+  &.btn-agregar {
+    background-color: $color-agregar;
+    color: $color-blanco;
+    border: none;
+    &:hover {
+      background-color: darken($color-agregar, 10%);
+    }
+    &:disabled {
+      background-color: lighten($color-agregar, 20%);
+    }
+  }
+  &.btn-secondary {
+    background-color: #6c757d;
+    color: $color-blanco;
+    border: none;
+    &:hover {
+      background-color: darken(#6c757d, 10%);
+    }
+  }
+}
+
+// Responsive para móviles
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  .card {
+    margin: 0;
+  }
+}

@@ -402,30 +402,6 @@ $color-borde-hover: #9ca3af;
   }
 }
 
-// Spinner
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-  margin-right: 0.5rem;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.texto-procesando {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 // Overlay de carga
 .overlay-carga {
   position: absolute;

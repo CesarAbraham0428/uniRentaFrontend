@@ -1,6 +1,7 @@
+import { PropiedadService } from '../../../../core/services/propiedad.service';
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Propiedad, PropiedadService } from '../../../../core/services/propiedad.service';
+import { Propiedad } from '../../../../interfaces/propiedad.interface';
 
 @Component({
   selector: 'app-propiedad-detalle',

@@ -1,1 +1,44 @@
-<p>rentero-layout works!</p>
+<div class="container-fluid">
+  <header class="row">
+    <div class="col-12">
+      <h2>Gestión de Propiedades</h2>
+    </div>
+  </header>
+
+  <main class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4>Mis Propiedades</h4>
+          <button class="btn btn-agregar">Agregar Propiedad</button>
+        </div>
+        <div class="card-body">
+          <!-- Aquí irá la lista de propiedades, ej. una tabla -->
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Ejemplo de fila, reemplazar con *ngFor -->
+              <tr>
+                <td>Propiedad Ejemplo</td>
+                <td>Descripción de ejemplo</td>
+                <td class="precio">$100.00</td>
+                <td>
+                  <button class="btn btn-sm btn-editar">Editar</button>
+                  <button class="btn btn-sm btn-ver">Ver</button>
+                  <button class="btn btn-sm btn-eliminar">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

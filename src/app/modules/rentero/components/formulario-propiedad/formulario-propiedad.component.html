@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-header text-center">
+          <h3>{{ esEdicion ? 'Editar Propiedad' : 'Registrar Nueva Propiedad' }}</h3>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="formularioPropiedad" (ngSubmit)="guardarPropiedad()">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre de la Propiedad</label>
+              <input type="text" class="form-control" id="nombre" formControlName="nombre" placeholder="Ingrese el nombre">
+              <div *ngIf="formularioPropiedad.get('nombre')?.invalid && formularioPropiedad.get('nombre')?.touched" class="text-danger">
+                El nombre es requerido.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" rows="3" formControlName="descripcion" placeholder="Ingrese una descripción"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="precio" class="form-label">Precio</label>
+              <input type="number" class="form-control" id="precio" formControlName="precio" placeholder="Ingrese el precio">
+              <div *ngIf="formularioPropiedad.get('precio')?.invalid && formularioPropiedad.get('precio')?.touched" class="text-danger">
+                El precio debe ser mayor a 0.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+              <select class="form-control" id="tipoDocumento" formControlName="tipoDocumentoId">
+                <option value="">Seleccione un tipo de documento</option>
+                <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
+                  {{ tipo.nombre }}
+                </option>
+              </select>
+              <div *ngIf="formularioPropiedad.get('tipoDocumentoId')?.invalid && formularioPropiedad.get('tipoDocumentoId')?.touched" class="text-danger">
+                Debe seleccionar un tipo de documento.
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-agregar" [disabled]="formularioPropiedad.invalid">
+                {{ esEdicion ? 'Actualizar' : 'Registrar' }} Propiedad
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Procesamiento de documento -->
+<app-procesamiento-documento [visible]="procesando" mensaje="Procesando propiedad..."></app-procesamiento-documento>
