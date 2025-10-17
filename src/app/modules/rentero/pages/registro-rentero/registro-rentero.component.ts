@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
 import { RenteroService } from '../../../../core/services/rentero.service';
+import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
 import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../../interfaces/rentero.interface';
 
 @Component({
@@ -19,7 +19,7 @@ export class RegistroRenteroComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private renteroService: RenteroService,
-    private toastr: ToastrService
+    private documentoValidacionService: DocumentoValidacionService
   ) {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -73,9 +73,11 @@ export class RegistroRenteroComponent implements OnDestroy {
     }
 
     if (archivo) {
-      this.archivoSeleccionado = archivo;
-      this.urlPrevisualizacion = URL.createObjectURL(archivo);
-      this.formulario.patchValue({ archivo });
+      if (this.documentoValidacionService.procesarDocumento(archivo, 'registro')) {
+        this.archivoSeleccionado = archivo;
+        this.urlPrevisualizacion = URL.createObjectURL(archivo);
+        this.formulario.patchValue({ archivo });
+      }
     } else {
       this.archivoSeleccionado = null;
       this.urlPrevisualizacion = null;
@@ -84,7 +86,7 @@ export class RegistroRenteroComponent implements OnDestroy {
 
   registrar(): void {
     if (!this.formulario.valid || !this.archivoSeleccionado) {
-      this.toastr.error('Por favor completa todos los campos', 'Formulario incompleto');
+      this.documentoValidacionService.manejarErrores({ mensaje: 'Por favor completa todos los campos' }, 'Formulario incompleto');
       return;
     }
 
@@ -101,18 +103,16 @@ export class RegistroRenteroComponent implements OnDestroy {
       next: (respuesta: RespuestaRegistroRentero) => {
         this.procesando = false;
         if (respuesta.exito) {
-          this.toastr.success(respuesta.mensaje, '¡Registro exitoso!', { timeOut: 5000 });
+          this.documentoValidacionService.mostrarExito(respuesta.mensaje, '¡Registro exitoso!');
           this.reiniciarFormulario();
         } else {
           const mensaje = respuesta.errores?.join(', ') || respuesta.mensaje;
-          this.toastr.error(mensaje, 'Error en el registro');
+          this.documentoValidacionService.mostrarExito(mensaje, 'Error en el registro');
         }
       },
       error: (error) => {
         this.procesando = false;
-        const mensaje = error.error?.mensaje || error.message || 'Error al conectar con el servidor';
-        this.toastr.error(mensaje, 'Error del servidor');
-        console.error('Error al registrar rentero:', error);
+        this.documentoValidacionService.manejarErrores(error, 'registro de rentero');
       }
     });
   }

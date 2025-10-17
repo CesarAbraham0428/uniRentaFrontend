@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentoService } from '../../../../core/services/documento.service';
+import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
 import { TipoDocumento } from '../../../../interfaces/documento.interface';
 
 @Component({
@@ -14,12 +15,14 @@ export class FormularioPropiedadComponent implements OnInit {
   esEdicion: boolean = false;
   idPropiedad: string | null = null;
   tiposDocumento: TipoDocumento[] = [];
+  procesando: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private documentoService: DocumentoService
+    private documentoService: DocumentoService,
+    private documentoValidacionService: DocumentoValidacionService
   ) {
     this.formularioPropiedad = this.fb.group({
       nombre: ['', [Validators.required]],
@@ -46,23 +49,30 @@ export class FormularioPropiedadComponent implements OnInit {
         this.tiposDocumento = tipos;
       },
       error: (error) => {
-        console.error('Error al cargar tipos de documento:', error);
+        this.documentoValidacionService.manejarErrores(error, 'carga de tipos de documento');
       }
     });
   }
 
   guardarPropiedad(): void {
     if (this.formularioPropiedad.valid) {
+      this.procesando = true;
       const datosPropiedad = this.formularioPropiedad.value;
       if (this.esEdicion) {
         // Llamar al servicio para actualizar
         console.log('Actualizando propiedad:', datosPropiedad);
+        this.procesando = false;
+        this.documentoValidacionService.mostrarExito('Propiedad actualizada exitosamente');
+        this.router.navigate(['/rentero']);
       } else {
         // Llamar al servicio para crear
         console.log('Creando propiedad:', datosPropiedad);
+        this.procesando = false;
+        this.documentoValidacionService.mostrarExito('Propiedad creada exitosamente');
+        this.router.navigate(['/rentero']);
       }
-      // Redirigir al layout después de guardar
-      this.router.navigate(['/rentero']);
+    } else {
+      this.documentoValidacionService.manejarErrores({ mensaje: 'Por favor completa todos los campos requeridos' }, 'Formulario incompleto');
     }
   }
 

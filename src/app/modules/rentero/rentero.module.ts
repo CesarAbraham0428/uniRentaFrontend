@@ -6,7 +6,7 @@ import { RenteroRoutingModule } from './rentero-routing.module';
 import { RenteroLayoutComponent } from './pages/rentero-layout/rentero-layout.component';
 import { RegistroRenteroComponent } from './pages/registro-rentero/registro-rentero.component';
 import { FormularioPropiedadComponent } from './components/formulario-propiedad/formulario-propiedad.component';
-
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,8 @@ import { FormularioPropiedadComponent } from './components/formulario-propiedad/
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RenteroRoutingModule
+    RenteroRoutingModule,
+    SharedModule
   ]
 })
 export class RenteroModule { }
