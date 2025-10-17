@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RenteroRoutingModule } from './rentero-routing.module';
 import { RenteroLayoutComponent } from './pages/rentero-layout/rentero-layout.component';
 import { RegistroRenteroComponent } from './pages/registro-rentero/registro-rentero.component';
+import { FormularioPropiedadComponent } from './components/formulario-propiedad/formulario-propiedad.component';
 
 
 @NgModule({
@@ -12,7 +13,8 @@ import { RegistroRenteroComponent } from './pages/registro-rentero/registro-rent
     
     
     RenteroLayoutComponent,
-    RegistroRenteroComponent
+    RegistroRenteroComponent,
+    FormularioPropiedadComponent
   ],
   imports: [
     CommonModule,

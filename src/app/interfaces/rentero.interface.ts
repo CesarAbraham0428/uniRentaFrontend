@@ -18,7 +18,7 @@ export interface FormularioRegistroRentero {
 export interface RespuestaSubidaArchivo {
   exito: boolean;
   mensaje: string;
-  rutaArchivo?: string;
+  rutaArchivo?: string
 }
 
 export interface RespuestaRegistroRentero {

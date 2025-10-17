@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../interfaces/rentero';
+import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../interfaces/rentero.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class RenteroService {
     });
     
     formData.append('documento', archivo, archivo.name);
-    formData.append('tipo', 'ine'); 
+    formData.append('tipo_id', '1'); 
     
     return this.http.post<RespuestaRegistroRentero>(`${this.apiUrl}/registrar`, formData);
   }

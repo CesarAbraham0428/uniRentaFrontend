@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { RenteroService } from '../../../../core/services/rentero.service';
-import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../../interfaces/rentero';
+import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../../interfaces/rentero.interface';
 
 @Component({
   selector: 'app-registro-rentero',

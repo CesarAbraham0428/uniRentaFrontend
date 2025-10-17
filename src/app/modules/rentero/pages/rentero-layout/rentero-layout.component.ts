@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rentero-layout',
@@ -7,4 +8,9 @@ import { Component } from '@angular/core';
 })
 export class RenteroLayoutComponent {
 
+  constructor(private router: Router) {}
+
+  navegarAFormulario(): void {
+    this.router.navigate(['/rentero/formulario/nuevo']);  // Navega a formulario para creación
+  }
 }
