@@ -1,4 +1,15 @@
 <div class="main-container" *ngIf="!cargando && !error && propiedad">
+   <div class="boton-regreso">
+    <button
+      type="button"
+      class="boton-volver"
+      (click)="volver()"
+    >
+      <i class="fas fa-arrow-left"></i>
+      Volver
+    </button>
+  </div>
+
   <div class="property-header">
     <h1 class="property-title">
       <span class="title-text">{{ propiedad.nombre }}</span>
