@@ -1,6 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router'; // ← Agregar esta línea
+import { Router } from '@angular/router';                       // 👈 IMPORTA Router
+import { trigger, transition, style, animate } from '@angular/animations'; // 👈 IMPORTA Animations
+
 import { RenteroService } from '../../../../core/services/rentero.service';
 import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
 import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../../interfaces/rentero.interface';
@@ -8,7 +10,18 @@ import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../..
 @Component({
   selector: 'app-registro-rentero',
   templateUrl: './registro-rentero.component.html',
-  styleUrls: ['./registro-rentero.component.scss']
+  styleUrls: ['./registro-rentero.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.9) translateY(20px)' }),
+        animate('600ms ease-out', style({ opacity: 1, transform: 'scale(1) translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('400ms ease-in', style({ opacity: 0, transform: 'scale(0.9) translateY(-20px)' }))
+      ])
+    ])
+  ]
 })
 export class RegistroRenteroComponent implements OnDestroy {
   pasoActual: number = 1;
@@ -16,13 +29,13 @@ export class RegistroRenteroComponent implements OnDestroy {
   archivoSeleccionado: File | null = null;
   urlPrevisualizacion: string | null = null;
   procesando: boolean = false;
+  mostrarPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private renteroService: RenteroService,
     private documentoValidacionService: DocumentoValidacionService,
-    private router: Router
-
+    private router: Router                                       // 👈 INYECTA Router
   ) {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -58,9 +71,7 @@ export class RegistroRenteroComponent implements OnDestroy {
   }
 
   siguientePaso(): void {
-    if (this.datosValidos) {
-      this.pasoActual = 2;
-    }
+    if (this.datosValidos) this.pasoActual = 2;
   }
 
   anteriorPaso(): void {
@@ -71,9 +82,7 @@ export class RegistroRenteroComponent implements OnDestroy {
     const input = event.target as HTMLInputElement;
     const archivo = input.files?.[0];
 
-    if (this.urlPrevisualizacion) {
-      URL.revokeObjectURL(this.urlPrevisualizacion);
-    }
+    if (this.urlPrevisualizacion) URL.revokeObjectURL(this.urlPrevisualizacion);
 
     if (archivo) {
       if (this.documentoValidacionService.procesarDocumento(archivo, 'registro')) {
@@ -108,6 +117,8 @@ export class RegistroRenteroComponent implements OnDestroy {
         if (respuesta.exito) {
           this.documentoValidacionService.mostrarExito(respuesta.mensaje, '¡Registro exitoso!');
           this.reiniciarFormulario();
+          // Ejemplo: llevar a login
+          // this.router.navigate(['/rentero/login']);
         } else {
           const mensaje = respuesta.errores?.join(', ') || respuesta.mensaje;
           this.documentoValidacionService.mostrarExito(mensaje, 'Error en el registro');
@@ -140,6 +151,6 @@ export class RegistroRenteroComponent implements OnDestroy {
   }
 
   irALogin(): void {
-  this.router.navigate(['/rentero/login']);
-}
+    this.router.navigate(['/rentero/login']);
+  }
 }

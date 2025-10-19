@@ -1,128 +1,166 @@
 <div class="propiedades-page">
-  <!-- Filtros Section Compactos -->
-  <div class="container pt-5 pb-4">
-    <div class="card shadow-sm filtros-card">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">
-            <i class="bi bi-funnel me-2"></i>Filtrar Propiedades
-          </h5>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary"
-            (click)="limpiarFiltros()"
-            [disabled]="cargando"
-          >
-            <i class="bi bi-x-circle me-1"></i> Limpiar
-          </button>
+  <!-- Hero Carousel Section -->
+  <section class="hero-carousel">
+    <div class="carousel-container">
+      <div class="carousel-slides">
+        <div class="carousel-slide" [class.active]="currentSlide === 0">
+          <img src="/assets/car_1.png" alt="Hero 1" class="hero-image" />
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h1 class="hero-title">Encuentra tu depa ideal</h1>
+            <p class="hero-subtitle">La mejor opción para estudiantes</p>
+          </div>
         </div>
 
-        <form (ngSubmit)="aplicarFiltros()">
-          <div class="row g-2">
-            <!-- Precio -->
-            <div class="col-lg-2 col-md-3 col-sm-6">
-              <label class="form-label form-label-sm">Precio Mínimo</label>
-              <div class="input-group input-group-sm">
-                <span class="input-group-text">$</span>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="precioMin"
-                  name="precioMin"
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-            </div>
+        <div class="carousel-slide" [class.active]="currentSlide === 1">
+          <img src="/assets/car_2.png" alt="Hero 2" class="hero-image" />
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h1 class="hero-title">UniRenta: Tu web, tu depa</h1>
+            <p class="hero-subtitle">Conectamos estudiantes con su hogar perfecto</p>
+          </div>
+        </div>
 
-            <div class="col-lg-2 col-md-3 col-sm-6">
-              <label class="form-label form-label-sm">Precio Máximo</label>
-              <div class="input-group input-group-sm">
-                <span class="input-group-text">$</span>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="precioMax"
-                  name="precioMax"
-                  placeholder="10,000"
-                  min="0"
-                />
-              </div>
-            </div>
+        <div class="carousel-slide" [class.active]="currentSlide === 2">
+          <img src="/assets/car_3.png" alt="Hero 3" class="hero-image" />
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h1 class="hero-title">Vive cerca de tu universidad</h1>
+            <p class="hero-subtitle">Miles de opciones esperándote</p>
+          </div>
+        </div>
+      </div>
 
-            <!-- Ubicación -->
-            <div class="col-lg-2 col-md-3 col-sm-6">
-              <label class="form-label form-label-sm">Colonia</label>
-              <input
-                type="text"
-                class="form-control form-control-sm"
-                [(ngModel)]="colonia"
-                name="colonia"
-                placeholder="Ej: Centro"
-              />
-            </div>
+      <!-- Carousel Indicators -->
+      <div class="carousel-indicators">
+        <button
+          *ngFor="let slide of [0, 1, 2]; let i = index"
+          [class.active]="currentSlide === i"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Ir a slide ' + (i + 1)"
+        ></button>
+      </div>
 
-            <div class="col-lg-2 col-md-3 col-sm-6">
-              <label class="form-label form-label-sm">Municipio</label>
-              <input
-                type="text"
-                class="form-control form-control-sm"
-                [(ngModel)]="municipio"
-                name="municipio"
-                placeholder="Ej: Dolores Hidalgo"
-              />
-            </div>
+      <!-- Scroll Down Button -->
+      <button class="scroll-down-btn" (click)="scrollToSearch()" aria-label="Buscar departamento">
+        <span class="scroll-text">Buscar departamento</span>
+        <i class="bi bi-chevron-down scroll-icon"></i>
+      </button>
+    </div>
+  </section>
 
-            <!-- Universidad -->
-            <div class="col-lg-3 col-md-6 col-sm-8">
-              <label class="form-label form-label-sm"
-                >Cerca de universidad</label
-              >
-              <input
-                type="text"
-                class="form-control form-control-sm"
-                [(ngModel)]="universidadNombre"
-                name="universidadNombre"
-                placeholder="Ej: UTNG, UDHI"
-              />
-            </div>
+  <!-- Search Bar Section -->
+  <div class="search-section" id="searchSection">
+    <div class="container">
+      <form (ngSubmit)="aplicarFiltros()" class="search-form">
+        <!-- Destino -->
+        <div class="search-bar">
+          <div class="search-field">
+            <label class="search-label">Destino</label>
+            <input
+              type="text"
+              class="search-input"
+              [(ngModel)]="colonia"
+              name="colonia"
+              placeholder="Buscar colonias"
+            />
+          </div>
 
-            <div class="col-lg-1 col-md-2 col-sm-4">
-              <label class="form-label form-label-sm">Rango (km)</label>
+          <div class="search-divider"></div>
+
+          <!-- Municipio -->
+          <div class="search-field">
+            <label class="search-label">Municipio</label>
+            <input
+              type="text"
+              class="search-input"
+              [(ngModel)]="municipio"
+              name="municipio"
+              placeholder="Agregar municipio"
+            />
+          </div>
+
+          <div class="search-divider"></div>
+
+          <!-- Precio -->
+          <div class="search-field search-field-price">
+            <label class="search-label">Precio</label>
+            <div class="price-inputs">
               <input
                 type="number"
-                class="form-control form-control-sm"
-                [(ngModel)]="rangoKm"
-                name="rangoKm"
-                placeholder="2"
-                min="0.5"
-                step="0.5"
-                [disabled]="!universidadNombre"
+                class="search-input search-input-small"
+                [(ngModel)]="precioMin"
+                name="precioMin"
+                placeholder="Mín"
+                min="0"
+              />
+              <span class="price-separator">-</span>
+              <input
+                type="number"
+                class="search-input search-input-small"
+                [(ngModel)]="precioMax"
+                name="precioMax"
+                placeholder="Máx"
+                min="0"
               />
             </div>
           </div>
 
-          <!-- Botón de filtrar separado -->
-          <div class="row mt-3">
-            <div class="col-12 text-center">
-              <button
-                type="submit"
-                class="btn btn-filter btn-sm px-4"
-                [disabled]="cargando"
-              >
-                <i class="bi bi-funnel-fill me-1"></i> Filtrar
-              </button>
-            </div>
+          <div class="search-divider"></div>
+
+          <!-- Universidad -->
+          <div class="search-field">
+            <label class="search-label">Universidad</label>
+            <input
+              type="text"
+              class="search-input"
+              [(ngModel)]="universidadNombre"
+              name="universidadNombre"
+              placeholder="Ej: UTNG, UDHI"
+            />
           </div>
-        </form>
-      </div>
+
+          <div class="search-divider"></div>
+
+          <!-- Rango -->
+          <div class="search-field search-field-small">
+            <label class="search-label">Rango (km)</label>
+            <input
+              type="number"
+              class="search-input"
+              [(ngModel)]="rangoKm"
+              name="rangoKm"
+              placeholder="2"
+              min="0.5"
+              step="0.5"
+              [disabled]="!universidadNombre"
+            />
+          </div>
+
+          <!-- Botón de limpiar mejorado dentro de la barra -->
+          <button
+            type="button"
+            class="clear-btn"
+            (click)="limpiarFiltros()"
+            [disabled]="cargando"
+            title="Limpiar filtros"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+
+          <!-- Search Button -->
+          <button type="submit" class="search-btn" [disabled]="cargando">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
   <!-- Resultados Section -->
   <div class="container pb-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="results-title mb-0">
         <i class="bi bi-house-door me-2"></i>Propiedades Disponibles
         <span class="badge bg-primary ms-2">{{ propiedades.length }}</span>
       </h5>
@@ -218,6 +256,17 @@
       <button class="btn btn-primary btn-sm" (click)="limpiarFiltros()">
         <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
       </button>
+    </div>
+  </div>  
+
+  <!-- Mapa de resultados -->
+  <div class="container pb-5" *ngIf="!cargando && !error && propiedades.length > 0">
+    <div class="map-section">
+      <div class="map-header">
+        <h5 class="map-title">Ubicación de las propiedades</h5>
+        <p class="map-subtitle">Explora las propiedades en el mapa</p>
+      </div>
+      <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
     </div>
   </div>
 

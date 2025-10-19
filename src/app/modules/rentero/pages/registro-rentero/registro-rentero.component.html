@@ -1,218 +1,234 @@
 <div class="contenedor-registro">
-  <div class="tarjeta-registro">
-    <!-- Encabezado -->
-    <div class="encabezado-registro">
-      <i class="bi bi-person-plus-fill icono-titulo"></i>
-      <h2 class="titulo">Registro de Rentero</h2>
-      <p class="subtitulo">Completa tu información para comenzar</p>
+  <!-- Contenedor de imagen izquierdo -->
+  <div class="contenedor-imagen">
+    <div class="overlay-imagen">
+      <h2 class="frase-animada" [@fadeInOut]>
+        {{ pasoActual === 1 ? 'Conviértete en socio de nuestra aplicación' : 'Estás a un paso de convertirte en socio' }}
+      </h2>
     </div>
+    <img src="/assets/fondo.png" alt="Registro" class="imagen-fondo" />
+  </div>
 
-    <!-- Indicador de pasos -->
-    <div class="indicador-pasos">
-      <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
-        <div class="circulo-paso">
-          <i class="bi" [class.bi-check-lg]="pasoActual > 1" [class.bi-person]="pasoActual <= 1"></i>
-        </div>
-        <span class="texto-paso">Datos personales</span>
+  <!-- Contenedor de formulario derecho -->
+  <div class="contenedor-formulario">
+    <div class="tarjeta-registro">
+      <!-- Encabezado -->
+      <div class="encabezado-registro">
+        <i class="bi bi-person-plus-fill icono-titulo"></i>
+        <h2 class="titulo">Registro de Rentero</h2>
+        <p class="subtitulo">Completa tu información para comenzar</p>
       </div>
-      <div class="linea-paso" [class.activa]="pasoActual > 1"></div>
-      <div class="paso" [class.activo]="pasoActual >= 2">
-        <div class="circulo-paso">
-          <i class="bi bi-file-earmark-text"></i>
-        </div>
-        <span class="texto-paso">Documento</span>
-      </div>
-    </div>
 
-    <!-- Paso 1: Datos personales -->
-    <form [formGroup]="formulario" *ngIf="pasoActual === 1" class="formulario-paso">
-      <div class="fila-campos">
-        <div class="grupo-campo">
-          <label for="nombre" class="etiqueta">
-            <i class="bi bi-person"></i>
-            Nombre
-          </label>
-          <input
-            id="nombre"
-            formControlName="nombre"
-            type="text"
-            class="campo-entrada"
-            [class.invalido]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched"
-            placeholder="Juan"
-          />
-          <small class="mensaje-error" *ngIf="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
-            {{ obtenerMensajeError('nombre') }}
-          </small>
+      <!-- Indicador de pasos -->
+      <div class="indicador-pasos">
+        <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
+          <div class="circulo-paso">
+            <i class="bi" [class.bi-check-lg]="pasoActual > 1" [class.bi-person]="pasoActual <= 1"></i>
+          </div>
+          <span class="texto-paso">Datos personales</span>
         </div>
-
-        <div class="grupo-campo">
-          <label for="apellido" class="etiqueta">
-            <i class="bi bi-person"></i>
-            Apellido
-          </label>
-          <input
-            id="apellido"
-            formControlName="apellido"
-            type="text"
-            class="campo-entrada"
-            [class.invalido]="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched"
-            placeholder="Pérez"
-          />
-          <small class="mensaje-error" *ngIf="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched">
-            {{ obtenerMensajeError('apellido') }}
-          </small>
+        <div class="linea-paso" [class.activa]="pasoActual > 1"></div>
+        <div class="paso" [class.activo]="pasoActual >= 2">
+          <div class="circulo-paso">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <span class="texto-paso">Documento</span>
         </div>
       </div>
 
-      <div class="grupo-campo">
-        <label for="telefono" class="etiqueta">
-          <i class="bi bi-telephone"></i>
-          Teléfono
-        </label>
-        <input
-          id="telefono"
-          formControlName="telefono"
-          type="tel"
-          class="campo-entrada"
-          [class.invalido]="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched"
-          placeholder="4611234567"
-        />
-        <small class="mensaje-error" *ngIf="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched">
-          {{ obtenerMensajeError('telefono') }}
-        </small>
-      </div>
+      <!-- Paso 1: Datos personales -->
+      <form [formGroup]="formulario" *ngIf="pasoActual === 1" class="formulario-paso">
+        <div class="fila-campos">
+          <div class="grupo-campo">
+            <label for="nombre" class="etiqueta">
+              <i class="bi bi-person"></i>
+              Nombre
+            </label>
+            <input 
+              id="nombre" 
+              formControlName="nombre" 
+              type="text" 
+              class="campo-entrada"
+              [class.invalido]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched"
+              placeholder="Juan"
+            />
+            <div class="mensaje-error" *ngIf="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>{{ obtenerMensajeError('nombre') }}</span>
+            </div>
+          </div>
 
-      <div class="grupo-campo">
-        <label for="email" class="etiqueta">
-          <i class="bi bi-envelope"></i>
-          Correo electrónico
-        </label>
-        <input
-          id="email"
-          formControlName="email"
-          type="email"
-          class="campo-entrada"
-          [class.invalido]="formulario.get('email')?.invalid && formulario.get('email')?.touched"
-          placeholder="ejemplo@correo.com"
-        />
-        <small class="mensaje-error" *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched">
-          {{ obtenerMensajeError('email') }}
-        </small>
-      </div>
-
-      <div class="grupo-campo">
-        <label for="password" class="etiqueta">
-          <i class="bi bi-lock"></i>
-          Contraseña
-        </label>
-        <input
-          id="password"
-          formControlName="password"
-          type="password"
-          class="campo-entrada"
-          [class.invalido]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
-          placeholder="Mínimo 6 caracteres"
-        />
-        <small class="mensaje-error" *ngIf="formulario.get('password')?.invalid && formulario.get('password')?.touched">
-          {{ obtenerMensajeError('password') }}
-        </small>
-      </div>
-
-      <button
-        type="button"
-        (click)="siguientePaso()"
-        [disabled]="!datosValidos"
-        class="boton boton-primario"
-      >
-        Siguiente
-        <i class="bi bi-arrow-right"></i>
-      </button>
-
-      <!-- Enlace a login en el paso 1 -->
-      <div class="enlace-login">
-        <p class="texto-login">
-          ¿Ya tienes una cuenta?
-          <button
-            type="button"
-            class="enlace-login-boton"
-            (click)="irALogin()"
-          >
-            Inicia sesión aquí
-          </button>
-        </p>
-      </div>
-    </form>
-
-    <!-- Paso 2: Subir documento -->
-    <div *ngIf="pasoActual === 2" class="formulario-paso">
-      <div class="grupo-campo">
-        <label class="etiqueta">
-          <i class="bi bi-file-earmark-arrow-up"></i>
-          Documento de identidad
-        </label>
-
-        <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
-          <input
-            id="archivo"
-            type="file"
-            (change)="onArchivoSeleccionado($event)"
-            accept="image/*,.pdf"
-            class="input-archivo"
-          />
-          <label for="archivo" class="etiqueta-archivo">
-            <i class="bi bi-cloud-upload icono-archivo"></i>
-            <span class="texto-principal">
-              {{ archivoSeleccionado ? archivoSeleccionado.name : 'Haz clic para seleccionar' }}
-            </span>
-            <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Previsualización -->
-      <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
-        <h4 class="titulo-previsualizacion">
-          <i class="bi bi-eye"></i>
-          Previsualización
-        </h4>
-        <div class="contenedor-previsualizacion">
-          <img
-            *ngIf="esImagen"
-            [src]="urlPrevisualizacion"
-            alt="Previsualización del documento"
-            class="imagen-previsualizacion"
-          />
-          <div *ngIf="esPdf" class="previsualizacion-pdf">
-            <i class="bi bi-file-pdf icono-pdf"></i>
-            <p class="nombre-archivo">{{ archivoSeleccionado?.name }}</p>
-            <small class="info-archivo">Archivo PDF seleccionado</small>
+          <div class="grupo-campo">
+            <label for="apellido" class="etiqueta">
+              <i class="bi bi-person"></i>
+              Apellido
+            </label>
+            <input 
+              id="apellido" 
+              formControlName="apellido" 
+              type="text" 
+              class="campo-entrada"
+              [class.invalido]="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched"
+              placeholder="Pérez"
+            />
+            <div class="mensaje-error" *ngIf="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>{{ obtenerMensajeError('apellido') }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="grupo-botones">
-        <button
-          type="button"
-          (click)="anteriorPaso()"
-          class="boton boton-secundario"
-          [disabled]="procesando"
-        >
-          <i class="bi bi-arrow-left"></i>
-          Anterior
-        </button>
-        <button
-          type="button"
-          (click)="registrar()"
-          [disabled]="!archivoValido || procesando"
+        <div class="fila-campos">
+          <div class="grupo-campo">
+            <label for="telefono" class="etiqueta">
+              <i class="bi bi-telephone"></i>
+              Teléfono
+            </label>
+            <input 
+              id="telefono" 
+              formControlName="telefono" 
+              type="tel" 
+              class="campo-entrada"
+              [class.invalido]="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched"
+              placeholder="4611234567"
+            />
+            <div class="mensaje-error" *ngIf="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>{{ obtenerMensajeError('telefono') }}</span>
+            </div>
+          </div>
+
+          <div class="grupo-campo">
+            <label for="email" class="etiqueta">
+              <i class="bi bi-envelope"></i>
+              Correo electrónico
+            </label>
+            <input 
+              id="email" 
+              formControlName="email" 
+              type="email" 
+              class="campo-entrada"
+              [class.invalido]="formulario.get('email')?.invalid && formulario.get('email')?.touched"
+              placeholder="ejemplo@correo.com"
+            />
+            <div class="mensaje-error" *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>{{ obtenerMensajeError('email') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grupo-campo">
+          <label for="password" class="etiqueta">
+            <i class="bi bi-lock"></i>
+            Contraseña
+          </label>
+          <div class="campo-password">
+            <input 
+              id="password" 
+              formControlName="password" 
+              [type]="mostrarPassword ? 'text' : 'password'" 
+              class="campo-entrada"
+              [class.invalido]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
+              placeholder="Mínimo 6 caracteres"
+            />
+            <button 
+              type="button" 
+              class="boton-toggle-password"
+              (click)="mostrarPassword = !mostrarPassword"
+              tabindex="-1"
+            >
+              <i class="bi" [class.bi-eye]="!mostrarPassword" [class.bi-eye-slash]="mostrarPassword"></i>
+            </button>
+          </div>
+          <div class="mensaje-error" *ngIf="formulario.get('password')?.invalid && formulario.get('password')?.touched">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>{{ obtenerMensajeError('password') }}</span>
+          </div>
+        </div>
+
+        <button 
+          type="button" 
+          (click)="siguientePaso()" 
+          [disabled]="!datosValidos"
           class="boton boton-primario"
         >
-          Registrar
-          <i class="bi bi-check-lg"></i>
+          Siguiente
+          <i class="bi bi-arrow-right"></i>
         </button>
-      </div>
-    </div>
+      </form>
 
-    <!-- Procesamiento de documento -->
-    <app-procesamiento-documento [visible]="procesando" mensaje="Procesando tu registro..."></app-procesamiento-documento>
+      <!-- Paso 2: Subir documento -->
+      <div *ngIf="pasoActual === 2" class="formulario-paso">
+        <div class="grupo-campo">
+          <label class="etiqueta">
+            <i class="bi bi-file-earmark-arrow-up"></i>
+            Documento de identidad
+          </label>
+          
+          <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
+            <input 
+              id="archivo" 
+              type="file" 
+              (change)="onArchivoSeleccionado($event)" 
+              accept="image/*,.pdf" 
+              class="input-archivo"
+            />
+            <label for="archivo" class="etiqueta-archivo">
+              <i class="bi bi-cloud-upload icono-archivo"></i>
+              <span class="texto-principal">
+                {{ archivoSeleccionado ? archivoSeleccionado.name : 'Haz clic para seleccionar' }}
+              </span>
+              <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Previsualización -->
+        <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
+          <h4 class="titulo-previsualizacion">
+            <i class="bi bi-eye"></i>
+            Previsualización
+          </h4>
+          <div class="contenedor-previsualizacion">
+            <img 
+              *ngIf="esImagen" 
+              [src]="urlPrevisualizacion" 
+              alt="Previsualización del documento"
+              class="imagen-previsualizacion"
+            />
+            <div *ngIf="esPdf" class="previsualizacion-pdf">
+              <i class="bi bi-file-pdf icono-pdf"></i>
+              <p class="nombre-archivo">{{ archivoSeleccionado?.name }}</p>
+              <small class="info-archivo">Archivo PDF seleccionado</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="grupo-botones">
+          <button 
+            type="button" 
+            (click)="anteriorPaso()" 
+            class="boton boton-secundario"
+            [disabled]="procesando"
+          >
+            <i class="bi bi-arrow-left"></i>
+            Anterior
+          </button>
+          <button 
+            type="button" 
+            (click)="registrar()" 
+            [disabled]="!archivoValido || procesando"
+            class="boton boton-primario"
+          >
+            Registrar
+            <i class="bi bi-check-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Procesamiento de documento -->
+      <app-procesamiento-documento [visible]="procesando" mensaje="Procesando tu registro..."></app-procesamiento-documento>
+    </div>
   </div>
 </div>
