@@ -1,3 +1,4 @@
+// ...tus imports
 import { Component, Input, ElementRef, ViewChild, OnInit, OnDestroy, OnChanges, SimpleChanges, NgZone } from '@angular/core';
 import mapboxgl, { Map, Marker } from 'mapbox-gl';
 import { environment } from '../../../../../environments/environment';
@@ -21,15 +22,21 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
   private directions?: any;
   private navStarted = false;
 
-  constructor(private zone: NgZone) { }
+  // === Loader flags ===
+  isMapLoading = true;
+  isRoutingLoading = false;
+
+  constructor(private zone: NgZone) {}
 
   ngOnInit(): void {
     (mapboxgl as any).accessToken = environment.mapboxToken;
 
+    this.isMapLoading = true;
+
     this.map = new mapboxgl.Map({
       container: this.mapContainer.nativeElement,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: (this.lng != null && this.lat != null) ? [this.lng, this.lat] : [-99.1332, 19.4326], // CDMX fallback
+      center: (this.lng != null && this.lat != null) ? [this.lng, this.lat] : [-99.1332, 19.4326],
       zoom: (this.lng != null && this.lat != null) ? 15 : 12
     });
 
@@ -37,6 +44,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
 
     this.map.on('load', () => {
       this.addPropertyMarker();
+      this.isMapLoading = false; // ✅ ocultar loader del mapa
     });
   }
 
@@ -51,8 +59,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onComoLlegar(): void {
-    if (this.navStarted) return;
-    if (!this.map) return;
+    if (this.navStarted || !this.map) return;
 
     if (!navigator.geolocation) {
       alert('Tu navegador no soporta geolocalización.');
@@ -60,6 +67,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this.navStarted = true;
+    this.isRoutingLoading = true; // ✅ mostrar "Trazando ruta..."
 
     if (!this.directions) {
       this.directions = new (MapboxDirections as any)({
@@ -78,15 +86,24 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
       if (this.lng != null && this.lat != null) {
         this.directions.setDestination([this.lng, this.lat]);
       }
+
+      // Eventos para apagar el loader cuando se resuelve o falla la ruta
+      this.directions.on('route', () => this.zone.run(() => this.isRoutingLoading = false));
+      this.directions.on('clear', () => this.zone.run(() => this.isRoutingLoading = false));
+      this.directions.on('error', () => this.zone.run(() => this.isRoutingLoading = false));
+    } else {
+      // Si ya existe, garantizamos que se vea el loader en un nuevo cálculo
+      this.isRoutingLoading = true;
     }
 
     this.watchId = navigator.geolocation.watchPosition(
       (pos) => {
         this.zone.runOutsideAngular(() => {
           const origin: [number, number] = [pos.coords.longitude, pos.coords.latitude];
+
           if (!this.userMarker) {
             const userEl = document.createElement('div');
-            userEl.classList.add('mapboxgl-marker', 'marker-user'); // conserva cursor si lo necesitas
+            userEl.classList.add('mapboxgl-marker', 'marker-user');
             this.userMarker = new mapboxgl.Marker({ element: userEl, anchor: 'bottom' })
               .setLngLat(origin)
               .addTo(this.map!);
@@ -94,6 +111,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
             this.userMarker.setLngLat(origin);
           }
 
+          // Establecer origen dispara el cálculo de ruta del control
           this.directions.setOrigin(origin);
 
           if (this.propertyMarker && this.map && this.userMarker) {
@@ -108,6 +126,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
         console.warn('Geolocation error:', err);
         alert('No pudimos obtener tu ubicación. Revisa permisos de ubicación.');
         this.navStarted = false;
+        this.isRoutingLoading = false; // ✅ apagar loader si falla geolocalización
       },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     );
@@ -119,13 +138,12 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
     this.propertyMarker?.remove();
 
     const el = document.createElement('div');
-    el.classList.add('mapboxgl-marker', 'marker-home'); // mantiene cursor y permite reutilizar estilos
+    el.classList.add('mapboxgl-marker', 'marker-home');
 
     this.propertyMarker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
       .setLngLat([this.lng, this.lat])
       .setPopup(new mapboxgl.Popup().setText('Departamento'))
       .addTo(this.map!);
-
   }
 
   ngOnDestroy(): void {

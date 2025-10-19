@@ -3,7 +3,10 @@
   <div class="contenedor-imagen">
     <div class="overlay-imagen">
       <h2 class="frase-animada" [@fadeInOut]>
-        {{ pasoActual === 1 ? 'Conviértete en socio de nuestra aplicación' : 'Estás a un paso de convertirte en socio'
+        {{
+          pasoActual === 1
+            ? "Conviértete en socio de nuestra aplicación"
+            : "Estás a un paso de convertirte en socio"
         }}
       </h2>
     </div>
@@ -22,9 +25,17 @@
 
       <!-- Indicador de pasos -->
       <div class="indicador-pasos">
-        <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
+        <div
+          class="paso"
+          [class.activo]="pasoActual >= 1"
+          [class.completado]="pasoActual > 1"
+        >
           <div class="circulo-paso">
-            <i class="bi" [class.bi-check-lg]="pasoActual > 1" [class.bi-person]="pasoActual <= 1"></i>
+            <i
+              class="bi"
+              [class.bi-check-lg]="pasoActual > 1"
+              [class.bi-person]="pasoActual <= 1"
+            ></i>
           </div>
           <span class="texto-paso">Datos personales</span>
         </div>
@@ -38,19 +49,37 @@
       </div>
 
       <!-- Paso 1: Datos personales -->
-      <form [formGroup]="formulario" *ngIf="pasoActual === 1" class="formulario-paso">
+      <form
+        [formGroup]="formulario"
+        *ngIf="pasoActual === 1"
+        class="formulario-paso"
+      >
         <div class="fila-campos">
           <div class="grupo-campo">
             <label for="nombre" class="etiqueta">
               <i class="bi bi-person"></i>
               Nombre
             </label>
-            <input id="nombre" formControlName="nombre" type="text" class="campo-entrada"
-              [class.invalido]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched"
-              placeholder="Juan" />
-            <div class="mensaje-error" *ngIf="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
+            <input
+              id="nombre"
+              formControlName="nombre"
+              type="text"
+              class="campo-entrada"
+              [class.invalido]="
+                formulario.get('nombre')?.invalid &&
+                formulario.get('nombre')?.touched
+              "
+              placeholder="Juan"
+            />
+            <div
+              class="mensaje-error"
+              *ngIf="
+                formulario.get('nombre')?.invalid &&
+                formulario.get('nombre')?.touched
+              "
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
-              <span>{{ obtenerMensajeError('nombre') }}</span>
+              <span>{{ obtenerMensajeError("nombre") }}</span>
             </div>
           </div>
 
@@ -59,13 +88,26 @@
               <i class="bi bi-person"></i>
               Apellido
             </label>
-            <input id="apellido" formControlName="apellido" type="text" class="campo-entrada"
-              [class.invalido]="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched"
-              placeholder="Pérez" />
-            <div class="mensaje-error"
-              *ngIf="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched">
+            <input
+              id="apellido"
+              formControlName="apellido"
+              type="text"
+              class="campo-entrada"
+              [class.invalido]="
+                formulario.get('apellido')?.invalid &&
+                formulario.get('apellido')?.touched
+              "
+              placeholder="Pérez"
+            />
+            <div
+              class="mensaje-error"
+              *ngIf="
+                formulario.get('apellido')?.invalid &&
+                formulario.get('apellido')?.touched
+              "
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
-              <span>{{ obtenerMensajeError('apellido') }}</span>
+              <span>{{ obtenerMensajeError("apellido") }}</span>
             </div>
           </div>
         </div>
@@ -76,13 +118,26 @@
               <i class="bi bi-telephone"></i>
               Teléfono
             </label>
-            <input id="telefono" formControlName="telefono" type="tel" class="campo-entrada"
-              [class.invalido]="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched"
-              placeholder="4611234567" />
-            <div class="mensaje-error"
-              *ngIf="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched">
+            <input
+              id="telefono"
+              formControlName="telefono"
+              type="tel"
+              class="campo-entrada"
+              [class.invalido]="
+                formulario.get('telefono')?.invalid &&
+                formulario.get('telefono')?.touched
+              "
+              placeholder="4611234567"
+            />
+            <div
+              class="mensaje-error"
+              *ngIf="
+                formulario.get('telefono')?.invalid &&
+                formulario.get('telefono')?.touched
+              "
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
-              <span>{{ obtenerMensajeError('telefono') }}</span>
+              <span>{{ obtenerMensajeError("telefono") }}</span>
             </div>
           </div>
 
@@ -91,12 +146,26 @@
               <i class="bi bi-envelope"></i>
               Correo electrónico
             </label>
-            <input id="email" formControlName="email" type="email" class="campo-entrada"
-              [class.invalido]="formulario.get('email')?.invalid && formulario.get('email')?.touched"
-              placeholder="ejemplo@correo.com" />
-            <div class="mensaje-error" *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched">
+            <input
+              id="email"
+              formControlName="email"
+              type="email"
+              class="campo-entrada"
+              [class.invalido]="
+                formulario.get('email')?.invalid &&
+                formulario.get('email')?.touched
+              "
+              placeholder="ejemplo@correo.com"
+            />
+            <div
+              class="mensaje-error"
+              *ngIf="
+                formulario.get('email')?.invalid &&
+                formulario.get('email')?.touched
+              "
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
-              <span>{{ obtenerMensajeError('email') }}</span>
+              <span>{{ obtenerMensajeError("email") }}</span>
             </div>
           </div>
         </div>
@@ -107,22 +176,48 @@
             Contraseña
           </label>
           <div class="campo-password">
-            <input id="password" formControlName="password" [type]="mostrarPassword ? 'text' : 'password'"
+            <input
+              id="password"
+              formControlName="password"
+              [type]="mostrarPassword ? 'text' : 'password'"
               class="campo-entrada"
-              [class.invalido]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
-              placeholder="Mínimo 6 caracteres" />
-            <button type="button" class="boton-toggle-password" (click)="mostrarPassword = !mostrarPassword"
-              tabindex="-1">
-              <i class="bi" [class.bi-eye]="!mostrarPassword" [class.bi-eye-slash]="mostrarPassword"></i>
+              [class.invalido]="
+                formulario.get('password')?.invalid &&
+                formulario.get('password')?.touched
+              "
+              placeholder="Mínimo 6 caracteres"
+            />
+            <button
+              type="button"
+              class="boton-toggle-password"
+              (click)="mostrarPassword = !mostrarPassword"
+              tabindex="-1"
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="!mostrarPassword"
+                [class.bi-eye-slash]="mostrarPassword"
+              ></i>
             </button>
           </div>
-          <div class="mensaje-error" *ngIf="formulario.get('password')?.invalid && formulario.get('password')?.touched">
+          <div
+            class="mensaje-error"
+            *ngIf="
+              formulario.get('password')?.invalid &&
+              formulario.get('password')?.touched
+            "
+          >
             <i class="bi bi-exclamation-circle-fill"></i>
-            <span>{{ obtenerMensajeError('password') }}</span>
+            <span>{{ obtenerMensajeError("password") }}</span>
           </div>
         </div>
 
-        <button type="button" (click)="siguientePaso()" [disabled]="!datosValidos" class="boton boton-primario">
+        <button
+          type="button"
+          (click)="siguientePaso()"
+          [disabled]="!datosValidos"
+          class="boton boton-primario"
+        >
           Siguiente
           <i class="bi bi-arrow-right"></i>
         </button>
@@ -130,7 +225,11 @@
         <div class="enlace-login">
           <p class="texto-login">
             ¿Ya tienes una cuenta?
-            <button type="button" class="enlace-login-boton" (click)="irALogin()">
+            <button
+              type="button"
+              class="enlace-login-boton"
+              (click)="irALogin()"
+            >
               Inicia sesión aquí
             </button>
           </p>
@@ -146,12 +245,21 @@
           </label>
 
           <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
-            <input id="archivo" type="file" (change)="onArchivoSeleccionado($event)" accept="image/*,.pdf"
-              class="input-archivo" />
+            <input
+              id="archivo"
+              type="file"
+              (change)="onArchivoSeleccionado($event)"
+              accept="image/*,.pdf"
+              class="input-archivo"
+            />
             <label for="archivo" class="etiqueta-archivo">
               <i class="bi bi-cloud-upload icono-archivo"></i>
               <span class="texto-principal">
-                {{ archivoSeleccionado ? archivoSeleccionado.name : 'Haz clic para seleccionar' }}
+                {{
+                  archivoSeleccionado
+                    ? archivoSeleccionado.name
+                    : "Haz clic para seleccionar"
+                }}
               </span>
               <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
             </label>
@@ -165,8 +273,12 @@
             Previsualización
           </h4>
           <div class="contenedor-previsualizacion">
-            <img *ngIf="esImagen" [src]="urlPrevisualizacion" alt="Previsualización del documento"
-              class="imagen-previsualizacion" />
+            <img
+              *ngIf="esImagen"
+              [src]="urlPrevisualizacion"
+              alt="Previsualización del documento"
+              class="imagen-previsualizacion"
+            />
             <div *ngIf="esPdf" class="previsualizacion-pdf">
               <i class="bi bi-file-pdf icono-pdf"></i>
               <p class="nombre-archivo">{{ archivoSeleccionado?.name }}</p>
@@ -176,12 +288,21 @@
         </div>
 
         <div class="grupo-botones">
-          <button type="button" (click)="anteriorPaso()" class="boton boton-secundario" [disabled]="procesando">
+          <button
+            type="button"
+            (click)="anteriorPaso()"
+            class="boton boton-secundario"
+            [disabled]="procesando"
+          >
             <i class="bi bi-arrow-left"></i>
             Anterior
           </button>
-          <button type="button" (click)="registrar()" [disabled]="!archivoValido || procesando"
-            class="boton boton-primario">
+          <button
+            type="button"
+            (click)="registrar()"
+            [disabled]="!archivoValido || procesando"
+            class="boton boton-primario"
+          >
             Registrar
             <i class="bi bi-check-lg"></i>
           </button>
@@ -189,8 +310,13 @@
       </div>
 
       <!-- Procesamiento de documento -->
-      <app-procesamiento-documento [visible]="procesando"
-        mensaje="Procesando tu registro..."></app-procesamiento-documento>
+      <app-procesamiento-documento
+        [visible]="procesando"
+        [mensaje]="esPdf ? 'Verificando PDF…' : 'Verificando imagen…'"
+        [previewUrl]="urlPrevisualizacion"
+        [fileType]="archivoSeleccionado?.type ?? null"
+      >
+      </app-procesamiento-documento>
     </div>
   </div>
 </div>

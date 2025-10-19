@@ -162,10 +162,29 @@
   }
 }
 
+.sticky-sentinel {
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+}
+
 .search-section {
   padding: 2.5rem 0;
   position: relative;
   z-index: 10;
+  background: transparent;           /* Invisible por defecto */
+  box-shadow: none;
+  border-bottom: none;
+  transition: all 0.3s ease;         /* Suaviza el cambio */
+}
+
+.search-section.is-sticky {
+  position: sticky;
+  top: 0;                            /* o ajusta si hay navbar */
+  z-index: 1000;
+  background: #FEFDFE;               /* Aparece el fondo blanco */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  border-bottom: 1px solid #dee2e6;
 }
 
 .search-form {
