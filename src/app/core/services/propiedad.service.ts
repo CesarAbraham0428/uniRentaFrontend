@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Propiedad, ApiResponse, SinglePropertyResponse } from '../../interfaces/propiedad.interface';
+import { PropiedadNueva, FormularioRegistroPropiedad, ApiResponse, SinglePropertyResponse } from '../../interfaces/propiedad.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -55,7 +55,22 @@ export class PropiedadService {
     return this.http.get<ApiResponse>(`${this.apiUrl}/filtrar`, { params });
   }
 
-    registrarPropiedad(datosPropiedad: Propiedad): Observable<Propiedad> {
-      return this.http.post<Propiedad>(`${this.apiUrl}/registrar`, datosPropiedad);
-    }
+registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, tipoDocumentoId?: number): Observable<FormularioRegistroPropiedad> {
+  const formData = new FormData();
+
+  // Agregar campos individuales
+  formData.append('nombre', datosPropiedad.nombre);
+  formData.append('rentero_id', datosPropiedad.rentero_id.toString());
+  
+  // Agregar ubicacion como JSON string
+  formData.append('ubicacion', JSON.stringify(datosPropiedad.ubicacion));
+  
+  // Agregar el archivo
+  formData.append('documento', archivo, archivo.name);
+  
+  // Agregar tipo_id
+  formData.append('tipo_id', tipoDocumentoId?.toString() || '1');
+
+  return this.http.post<FormularioRegistroPropiedad>(`${this.apiUrl}/registrar`, formData);
+}
 }

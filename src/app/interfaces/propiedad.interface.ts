@@ -43,6 +43,41 @@ export interface Propiedad {
   rentero: Rentero;
 }
 
+export interface UbicacionNueva {
+  nombre: string;
+  direccion: string;
+  calle: string;
+  colonia: string;
+  numero: string;
+  codigo_postal: string;
+  municipio: string | null;
+  estado: string | null;
+  coordenadas: {
+    crs: {
+      type: string;
+      properties: {
+        name: string;
+      };
+    };
+    type: string;
+    coordinates: number[];
+  };
+}
+
+export interface PropiedadNueva {
+  id: number;
+  rentero_id: number;
+  nombre: string;
+  ubicacion: UbicacionNueva;
+  visible: boolean;
+}
+
+export interface FormularioRegistroPropiedad {
+  nombre: string;
+  ubicacion: Ubicacion;
+  rentero_id: number;
+}
+
 // Interfaz para la respuesta de la API
 export interface ApiResponse {
   success: boolean;

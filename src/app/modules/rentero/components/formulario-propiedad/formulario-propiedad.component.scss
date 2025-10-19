@@ -1,77 +1,372 @@
-// Variables de colores basadas en la paleta proporcionada
-$color-fondo-pantalla: #EAEDEF;
-$color-div: #FEFDFE;
-$color-letras: #1B1C1D;
-$color-header-footer: #1A3B55;
+// Variables de colores
+$color-fondo: #EAEDEF;
+$color-tarjeta: #FEFDFE;
+$color-texto: #1B1C1D;
+$color-primario: #1A3B55;
 $color-agregar: #228B22;
-$color-blanco: #FEFDFE;
+$color-error: #DC143C;
+$color-borde: #d1d5db;
 
-// Estilos generales
-.container {
-  background-color: $color-fondo-pantalla;
+// Contenedor principal
+.contenedor-formulario {
   min-height: 100vh;
+  background-color: $color-fondo;
+  padding: 2rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tarjeta-registro {
+  background: $color-tarjeta;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  max-width: 600px;
+  width: 100%;
   padding: 2rem;
+  position: relative;
 }
 
-.card {
-  background-color: $color-div;
-  color: $color-letras;
-  border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+// Encabezado
+.encabezado-registro {
+  text-align: center;
+  margin-bottom: 2rem;
 
-.card-header {
-  background-color: $color-header-footer;
-  color: $color-blanco;
-  border: none;
-}
-
-.form-label {
-  color: $color-letras;
-  font-weight: bold;
-}
-
-.form-control {
-  border: 1px solid #ccc;
-  &:focus {
-    border-color: $color-header-footer;
-    box-shadow: 0 0 0 0.2rem rgba($color-header-footer, 0.25);
+  .icono-titulo {
+    font-size: 2.5rem;
+    color: $color-primario;
+    margin-bottom: 0.5rem;
   }
-}
 
-.text-danger {
-  color: #DC143C;  // Color de error consistente con eliminar
-}
+  .titulo {
+    color: $color-primario;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+  }
 
-// Botones con colores específicos
-.btn {
-  &.btn-agregar {
-    background-color: $color-agregar;
-    color: $color-blanco;
-    border: none;
-    &:hover {
-      background-color: darken($color-agregar, 10%);
-    }
-    &:disabled {
-      background-color: lighten($color-agregar, 20%);
-    }
-  }
-  &.btn-secondary {
-    background-color: #6c757d;
-    color: $color-blanco;
-    border: none;
-    &:hover {
-      background-color: darken(#6c757d, 10%);
-    }
-  }
-}
-
-// Responsive para móviles
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-  .card {
+  .subtitulo {
+    color: lighten($color-texto, 30%);
+    font-size: 0.9rem;
     margin: 0;
+  }
+}
+
+// Indicador de pasos
+.indicador-pasos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+
+  .paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+
+    .circulo-paso {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #d6d9df;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: #5a5c5e;
+      transition: all 0.3s;
+    }
+
+    .texto-paso {
+      font-size: 0.75rem;
+      color: #48494b;
+      font-weight: 500;
+    }
+
+    &.activo .circulo-paso {
+      background: $color-primario;
+      color: white;
+      box-shadow: 0 0 0 4px rgba($color-primario, 0.15);
+    }
+
+    &.activo .texto-paso {
+      color: $color-primario;
+      font-weight: 600;
+    }
+
+    &.completado .circulo-paso {
+      background: $color-agregar;
+      color: white;
+    }
+  }
+
+  .linea-paso {
+    height: 2px;
+    width: 50px;
+    background: #d6d9df;
+
+    &.activa {
+      background: $color-agregar;
+    }
+  }
+}
+
+// Formulario
+.fila-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grupo-campo {
+  margin-bottom: 1rem;
+
+  .etiqueta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-texto;
+    margin-bottom: 0.4rem;
+
+    i {
+      color: $color-primario;
+    }
+  }
+
+  .campo-entrada {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 2px solid $color-borde;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    color: $color-texto;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primario;
+      box-shadow: 0 0 0 3px rgba($color-primario, 0.1);
+    }
+
+    &.invalido {
+      border-color: $color-error;
+      background: rgba($color-error, 0.02);
+    }
+  }
+
+  .mensaje-error {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: $color-error;
+    font-size: 0.75rem;
+    margin-top: 0.4rem;
+  }
+}
+
+// Zona de archivo
+.zona-archivo {
+  position: relative;
+  border: 2px dashed $color-borde;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: $color-primario;
+    background: rgba($color-primario, 0.02);
+  }
+
+  &.con-archivo {
+    border-color: $color-agregar;
+    background: rgba($color-agregar, 0.02);
+  }
+
+  .input-archivo {
+    display: none;
+  }
+
+  .etiqueta-archivo {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+
+    .icono-archivo {
+      font-size: 2.5rem;
+      color: $color-primario;
+    }
+
+    .texto-principal {
+      font-weight: 600;
+      color: $color-texto;
+    }
+
+    .texto-secundario {
+      font-size: 0.85rem;
+      color: lighten($color-texto, 30%);
+    }
+  }
+}
+
+// Previsualización
+.seccion-previsualizacion {
+  margin-top: 1.5rem;
+
+  .titulo-previsualizacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $color-texto;
+    margin-bottom: 1rem;
+
+    i {
+      color: $color-primario;
+    }
+  }
+
+  .contenedor-previsualizacion {
+    border: 2px solid $color-borde;
+    border-radius: 8px;
+    padding: 1rem;
+    background: white;
+
+    .imagen-previsualizacion {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .previsualizacion-pdf {
+      text-align: center;
+
+      .icono-pdf {
+        font-size: 3rem;
+        color: $color-error;
+        margin-bottom: 0.5rem;
+      }
+
+      .nombre-archivo {
+        font-weight: 600;
+        color: $color-texto;
+        margin: 0.5rem 0;
+      }
+
+      .info-archivo {
+        color: lighten($color-texto, 30%);
+      }
+    }
+  }
+}
+
+// Botones
+.boton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.boton-primario {
+  background: $color-agregar;
+  color: white;
+  width: 100%;
+
+  &:not(:disabled):hover {
+    background: darken($color-agregar, 8%);
+  }
+}
+
+.boton-secundario {
+  background: lighten($color-texto, 65%);
+  color: $color-texto;
+
+  &:not(:disabled):hover {
+    background: lighten($color-texto, 55%);
+  }
+}
+
+.grupo-botones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+
+  .boton {
+    width: 100%;
+  }
+}
+
+// Botón de regresar
+.boton-regresar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  background: lighten($color-texto, 65%);
+  color: $color-texto;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: lighten($color-texto, 55%);
+    transform: translateY(-1px);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .contenedor-formulario {
+    padding: 1.5rem;
+  }
+
+  .tarjeta-registro {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .fila-campos,
+  .grupo-botones {
+    grid-template-columns: 1fr;
+  }
+
+  .indicador-pasos .texto-paso {
+    font-size: 0.7rem;
   }
 }
