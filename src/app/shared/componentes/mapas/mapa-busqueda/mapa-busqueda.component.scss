@@ -1,19 +1,18 @@
 .mapa-busqueda {
   width: 100%;
-  height: 360px;
-  border-radius: 10px;
+  height: 100%;     
+  min-height: 320px;
+  border-radius: 0;
   overflow: hidden;
 }
 
+
 .mapboxgl-marker { cursor: pointer; }
 
-/* El pin nativo ya es position:absolute. Lo usamos como contenedor del badge */
 .mapboxgl-marker.has-badge {
-  /* hint de render para evitar jitter subpixel en algunos navegadores */
   will-change: transform;
 }
 
-/* Badge solo si existe la clase y el atributo data-count */
 .mapboxgl-marker.has-badge::after {
   content: attr(data-count);
   position: absolute;
@@ -35,3 +34,60 @@
   transform: translate(20%, -20%);
 }
 
+.marker-home {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #2563eb;           
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-home::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3.172 2.293 12.88a1 1 0 1 0 1.414 1.415L5 13.002V20a1 1 0 0 0 1 1h5v-5h2v5h5a1 1 0 0 0 1-1v-6l1.293 1.293a1 1 0 0 0 1.414-1.415L12 3.172z'/></svg>") center / contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3.172 2.293 12.88a1 1 0 1 0 1.414 1.415L5 13.002V20a1 1 0 0 0 1 1h5v-5h2v5h5a1 1 0 0 0 1-1v-6l1.293 1.293a1 1 0 0 0 1.414-1.415L12 3.172z'/></svg>") center / contain no-repeat;
+}
+
+.mapboxgl-marker.has-badge.marker-home {
+  background: #1f2937; 
+}
+
+.mapboxgl-popup.prop-popup { z-index: 10; }
+
+.mapboxgl-popup.prop-popup .mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0,0,0,.25);
+  width: 260px; 
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.mapboxgl-popup.prop-popup .mapboxgl-popup-tip {
+  border-top-color: #fff;
+}
+
+.pp-card { display: grid; grid-template-columns: 96px 1fr; min-height: 96px; }
+.pp-media { background-size: cover; background-position: center; }
+.pp-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.pp-title { font-weight: 700; font-size: 14px; color: #111827; line-height: 1.2; }
+.pp-price { font-weight: 800; color: #10b981; font-size: 15px; }
+.pp-link { margin-top: 4px; align-self: flex-start; font-size: 12px; color: #2563eb; text-decoration: none; font-weight: 600; }
+.pp-link:hover { text-decoration: underline; }
+
+.pp-list { max-height: 220px; overflow: auto; }
+.pp-list ul { list-style: none; margin: 0; padding: 8px 0; }
+.pp-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; }
+.pp-item + .pp-item { border-top: 1px solid #f1f5f9; }
+.pp-item-title { font-weight: 600; font-size: 13px; color: #111827; }
+.pp-item-price { font-weight: 800; font-size: 13px; color: #10b981; white-space: nowrap; }
+.pp-more { padding: 8px 12px; font-size: 12px; color: #6b7280; border-top: 1px solid #f1f5f9; }
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-content { margin-top: 6px; }

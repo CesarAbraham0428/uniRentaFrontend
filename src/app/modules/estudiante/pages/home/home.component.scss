@@ -422,6 +422,37 @@
   margin: 0;
 }
 
+.map-card {
+  border: 2px solid #dee2e6;
+  border-radius: 16px;
+  overflow: hidden; 
+  background: #fff;
+}
+
+.map-card-header {
+  background: #f8f9fa;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.map-card-body {
+  padding: 0;            
+  height: 420px;         
+  position: relative;    
+}
+
+.map-card-body app-mapa-busqueda,
+.map-card-body .mapa-busqueda {
+  display: block;
+  height: 100%;
+}
+
+@media (min-width: 992px) {
+  .map-card-body { height: 520px; }
+}
+
+
 @media (max-width: 992px) {
   .hero-title {
     font-size: 2.5rem;

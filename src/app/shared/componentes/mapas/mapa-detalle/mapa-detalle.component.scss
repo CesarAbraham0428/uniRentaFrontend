@@ -35,3 +35,55 @@
     }
   }
 }
+
+:host ::ng-deep .mapboxgl-marker { cursor: pointer; }
+
+:host ::ng-deep .marker-home {
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  background: #2563eb;
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host ::ng-deep .marker-home::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3.172 2.293 12.88a1 1 0 1 0 1.414 1.415L5 13.002V20a1 1 0 0 0 1 1h5v-5h2v5h5a1 1 0 0 0 1-1v-6l1.293 1.293a1 1 0 0 0 1.414-1.415L12 3.172z'/></svg>") center / contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3.172 2.293 12.88a1 1 0 1 0 1.414 1.415L5 13.002V20a1 1 0 0 0 1 1h5v-5h2v5h5a1 1 0 0 0 1-1v-6l1.293 1.293a1 1 0 0 0 1.414-1.415L12 3.172z'/></svg>") center / contain no-repeat;
+}
+
+
+:host ::ng-deep .marker-user {
+  width: 40px;          
+  height: 40px;
+  border-radius: 9999px;
+  background: #455c8e;  
+  box-shadow: 0 4px 12px rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff; 
+}
+
+:host ::ng-deep .marker-user::before {
+  content: "";
+  width: 22px;          
+  height: 22px;
+  background: #ffffff;  
+  /* Silueta humana (Material "person") como máscara para recolorear fácil */
+  -webkit-mask: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+<path fill='%23000' d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.2 0-8 1.6-8 4v2h16v-2c0-2.4-4.8-4-8-4z'/>\
+</svg>") center / contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+<path fill='%23000' d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.2 0-8 1.6-8 4v2h16v-2c0-2.4-4.8-4-8-4z'/>\
+</svg>") center / contain no-repeat;
+}
+

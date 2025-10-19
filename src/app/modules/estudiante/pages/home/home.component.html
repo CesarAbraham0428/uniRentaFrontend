@@ -17,7 +17,9 @@
           <div class="hero-overlay"></div>
           <div class="hero-content">
             <h1 class="hero-title">UniRenta: Tu web, tu depa</h1>
-            <p class="hero-subtitle">Conectamos estudiantes con su hogar perfecto</p>
+            <p class="hero-subtitle">
+              Conectamos estudiantes con su hogar perfecto
+            </p>
           </div>
         </div>
 
@@ -42,7 +44,11 @@
       </div>
 
       <!-- Scroll Down Button -->
-      <button class="scroll-down-btn" (click)="scrollToSearch()" aria-label="Buscar departamento">
+      <button
+        class="scroll-down-btn"
+        (click)="scrollToSearch()"
+        aria-label="Buscar departamento"
+      >
         <span class="scroll-text">Buscar departamento</span>
         <i class="bi bi-chevron-down scroll-icon"></i>
       </button>
@@ -257,16 +263,23 @@
         <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
       </button>
     </div>
-  </div>  
+  </div>
 
   <!-- Mapa de resultados -->
-  <div class="container pb-5" *ngIf="!cargando && !error && propiedades.length > 0">
-    <div class="map-section">
-      <div class="map-header">
-        <h5 class="map-title">Ubicación de las propiedades</h5>
-        <p class="map-subtitle">Explora las propiedades en el mapa</p>
+  <!-- Mapa de resultados -->
+  <div
+    class="container pb-5"
+    *ngIf="!cargando && !error && propiedades.length > 0"
+  >
+    <div class="card map-card shadow-sm">
+      <div class="card-header map-card-header">
+        <h5 class="map-title mb-0">Ubicación de las propiedades</h5>
+        <p class="map-subtitle mb-0">Explora las propiedades en el mapa</p>
       </div>
-      <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
+
+      <div class="map-card-body">
+        <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
+      </div>
     </div>
   </div>
 </div>

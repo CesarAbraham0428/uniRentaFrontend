@@ -1,10 +1,11 @@
 import {
   Component, Input, ElementRef, ViewChild,
   OnInit, OnDestroy, OnChanges, SimpleChanges,
-  ViewEncapsulation
+  ViewEncapsulation, HostListener
 } from '@angular/core';
 import mapboxgl, { Map as MapboxMap, Marker, LngLatBounds } from 'mapbox-gl';
 import { environment } from '../../../../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
 
 type Coords = [number, number];
 
@@ -21,6 +22,13 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
   private map?: MapboxMap;
   private markers: Marker[] = [];
 
+  constructor(private router: Router, private route: ActivatedRoute) { }
+
+  @HostListener('window:resize')
+  onWinResize() {
+    this.map?.resize();
+  }
+
   ngOnInit(): void {
     (mapboxgl as any).accessToken = environment.mapboxToken;
 
@@ -35,6 +43,7 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
     this.map.on('load', () => {
       this.renderMarkers();
+      setTimeout(() => this.map?.resize(), 0);
     });
   }
 
@@ -57,50 +66,81 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
     const bounds = new LngLatBounds();
 
     for (const g of groups) {
-      // Crea el marcador con pin nativo
-      const marker = new mapboxgl.Marker({ anchor: 'bottom' })
+      const el = document.createElement('div');
+      el.classList.add('mapboxgl-marker', 'marker-home');
+
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat(g.coords);
 
-      const el = marker.getElement(); 
+      const count = g.items.length;
 
-      if (g.count > 1) {
+      // Badge
+      if (count > 1) {
         el.classList.add('has-badge');
-        el.setAttribute('data-count', String(g.count));
-        el.setAttribute('title', `${g.count} propiedades en esta ubicación`);
+        el.setAttribute('data-count', String(count));
+        el.setAttribute('title', `${count} propiedades en esta ubicación`);
       } else {
         el.classList.remove('has-badge');
         el.removeAttribute('data-count');
         el.removeAttribute('title');
       }
 
+      const popup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: true,
+        offset: [0, -36],
+        anchor: 'bottom',
+        className: 'prop-popup'
+      }).setHTML(this.buildPopupHTML(g.items));
+
+      popup.on('open', () => {
+        const popupEl = popup.getElement();
+        if (!popupEl) return;
+        const links = popupEl.querySelectorAll<HTMLElement>('.pp-nav');
+        links.forEach(link => {
+          link.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const id = (ev.currentTarget as HTMLElement).dataset['id'];
+            if (id) {
+              this.router.navigate(['propiedad', id], { relativeTo: this.route });
+              popup.remove();
+            }
+          }, { once: true });
+        });
+      });
+
+      marker.setPopup(popup);
+
       el.addEventListener('click', () => {
         if (!this.map) return;
         const current = this.map.getZoom();
-        const desired = g.count > 1 ? Math.max(current + 2, 14) : Math.max(current + 1, 13);
-        const targetZoom = Math.min(desired, 18); 
+        const desired = count > 1 ? Math.max(current + 2, 14) : Math.max(current + 1, 13);
+        const targetZoom = Math.min(desired, 18);
 
         this.map.easeTo({
           center: g.coords as mapboxgl.LngLatLike,
           zoom: targetZoom,
-          duration: 600,
+          duration: 500,
         });
+
+        marker.togglePopup();
       }, { passive: true });
 
       marker.addTo(this.map!);
-
       this.markers.push(marker);
       bounds.extend(g.coords);
     }
 
-
-    // Todos los marcadores
     if (!bounds.isEmpty()) {
       this.map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 600 });
+      setTimeout(() => this.map?.resize(), 0);
     }
+
   }
 
-  private groupByCoordinates(items: any[]): { coords: Coords; count: number }[] {
-    const map = new Map<string, { coords: Coords; count: number }>();
+  private groupByCoordinates(items: any[]): { coords: Coords; items: any[] }[] {
+    const map = new Map<string, { coords: Coords; items: any[] }>();
 
     for (const it of (items || [])) {
       const coords: number[] | undefined = it?.ubicacion?.coordenadas?.coordinates;
@@ -112,14 +152,62 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
       const key = `${lng}|${lat}`;
       if (!map.has(key)) {
-        map.set(key, { coords: [lng, lat], count: 1 });
+        map.set(key, { coords: [lng, lat], items: [it] });
       } else {
-        const cur = map.get(key)!;
-        cur.count += 1;
+        map.get(key)!.items.push(it);
       }
     }
 
     return Array.from(map.values());
+  }
+
+  private buildPopupHTML(items: any[]): string {
+    if (items.length === 1) {
+      const p = items[0];
+      const nombre = this.escapeHtml(p?.nombre || 'Departamento');
+      const precio = this.formatMoney(p?.precio);
+      const id = p?.id;
+
+      return `
+      <div class="pp-list">
+        <ul>
+          <li class="pp-item">
+            <a href="#" class="pp-item-title pp-nav" data-id="${id}">${nombre}</a>
+            <span class="pp-item-price">${precio}/mes</span>
+          </li>
+        </ul>
+      </div>
+    `;
+    } else {
+      const maxShow = 8;
+      const list = items.slice(0, maxShow).map((p: any) => {
+        const nombre = this.escapeHtml(p?.nombre || 'Depto');
+        const precio = this.formatMoney(p?.precio);
+        const id = p?.id;
+        return `
+        <li class="pp-item">
+          <a href="#" class="pp-item-title pp-nav" data-id="${id}">${nombre}</a>
+          <span class="pp-item-price">${precio}/mes</span>
+        </li>`;
+      }).join('');
+
+      const extra = items.length > maxShow
+        ? `<div class="pp-more">+${items.length - maxShow} más en esta ubicación</div>`
+        : '';
+
+      return `<div class="pp-list"><ul>${list}</ul>${extra}</div>`;
+    }
+  }
+
+  private formatMoney(v: any): string {
+    const n = Number(v || 0);
+    return n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
+  }
+
+  private escapeHtml(s: string): string {
+    return String(s).replace(/[&<>"']/g, (m) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    } as any)[m]);
   }
 
   ngOnDestroy(): void {

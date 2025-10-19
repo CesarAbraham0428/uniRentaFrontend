@@ -6,7 +6,7 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 @Component({
   selector: 'app-mapa-detalle',
   templateUrl: './mapa-detalle.component.html',
-  styleUrl: './mapa-detalle.component.scss'
+  styleUrls: ['./mapa-detalle.component.scss']
 })
 export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
   @Input() lat!: number;
@@ -51,7 +51,7 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onComoLlegar(): void {
-    if (this.navStarted) return; 
+    if (this.navStarted) return;
     if (!this.map) return;
 
     if (!navigator.geolocation) {
@@ -85,7 +85,11 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
         this.zone.runOutsideAngular(() => {
           const origin: [number, number] = [pos.coords.longitude, pos.coords.latitude];
           if (!this.userMarker) {
-            this.userMarker = new mapboxgl.Marker().setLngLat(origin).addTo(this.map!);
+            const userEl = document.createElement('div');
+            userEl.classList.add('mapboxgl-marker', 'marker-user'); // conserva cursor si lo necesitas
+            this.userMarker = new mapboxgl.Marker({ element: userEl, anchor: 'bottom' })
+              .setLngLat(origin)
+              .addTo(this.map!);
           } else {
             this.userMarker.setLngLat(origin);
           }
@@ -114,10 +118,14 @@ export class MapaDetalleComponent implements OnInit, OnDestroy, OnChanges {
 
     this.propertyMarker?.remove();
 
-    this.propertyMarker = new mapboxgl.Marker({ color: '#e11d48', anchor: 'bottom' })
+    const el = document.createElement('div');
+    el.classList.add('mapboxgl-marker', 'marker-home'); // mantiene cursor y permite reutilizar estilos
+
+    this.propertyMarker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
       .setLngLat([this.lng, this.lat])
       .setPopup(new mapboxgl.Popup().setText('Departamento'))
-      .addTo(this.map);
+      .addTo(this.map!);
+
   }
 
   ngOnDestroy(): void {

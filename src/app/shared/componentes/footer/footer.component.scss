@@ -1,12 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&family=Pacifico&family=Playwrite+DE+SAS&display=swap');
+
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 500;
+}
+
 .custom-footer {
   background-color: #1A3B55;
   color: #FEFDFE;
+  padding-top: 1rem;   
+  padding-bottom: 1.0rem; 
 }
 
 .footer-brand {
-  color: #EB6D31;
-  font-size: 1.5rem;
-  font-weight: bold;
+  color: #FEFDFE;
+  font-size: 1.9rem;  
 }
 
 .text-light-gray {
@@ -28,11 +36,12 @@
   color: #EAEDEF;
   text-decoration: none;
   transition: color 0.3s;
+  pointer-events: none; // Bloque de enlaces
 }
 
 .footer-links a:hover,
 .footer-contact a:hover {
-  color: #EB6D31;
+  color: #FEFDFE;
 }
 
 .footer-contact li {
@@ -40,7 +49,7 @@
 }
 
 .footer-contact i {
-  color: #EB6D31;
+  color: #FEFDFE;
 }
 
 .social-link {
@@ -49,7 +58,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background-color: rgba(254, 253, 254, 0.1);
+  background-color: rgba(254, 253, 254, 0.033);
   border-radius: 50%;
   color: #FEFDFE;
   text-decoration: none;
@@ -58,12 +67,13 @@
 }
 
 .social-link:hover {
-  background-color: #EB6D31;
+  background-color: #FEFDFE;
   color: #FEFDFE;
   transform: translateY(-3px);
 }
 
 .footer-bottom {
   border-top: 1px solid rgba(254, 253, 254, 0.1);
-  margin-top: 2rem;
+  margin-top: 1rem;   
+  padding-top: 0.50rem; 
 }
