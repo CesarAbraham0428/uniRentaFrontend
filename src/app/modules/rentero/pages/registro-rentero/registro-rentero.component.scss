@@ -11,7 +11,7 @@ $color-borde-hover: #9ca3af;
 .contenedor-registro {
   min-height: 100vh;
   display: flex;
-  
+
   @media (max-width: 968px) {
     flex-direction: column;
   }
@@ -23,12 +23,12 @@ $color-borde-hover: #9ca3af;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  
+
   @media (max-width: 968px) {
     min-height: 300px;
     flex: none;
   }
-  
+
   .imagen-fondo {
     width: 100%;
     height: 100%;
@@ -37,7 +37,7 @@ $color-borde-hover: #9ca3af;
     top: 0;
     left: 0;
   }
-  
+
   .overlay-imagen {
     position: absolute;
     top: 0;
@@ -52,7 +52,7 @@ $color-borde-hover: #9ca3af;
     padding: 3rem;
     z-index: 1;
   }
-  
+
   .frase-animada {
     color: white;
     font-size: 2.5rem;
@@ -61,11 +61,11 @@ $color-borde-hover: #9ca3af;
     line-height: 1.3;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
     animation: fadeInScale 0.6s ease-out;
-    
+
     @media (max-width: 1200px) {
       font-size: 2rem;
     }
-    
+
     @media (max-width: 968px) {
       font-size: 1.5rem;
     }
@@ -92,7 +92,7 @@ $color-borde-hover: #9ca3af;
   align-items: center;
   justify-content: center;
   overflow-y: auto;
-  
+
   @media (max-width: 968px) {
     padding: 1.5rem;
   }
@@ -105,7 +105,7 @@ $color-borde-hover: #9ca3af;
   max-width: 600px;
   width: 100%;
   padding: 2rem;
-  
+
   @media (max-width: 576px) {
     padding: 1.5rem;
   }
@@ -115,20 +115,20 @@ $color-borde-hover: #9ca3af;
 .encabezado-registro {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   .icono-titulo {
     font-size: 2.5rem;
     color: $color-primario;
     margin-bottom: 0.5rem;
   }
-  
+
   .titulo {
     color: $color-primario;
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
   }
-  
+
   .subtitulo {
     color: lighten($color-texto, 30%);
     font-size: 0.9rem;
@@ -143,13 +143,13 @@ $color-borde-hover: #9ca3af;
   justify-content: center;
   margin-bottom: 2rem;
   gap: 1rem;
-  
+
   .paso {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    
+
     .circulo-paso {
       width: 44px;
       height: 44px;
@@ -162,44 +162,44 @@ $color-borde-hover: #9ca3af;
       color: lighten($color-texto, 40%);
       transition: all 0.3s ease;
     }
-    
+
     .texto-paso {
       font-size: 0.75rem;
       color: lighten($color-texto, 30%);
       font-weight: 500;
       transition: color 0.3s ease;
     }
-    
+
     &.activo {
       .circulo-paso {
         background: $color-primario;
         color: white;
         box-shadow: 0 0 0 4px rgba($color-primario, 0.15);
       }
-      
+
       .texto-paso {
         color: $color-primario;
         font-weight: 600;
       }
     }
-    
+
     &.completado .circulo-paso {
       background: $color-agregar;
       color: white;
     }
   }
-  
+
   .linea-paso {
     height: 2px;
     width: 50px;
     background: lighten($color-borde, 5%);
     transition: background 0.3s ease;
-    
+
     &.activa {
       background: $color-agregar;
     }
   }
-  
+
   @media (max-width: 576px) {
     .texto-paso {
       font-size: 0.7rem;
@@ -227,7 +227,7 @@ $color-borde-hover: #9ca3af;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
@@ -235,7 +235,7 @@ $color-borde-hover: #9ca3af;
 
 .grupo-campo {
   margin-bottom: 1rem;
-  
+
   .etiqueta {
     display: flex;
     align-items: center;
@@ -244,13 +244,13 @@ $color-borde-hover: #9ca3af;
     font-weight: 600;
     color: $color-texto;
     margin-bottom: 0.4rem;
-    
+
     i {
       color: $color-primario;
       font-size: 0.9rem;
     }
   }
-  
+
   .campo-entrada {
     width: 100%;
     padding: 0.7rem 0.9rem;
@@ -260,28 +260,28 @@ $color-borde-hover: #9ca3af;
     transition: all 0.2s ease;
     background: white;
     color: $color-texto;
-    
+
     &:focus {
       outline: none;
       border-color: $color-primario;
       box-shadow: 0 0 0 3px rgba($color-primario, 0.1);
     }
-    
+
     &::placeholder {
       color: lighten($color-texto, 50%);
       font-size: 0.85rem;
     }
-    
+
     &.invalido {
       border-color: $color-error;
       background: rgba($color-error, 0.02);
-      
+
       &:focus {
         box-shadow: 0 0 0 3px rgba($color-error, 0.1);
       }
     }
   }
-  
+
   .mensaje-error {
     display: flex;
     align-items: center;
@@ -290,12 +290,12 @@ $color-borde-hover: #9ca3af;
     font-size: 0.75rem;
     margin-top: 0.4rem;
     animation: slideDown 0.2s ease;
-    
+
     i {
       font-size: 0.85rem;
       flex-shrink: 0;
     }
-    
+
     span {
       line-height: 1.3;
     }
@@ -318,11 +318,11 @@ $color-borde-hover: #9ca3af;
   position: relative;
   display: flex;
   align-items: center;
-  
+
   .campo-entrada {
     padding-right: 2.8rem;
   }
-  
+
   .boton-toggle-password {
     position: absolute;
     right: 0.5rem;
@@ -336,16 +336,16 @@ $color-borde-hover: #9ca3af;
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s ease;
-    
+
     i {
       font-size: 1.1rem;
     }
-    
+
     &:hover {
       color: $color-primario;
       background: rgba($color-primario, 0.05);
     }
-    
+
     &:focus {
       outline: none;
       box-shadow: 0 0 0 2px rgba($color-primario, 0.2);
@@ -362,45 +362,45 @@ $color-borde-hover: #9ca3af;
   text-align: center;
   transition: all 0.3s ease;
   background: lighten($color-fondo, 3%);
-  
+
   &:hover {
     border-color: $color-primario;
     background: white;
   }
-  
+
   &.con-archivo {
     border-color: $color-agregar;
     background: rgba($color-agregar, 0.05);
   }
-  
+
   .input-archivo {
     display: none;
   }
-  
+
   .etiqueta-archivo {
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
-    
+
     .icono-archivo {
       font-size: 2.5rem;
       color: $color-primario;
       transition: transform 0.3s ease;
     }
-    
+
     .texto-principal {
       font-weight: 500;
       color: $color-texto;
       font-size: 0.95rem;
     }
-    
+
     .texto-secundario {
       font-size: 0.8rem;
       color: lighten($color-texto, 40%);
     }
-    
+
     &:hover .icono-archivo {
       transform: translateY(-5px);
     }
@@ -413,7 +413,7 @@ $color-borde-hover: #9ca3af;
   padding: 1.25rem;
   background: lighten($color-fondo, 3%);
   border-radius: 12px;
-  
+
   .titulo-previsualizacion {
     display: flex;
     align-items: center;
@@ -422,12 +422,12 @@ $color-borde-hover: #9ca3af;
     font-weight: 600;
     color: $color-texto;
     margin: 0 0 0.85rem 0;
-    
+
     i {
       color: $color-primario;
     }
   }
-  
+
   .contenedor-previsualizacion {
     background: white;
     border-radius: 8px;
@@ -436,24 +436,24 @@ $color-borde-hover: #9ca3af;
     justify-content: center;
     align-items: center;
   }
-  
+
   .imagen-previsualizacion {
     max-width: 100%;
     max-height: 250px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   .previsualizacion-pdf {
     text-align: center;
     padding: 1.5rem;
-    
+
     .icono-pdf {
       font-size: 3rem;
       color: $color-error;
       margin-bottom: 0.75rem;
     }
-    
+
     .nombre-archivo {
       font-weight: 500;
       color: $color-texto;
@@ -461,7 +461,7 @@ $color-borde-hover: #9ca3af;
       word-break: break-word;
       font-size: 0.9rem;
     }
-    
+
     .info-archivo {
       color: lighten($color-texto, 40%);
       font-size: 0.8rem;
@@ -482,21 +482,21 @@ $color-borde-hover: #9ca3af;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  
+
   i {
     font-size: 1rem;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   &:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:not(:disabled):active {
     transform: translateY(0);
   }
@@ -507,7 +507,7 @@ $color-borde-hover: #9ca3af;
   color: white;
   width: 100%;
   margin-top: 0.5rem;
-  
+
   &:not(:disabled):hover {
     background: darken($color-agregar, 8%);
   }
@@ -516,7 +516,7 @@ $color-borde-hover: #9ca3af;
 .boton-secundario {
   background: lighten($color-texto, 65%);
   color: $color-texto;
-  
+
   &:not(:disabled):hover {
     background: lighten($color-texto, 55%);
   }
@@ -528,13 +528,48 @@ $color-borde-hover: #9ca3af;
   gap: 1rem;
   margin-top: 1.25rem;
   align-items: center;
-  
+
   .boton {
     margin: 0;
     width: 100%;
   }
-  
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
+  }
+}
+
+// Enlace de login
+.enlace-login {
+  margin-top: 2rem;
+  text-align: center;
+
+  .texto-login {
+    color: lighten($color-texto, 30%);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .enlace-login-boton {
+    background: none;
+    border: none;
+    color: $color-primario;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 0.25rem;
+    padding: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: darken($color-primario, 15%);
+    }
+
+    &:focus {
+      outline: 2px solid rgba($color-primario, 0.3);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
   }
 }
