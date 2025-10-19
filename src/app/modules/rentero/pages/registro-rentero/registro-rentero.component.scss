@@ -25,7 +25,7 @@ $color-borde-hover: #9ca3af;
   width: 100%;
   padding: 2.5rem;
   position: relative;
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
@@ -35,20 +35,20 @@ $color-borde-hover: #9ca3af;
 .encabezado-registro {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   .icono-titulo {
     font-size: 3rem;
     color: $color-primario;
     margin-bottom: 0.5rem;
   }
-  
+
   .titulo {
     color: $color-primario;
     font-size: 1.75rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
   }
-  
+
   .subtitulo {
     color: lighten($color-texto, 30%);
     font-size: 0.95rem;
@@ -63,13 +63,13 @@ $color-borde-hover: #9ca3af;
   justify-content: center;
   margin-bottom: 2.5rem;
   gap: 1rem;
-  
+
   .paso {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    
+
     .circulo-paso {
       width: 48px;
       height: 48px;
@@ -81,53 +81,53 @@ $color-borde-hover: #9ca3af;
       font-size: 1.25rem;
       color: lighten($color-texto, 40%);
       transition: all 0.3s ease;
-      
+
       i {
         transition: transform 0.3s ease;
       }
     }
-    
+
     .texto-paso {
       font-size: 0.8rem;
       color: lighten($color-texto, 30%);
       font-weight: 500;
       transition: color 0.3s ease;
     }
-    
+
     &.activo {
       .circulo-paso {
         background: $color-primario;
         color: white;
         box-shadow: 0 0 0 4px rgba($color-primario, 0.15);
       }
-      
+
       .texto-paso {
         color: $color-primario;
         font-weight: 600;
       }
     }
-    
+
     &.completado .circulo-paso {
       background: $color-agregar;
       color: white;
-      
+
       i {
         transform: scale(1.1);
       }
     }
   }
-  
+
   .linea-paso {
     height: 2px;
     width: 60px;
     background: lighten($color-borde, 5%);
     transition: background 0.3s ease;
-    
+
     &.activa {
       background: $color-agregar;
     }
   }
-  
+
   @media (max-width: 576px) {
     .texto-paso {
       display: none;
@@ -155,7 +155,7 @@ $color-borde-hover: #9ca3af;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
@@ -163,7 +163,7 @@ $color-borde-hover: #9ca3af;
 
 .grupo-campo {
   margin-bottom: 1.25rem;
-  
+
   .etiqueta {
     display: flex;
     align-items: center;
@@ -172,12 +172,12 @@ $color-borde-hover: #9ca3af;
     font-weight: 500;
     color: $color-texto;
     margin-bottom: 0.5rem;
-    
+
     i {
       color: $color-primario;
     }
   }
-  
+
   .campo-entrada {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -187,26 +187,26 @@ $color-borde-hover: #9ca3af;
     transition: all 0.2s ease;
     background: white;
     color: $color-texto;
-    
+
     &:focus {
       outline: none;
       border-color: $color-primario;
       box-shadow: 0 0 0 3px rgba($color-primario, 0.1);
     }
-    
+
     &::placeholder {
       color: lighten($color-texto, 50%);
     }
-    
+
     &.invalido {
       border-color: $color-error;
-      
+
       &:focus {
         box-shadow: 0 0 0 3px rgba($color-error, 0.1);
       }
     }
   }
-  
+
   .mensaje-error {
     display: block;
     color: $color-error;
@@ -236,45 +236,45 @@ $color-borde-hover: #9ca3af;
   text-align: center;
   transition: all 0.3s ease;
   background: lighten($color-fondo, 3%);
-  
+
   &:hover {
     border-color: $color-primario;
     background: white;
   }
-  
+
   &.con-archivo {
     border-color: $color-agregar;
     background: rgba($color-agregar, 0.05);
   }
-  
+
   .input-archivo {
     display: none;
   }
-  
+
   .etiqueta-archivo {
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    
+
     .icono-archivo {
       font-size: 3rem;
       color: $color-primario;
       transition: transform 0.3s ease;
     }
-    
+
     .texto-principal {
       font-weight: 500;
       color: $color-texto;
       font-size: 1rem;
     }
-    
+
     .texto-secundario {
       font-size: 0.85rem;
       color: lighten($color-texto, 40%);
     }
-    
+
     &:hover .icono-archivo {
       transform: translateY(-5px);
     }
@@ -287,7 +287,7 @@ $color-borde-hover: #9ca3af;
   padding: 1.5rem;
   background: lighten($color-fondo, 3%);
   border-radius: 12px;
-  
+
   .titulo-previsualizacion {
     display: flex;
     align-items: center;
@@ -296,12 +296,12 @@ $color-borde-hover: #9ca3af;
     font-weight: 600;
     color: $color-texto;
     margin: 0 0 1rem 0;
-    
+
     i {
       color: $color-primario;
     }
   }
-  
+
   .contenedor-previsualizacion {
     background: white;
     border-radius: 8px;
@@ -310,31 +310,31 @@ $color-borde-hover: #9ca3af;
     justify-content: center;
     align-items: center;
   }
-  
+
   .imagen-previsualizacion {
     max-width: 100%;
     max-height: 300px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   .previsualizacion-pdf {
     text-align: center;
     padding: 2rem;
-    
+
     .icono-pdf {
       font-size: 4rem;
       color: $color-error;
       margin-bottom: 1rem;
     }
-    
+
     .nombre-archivo {
       font-weight: 500;
       color: $color-texto;
       margin: 0 0 0.5rem 0;
       word-break: break-word;
     }
-    
+
     .info-archivo {
       color: lighten($color-texto, 40%);
       font-size: 0.85rem;
@@ -355,17 +355,17 @@ $color-borde-hover: #9ca3af;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   &:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:not(:disabled):active {
     transform: translateY(0);
   }
@@ -376,7 +376,7 @@ $color-borde-hover: #9ca3af;
   color: white;
   width: 100%;
   margin-top: 0.5rem;
-  
+
   &:not(:disabled):hover {
     background: darken($color-agregar, 8%);
   }
@@ -385,7 +385,7 @@ $color-borde-hover: #9ca3af;
 .boton-secundario {
   background: lighten($color-texto, 65%);
   color: $color-texto;
-  
+
   &:not(:disabled):hover {
     background: lighten($color-texto, 55%);
   }
@@ -396,7 +396,7 @@ $color-borde-hover: #9ca3af;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-top: 1.5rem;
-  
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
@@ -416,12 +416,12 @@ $color-borde-hover: #9ca3af;
   justify-content: center;
   z-index: 100;
   animation: fadeIn 0.3s ease;
-  
+
   .contenedor-carga {
     text-align: center;
     padding: 2rem;
   }
-  
+
   .spinner-grande {
     width: 60px;
     height: 60px;
@@ -431,17 +431,52 @@ $color-borde-hover: #9ca3af;
     animation: spin 0.8s linear infinite;
     margin: 0 auto 1.5rem;
   }
-  
+
   .texto-carga {
     color: $color-primario;
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
   }
-  
+
   .subtexto-carga {
     color: lighten($color-texto, 30%);
     font-size: 0.9rem;
     margin: 0;
+  }
+}
+
+// Enlace de login
+.enlace-login {
+  margin-top: 2rem;
+  text-align: center;
+
+  .texto-login {
+    color: lighten($color-texto, 30%);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .enlace-login-boton {
+    background: none;
+    border: none;
+    color: $color-primario;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 0.25rem;
+    padding: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: darken($color-primario, 15%);
+    }
+
+    &:focus {
+      outline: 2px solid rgba($color-primario, 0.3);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
   }
 }

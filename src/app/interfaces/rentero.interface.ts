@@ -27,3 +27,23 @@ export interface RespuestaRegistroRentero {
   rentero?: Rentero;
   errores?: string[];
 }
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  exito: boolean;
+  mensaje: string;
+  datos: {
+    rentero: {
+      id: number;
+      nombre: string;
+      apellido: string;
+      email: string;
+      telefono: string;
+    };
+    token: string;
+  };
+}

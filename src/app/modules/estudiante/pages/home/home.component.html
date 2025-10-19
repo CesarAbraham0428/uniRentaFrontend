@@ -119,11 +119,6 @@
     </div>
   </div>
 
-  <!-- Mapa de resultados -->
-  <div class="container pb-4" *ngIf="!cargando && !error">
-    <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
-  </div>
-
   <!-- Resultados Section -->
   <div class="container pb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -224,5 +219,10 @@
         <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
       </button>
     </div>
+  </div>
+
+    <!-- Mapa de resultados -->
+  <div class="container pb-4" *ngIf="!cargando && !error">
+    <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
   </div>
 </div>

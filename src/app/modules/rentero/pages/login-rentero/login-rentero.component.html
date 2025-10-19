@@ -1,0 +1,112 @@
+<div class="contenedor-login">
+  <!-- Botón de regreso fuera del contenedor -->
+  <div class="boton-regreso">
+    <button
+      type="button"
+      class="boton-home"
+      (click)="irAHome()"
+    >
+      <i class="bi bi-arrow-left"></i>
+      Ver propiedades
+    </button>
+  </div>
+
+  <div class="tarjeta-login">
+    <!-- Encabezado -->
+    <div class="encabezado-login">
+      <i class="bi bi-person-check-fill icono-titulo"></i>
+      <h2 class="titulo">Iniciar Sesión</h2>
+      <p class="subtitulo">Accede a tu cuenta de rentero</p>
+    </div>
+
+    <!-- Formulario de login -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="formulario-login">
+
+      <!-- Mostrar error general -->
+      <div *ngIf="error" class="alerta-error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Campo Email -->
+      <div class="grupo-campo">
+        <label for="email" class="etiqueta">
+          <i class="bi bi-envelope"></i>
+          Correo electrónico
+        </label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          class="campo-entrada"
+          [class.invalido]="emailInvalido"
+          placeholder="ejemplo@correo.com"
+          autocomplete="email"
+        />
+        <small class="mensaje-error" *ngIf="emailInvalido">
+          {{ obtenerMensajeError('email') }}
+        </small>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="grupo-campo">
+        <label for="password" class="etiqueta">
+          <i class="bi bi-lock"></i>
+          Contraseña
+        </label>
+        <div class="contenedor-password">
+          <input
+            id="password"
+            formControlName="password"
+            [type]="mostrarPassword ? 'text' : 'password'"
+            class="campo-entrada"
+            [class.invalido]="passwordInvalido"
+            placeholder="Tu contraseña"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="boton-toggle-password"
+            (click)="toggleMostrarPassword()"
+          >
+            <i class="bi" [class.bi-eye]="!mostrarPassword" [class.bi-eye-slash]="mostrarPassword"></i>
+          </button>
+        </div>
+        <small class="mensaje-error" *ngIf="passwordInvalido">
+          {{ obtenerMensajeError('password') }}
+        </small>
+      </div>
+
+      <!-- Botón de inicio de sesión -->
+      <button
+        type="submit"
+        class="boton boton-primario"
+        [disabled]="cargando || loginForm.invalid"
+      >
+        <span *ngIf="!cargando">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Iniciar Sesión
+        </span>
+        <span *ngIf="cargando" class="contenedor-carga">
+          <div class="spinner"></div>
+          Iniciando sesión...
+        </span>
+      </button>
+
+      <!-- Enlace a registro -->
+      <div class="enlace-registro">
+        <p class="texto-registro">
+          ¿No te has registrado?
+          <button
+            type="button"
+            class="enlace-registro-boton"
+            (click)="irARegistro()"
+          >
+            Regístrate aquí
+          </button>
+        </p>
+      </div>
+
+    </form>
+  </div>
+</div>

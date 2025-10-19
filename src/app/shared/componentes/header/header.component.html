@@ -1,18 +1,37 @@
 <header class="header">
   <div class="header-container">
     <div class="header-logo">
-      <a href="/" class="logo-link">
+      <a routerLink="/" class="logo-link">
         <span>UniRenta</span>
       </a>
     </div>
 
     <nav class="header-nav" [class.open]="isMenuOpen">
-      <a href="/" class="nav-link" (click)="closeMenu()">Iniciar Sesión</a>
-      <a href="/estudiante/dep-detail" class="nav-link" (click)="closeMenu()">Detalle</a>
+      <!-- Si NO está autenticado -->
+      <ng-container *ngIf="!estaAutenticado">
+        <a routerLink="/rentero/login" class="nav-link" (click)="closeMenu()">
+          Iniciar Sesión
+        </a>
+      </ng-container>
+
+      <!-- Si SÍ está autenticado -->
+      <ng-container *ngIf="estaAutenticado">
+        <span class="nav-user">
+          Hola, {{ nombreUsuario }}
+        </span>
+        <button class="nav-link" (click)="cerrarSesion()">
+          Cerrar Sesión
+        </button>
+      </ng-container>
+
+      <!-- Enlaces que siempre aparecen -->
+      <a routerLink="/estudiante/dep-detail" class="nav-link" (click)="closeMenu()">
+        Detalle
+      </a>
     </nav>
-    
-    <button 
-      class="menu-toggle" 
+
+    <button
+      class="menu-toggle"
       (click)="toggleMenu()"
       [attr.aria-expanded]="isMenuOpen"
       aria-label="Toggle navigation menu">

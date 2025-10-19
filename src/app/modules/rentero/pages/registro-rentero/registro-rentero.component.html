@@ -32,10 +32,10 @@
             <i class="bi bi-person"></i>
             Nombre
           </label>
-          <input 
-            id="nombre" 
-            formControlName="nombre" 
-            type="text" 
+          <input
+            id="nombre"
+            formControlName="nombre"
+            type="text"
             class="campo-entrada"
             [class.invalido]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched"
             placeholder="Juan"
@@ -50,10 +50,10 @@
             <i class="bi bi-person"></i>
             Apellido
           </label>
-          <input 
-            id="apellido" 
-            formControlName="apellido" 
-            type="text" 
+          <input
+            id="apellido"
+            formControlName="apellido"
+            type="text"
             class="campo-entrada"
             [class.invalido]="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched"
             placeholder="Pérez"
@@ -69,10 +69,10 @@
           <i class="bi bi-telephone"></i>
           Teléfono
         </label>
-        <input 
-          id="telefono" 
-          formControlName="telefono" 
-          type="tel" 
+        <input
+          id="telefono"
+          formControlName="telefono"
+          type="tel"
           class="campo-entrada"
           [class.invalido]="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched"
           placeholder="4611234567"
@@ -87,10 +87,10 @@
           <i class="bi bi-envelope"></i>
           Correo electrónico
         </label>
-        <input 
-          id="email" 
-          formControlName="email" 
-          type="email" 
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
           class="campo-entrada"
           [class.invalido]="formulario.get('email')?.invalid && formulario.get('email')?.touched"
           placeholder="ejemplo@correo.com"
@@ -105,10 +105,10 @@
           <i class="bi bi-lock"></i>
           Contraseña
         </label>
-        <input 
-          id="password" 
-          formControlName="password" 
-          type="password" 
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
           class="campo-entrada"
           [class.invalido]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
           placeholder="Mínimo 6 caracteres"
@@ -118,15 +118,29 @@
         </small>
       </div>
 
-      <button 
-        type="button" 
-        (click)="siguientePaso()" 
+      <button
+        type="button"
+        (click)="siguientePaso()"
         [disabled]="!datosValidos"
         class="boton boton-primario"
       >
         Siguiente
         <i class="bi bi-arrow-right"></i>
       </button>
+
+      <!-- Enlace a login en el paso 1 -->
+      <div class="enlace-login">
+        <p class="texto-login">
+          ¿Ya tienes una cuenta?
+          <button
+            type="button"
+            class="enlace-login-boton"
+            (click)="irALogin()"
+          >
+            Inicia sesión aquí
+          </button>
+        </p>
+      </div>
     </form>
 
     <!-- Paso 2: Subir documento -->
@@ -136,13 +150,13 @@
           <i class="bi bi-file-earmark-arrow-up"></i>
           Documento de identidad
         </label>
-        
+
         <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
-          <input 
-            id="archivo" 
-            type="file" 
-            (change)="onArchivoSeleccionado($event)" 
-            accept="image/*,.pdf" 
+          <input
+            id="archivo"
+            type="file"
+            (change)="onArchivoSeleccionado($event)"
+            accept="image/*,.pdf"
             class="input-archivo"
           />
           <label for="archivo" class="etiqueta-archivo">
@@ -162,9 +176,9 @@
           Previsualización
         </h4>
         <div class="contenedor-previsualizacion">
-          <img 
-            *ngIf="esImagen" 
-            [src]="urlPrevisualizacion" 
+          <img
+            *ngIf="esImagen"
+            [src]="urlPrevisualizacion"
             alt="Previsualización del documento"
             class="imagen-previsualizacion"
           />
@@ -177,18 +191,18 @@
       </div>
 
       <div class="grupo-botones">
-        <button 
-          type="button" 
-          (click)="anteriorPaso()" 
+        <button
+          type="button"
+          (click)="anteriorPaso()"
           class="boton boton-secundario"
           [disabled]="procesando"
         >
           <i class="bi bi-arrow-left"></i>
           Anterior
         </button>
-        <button 
-          type="button" 
-          (click)="registrar()" 
+        <button
+          type="button"
+          (click)="registrar()"
           [disabled]="!archivoValido || procesando"
           class="boton boton-primario"
         >

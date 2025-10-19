@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router'; // ← Agregar esta línea
 import { RenteroService } from '../../../../core/services/rentero.service';
 import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
 import { FormularioRegistroRentero, RespuestaRegistroRentero } from '../../../../interfaces/rentero.interface';
@@ -19,7 +20,9 @@ export class RegistroRenteroComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private renteroService: RenteroService,
-    private documentoValidacionService: DocumentoValidacionService
+    private documentoValidacionService: DocumentoValidacionService,
+    private router: Router
+
   ) {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -132,7 +135,11 @@ export class RegistroRenteroComponent implements OnDestroy {
     if (control.errors['minlength']) return `${campo} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
     if (control.errors['email']) return 'Email inválido';
     if (control.errors['pattern']) return 'Formato inválido';
-    
+
     return 'Campo inválido';
   }
+
+  irALogin(): void {
+  this.router.navigate(['/rentero/login']);
+}
 }

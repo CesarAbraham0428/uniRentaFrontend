@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PropiedadService } from '../../../../core/services/propiedad.service';
+import { PropiedadService } from './../../../../core/services/propiedad.service';
 import { Propiedad } from '../../../../interfaces/propiedad.interface';
 
 @Component({
@@ -38,7 +38,6 @@ export class HomeComponent implements OnInit {
 
         if (response.success && response.data) {
           this.propiedades = response.data;
-          console.log(`Se cargaron ${this.propiedades.length} propiedades`);
         } else {
           this.error = 'No se pudieron cargar las propiedades.';
           this.propiedades = [];
@@ -98,11 +97,8 @@ export class HomeComponent implements OnInit {
       }
     }
 
-    console.log('🔍 Aplicando filtros:', filtros);
-
     this.propiedadService.filtrarPropiedades(filtros).subscribe({
       next: (response) => {
-        console.log('Respuesta de filtros:', response);
 
         if (response.success && response.data) {
           this.propiedades = response.data;
@@ -125,7 +121,7 @@ export class HomeComponent implements OnInit {
         if (err.error?.mensaje) {
           this.error = err.error.mensaje;
         } else if (err.status === 0) {
-          this.error = '🔌 No se puede conectar con el servidor.';
+          this.error = 'No se puede conectar con el servidor.';
         } else {
           this.error = 'Error al filtrar las propiedades. Por favor, intenta de nuevo.';
         }
@@ -137,7 +133,6 @@ export class HomeComponent implements OnInit {
   }
 
   limpiarFiltros(): void {
-    console.log('🧹 Limpiando filtros...');
     this.precioMin = null;
     this.precioMax = null;
     this.colonia = '';
@@ -156,7 +151,6 @@ export class HomeComponent implements OnInit {
     const mensaje = encodeURIComponent('Hola, me interesa una de tus propiedades en UniRenta 🏠');
     const url = `https://wa.me/52${telefonoLimpio}?text=${mensaje}`;
 
-    console.log('📱 Abriendo WhatsApp:', url);
     window.open(url, '_blank');
   }
 }
