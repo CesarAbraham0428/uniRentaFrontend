@@ -16,12 +16,17 @@
 
       <!-- Si SÍ está autenticado -->
       <ng-container *ngIf="estaAutenticado">
-        <span class="nav-user">
-          Hola, {{ nombreUsuario }}
-        </span>
-        <button class="nav-link" (click)="cerrarSesion()">
-          Cerrar Sesión
-        </button>
+        <!-- <CHANGE> Mejorado el diseño del saludo de usuario con icono y mejor estructura -->
+        <div class="user-profile">
+          <div class="user-avatar">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="user-info">
+            <span class="user-greeting">Bienvenido</span>
+            <span class="user-name">{{ nombreUsuario }}</span>
+          </div>
+        </div>
+        <button class="nav-link" (click)="cerrarSesion()">Cerrar Sesión</button>
       </ng-container>
     </nav>
 

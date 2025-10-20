@@ -10,92 +10,309 @@ $color-ver: #EB6D31;
 $color-eliminar: #DC143C;
 $color-blanco: #FEFDFE;
 
-// Estilos generales
-.container-fluid {
+// Contenedor principal
+.contenedor-principal {
   background-color: $color-fondo-pantalla;
   min-height: 100vh;
-}
+  padding: 2rem;
 
-header {
-  background-color: $color-header-footer;
-  color: $color-blanco;
-  padding: 1rem;
-  h2 {
-    margin: 0;
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
 }
 
-main {
-  padding: 2rem;
+.contenido-principal {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.card {
+// Tarjeta de propiedades
+.tarjeta-propiedades {
   background-color: $color-div;
-  color: $color-letras;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
-.card-header {
-  background-color: lighten($color-div, 5%);
-  border-bottom: 1px solid #ddd;
+// Encabezado de la tarjeta
+.encabezado-tarjeta {
+  padding: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  h4 {
-    margin: 0;
-  }
-}
+  border-bottom: 2px solid lighten($color-letras, 70%);
 
-.table {
-  th, td {
-    color: $color-letras;
-  }
-  .precio {
-    color: $color-precios;
-    font-weight: bold;
-  }
-}
-
-// Botones con colores específicos
-.btn {
-  &.btn-agregar {
-    background-color: $color-agregar;
-    color: $color-blanco;
-    &:hover {
-      background-color: darken($color-agregar, 10%);
-    }
-  }
-  &.btn-editar {
-    background-color: $color-editar;
-    color: $color-blanco;
-    &:hover {
-      background-color: darken($color-editar, 10%);
-    }
-  }
-  &.btn-ver {
-    background-color: $color-ver;
-    color: $color-blanco;
-    &:hover {
-      background-color: darken($color-ver, 10%);
-    }
-  }
-  &.btn-eliminar {
-    background-color: $color-eliminar;
-    color: $color-blanco;
-    &:hover {
-      background-color: darken($color-eliminar, 10%);
-    }
-  }
-}
-
-// Responsive para móviles
-@media (max-width: 768px) {
-  .card-header {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
   }
-  .btn {
-    margin-top: 0.5rem;
+}
+
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  > i {
+    font-size: 2.5rem;
+    color: $color-header-footer;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .texto-titulo {
+    h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: $color-letras;
+      line-height: 1.2;
+
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+      }
+    }
+
+    .subtitulo {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.9rem;
+      color: lighten($color-letras, 35%);
+      font-weight: 400;
+    }
+  }
+}
+
+// Cuerpo de la tarjeta
+.cuerpo-tarjeta {
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.contenedor-tabla {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid lighten($color-letras, 70%);
+}
+
+// Tabla de propiedades
+.tabla-propiedades {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $color-blanco;
+
+  thead {
+    background-color: lighten($color-header-footer, 65%);
+    
+    tr {
+      th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $color-header-footer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid lighten($color-letras, 65%);
+
+        @media (max-width: 768px) {
+          padding: 0.75rem 1rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid lighten($color-letras, 75%);
+
+      &:hover {
+        background-color: lighten($color-fondo-pantalla, 3%);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 1.25rem;
+        color: $color-letras;
+        font-size: 0.95rem;
+        vertical-align: middle;
+
+        @media (max-width: 768px) {
+          padding: 1rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+// Celda de nombre con icono
+.celda-nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+
+  i {
+    font-size: 1.25rem;
+    color: $color-header-footer;
+    flex-shrink: 0;
+  }
+}
+
+// Celda de precio
+.celda-precio {
+  color: $color-precios;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+// Grupo de acciones
+.grupo-acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 968px) {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+// Botones
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+
+  i {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 968px) {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+.boton-agregar {
+  background-color: $color-agregar;
+  color: $color-blanco;
+
+  &:hover {
+    background-color: darken($color-agregar, 8%);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.boton-editar {
+  background-color: $color-editar;
+  color: $color-blanco;
+
+  &:hover {
+    background-color: darken($color-editar, 8%);
+  }
+}
+
+.boton-ver {
+  background-color: $color-ver;
+  color: $color-blanco;
+
+  &:hover {
+    background-color: darken($color-ver, 8%);
+  }
+}
+
+.boton-eliminar {
+  background-color: $color-eliminar;
+  color: $color-blanco;
+
+  &:hover {
+    background-color: darken($color-eliminar, 8%);
+  }
+}
+
+// Responsive adicional
+@media (max-width: 576px) {
+  .contenedor-tabla {
+    border: none;
+    border-radius: 0;
+  }
+
+  .tabla-propiedades {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid lighten($color-letras, 70%);
+        border-radius: 8px;
+        overflow: hidden;
+
+        td {
+          display: block;
+          text-align: left;
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid lighten($color-letras, 75%);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: $color-header-footer;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+  }
+
+  .grupo-acciones {
+    flex-direction: row;
   }
 }

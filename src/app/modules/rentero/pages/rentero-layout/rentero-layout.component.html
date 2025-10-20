@@ -1,20 +1,23 @@
-<div class="container-fluid">
-  <header class="row">
-    <div class="col-12">
-      <h2>Gestión de Propiedades</h2>
-    </div>
-  </header>
-
-  <main class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h4>Mis Propiedades</h4>
-          <button class="btn btn-agregar" routerLink="/rentero/formulario">Agregar Propiedad</button>
+<div class="contenedor-principal">
+  <main class="contenido-principal">
+    <div class="tarjeta-propiedades">
+      <div class="encabezado-tarjeta">
+        <div class="titulo-seccion">
+          <i class="bi bi-buildings"></i>
+          <div class="texto-titulo">
+            <h2>Gestión de Propiedades</h2>
+            <p class="subtitulo">Administra y controla tus propiedades</p>
+          </div>
         </div>
-        <div class="card-body">
-          <!-- Aquí irá la lista de propiedades, ej. una tabla -->
-          <table class="table table-striped">
+        <button class="boton boton-agregar" routerLink="/rentero/formulario">
+          <i class="bi bi-plus-circle"></i>
+          Agregar Propiedad
+        </button>
+      </div>
+
+      <div class="cuerpo-tarjeta">
+        <div class="contenedor-tabla">
+          <table class="tabla-propiedades">
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -24,15 +27,30 @@
               </tr>
             </thead>
             <tbody>
-              <!-- Ejemplo de fila, reemplazar con *ngFor -->
               <tr>
-                <td>Propiedad Ejemplo</td>
-                <td>Descripción de ejemplo</td>
-                <td class="precio">$100.00</td>
                 <td>
-                  <button class="btn btn-sm btn-editar" routerLink="/rentero/formulario/1">Editar</button>
-                  <button class="btn btn-sm btn-ver" routerLink="/rentero/formulario/1">Ver</button>
-                  <button class="btn btn-sm btn-eliminar">Eliminar</button>
+                  <div class="celda-nombre">
+                    <i class="bi bi-house-door"></i>
+                    <span>Propiedad Ejemplo</span>
+                  </div>
+                </td>
+                <td>Descripción de ejemplo</td>
+                <td class="celda-precio">$100.00</td>
+                <td>
+                  <div class="grupo-acciones">
+                    <button class="boton boton-editar" routerLink="/rentero/formulario/1" title="Editar">
+                      <i class="bi bi-pencil-square"></i>
+                      Editar
+                    </button>
+                    <button class="boton boton-ver" routerLink="/rentero/formulario/1" title="Ver">
+                      <i class="bi bi-eye"></i>
+                      Ver
+                    </button>
+                    <button class="boton boton-eliminar" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>

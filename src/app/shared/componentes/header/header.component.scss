@@ -84,15 +84,69 @@
     }
   }
 
-  // Estilos específicos para usuario autenticado
-  .nav-user {
-    color: #f4e5b8;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 0.5rem 0;
+  // <CHANGE> Nuevo diseño profesional para el perfil de usuario
+  .user-profile {
     display: flex;
     align-items: center;
-    opacity: 0.9;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(244, 229, 184, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #d4af37 0%, #f4e5b8 100%);
+      border-radius: 50%;
+      color: #1a3b55;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+
+      i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      line-height: 1.2;
+
+      .user-greeting {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .user-name {
+        font-size: 0.95rem;
+        color: #ffffff;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+      }
+    }
   }
 }
 
@@ -169,7 +223,7 @@
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: 0;
+    gap: 1rem;
     padding: 1.5rem 0;
     order: 3;
 
@@ -191,10 +245,18 @@
       }
     }
 
-    .nav-user {
-      padding: 0.875rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 1rem;
+    // <CHANGE> Ajustes responsive para el perfil de usuario
+    .user-profile {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      justify-content: flex-start;
+
+      .user-info {
+        .user-name {
+          max-width: none;
+        }
+      }
     }
   }
 
