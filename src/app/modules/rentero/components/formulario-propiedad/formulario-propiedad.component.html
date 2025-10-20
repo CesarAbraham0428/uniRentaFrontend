@@ -1,58 +1,182 @@
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card">
-        <div class="card-header text-center">
-          <h3>{{ esEdicion ? 'Editar Propiedad' : 'Registrar Nueva Propiedad' }}</h3>
+<div class="contenedor-formulario">
+  <div class="tarjeta-registro">
+    <!-- Encabezado -->
+    <div class="encabezado-registro">
+      <i class="bi bi-house-door-fill icono-titulo"></i>
+      <h2 class="titulo">{{ esEdicion ? 'Editar Propiedad' : 'Registrar Nueva Propiedad' }}</h2>
+      <p class="subtitulo">Completa la información de tu propiedad</p>
+    </div>
+
+    <!-- Botón de regresar -->
+    <button type="button" (click)="cancelar()" class="boton-regresar">
+      <i class="bi bi-arrow-left"></i>
+      Regresar
+    </button>
+
+    <!-- Indicador de pasos (solo si no es edición) -->
+    <div class="indicador-pasos" *ngIf="mostrarPasos">
+      <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
+        <div class="circulo-paso">
+          <i class="bi" [class.bi-check-lg]="pasoActual > 1" [class.bi-house]="pasoActual <= 1"></i>
         </div>
-        <div class="card-body">
-          <form [formGroup]="formularioPropiedad" (ngSubmit)="guardarPropiedad()">
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre de la Propiedad</label>
-              <input type="text" class="form-control" id="nombre" formControlName="nombre" placeholder="Ingrese el nombre">
-              <div *ngIf="formularioPropiedad.get('nombre')?.invalid && formularioPropiedad.get('nombre')?.touched" class="text-danger">
-                El nombre es requerido.
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="descripcion" class="form-label">Descripción</label>
-              <textarea class="form-control" id="descripcion" rows="3" formControlName="descripcion" placeholder="Ingrese una descripción"></textarea>
-            </div>
-
-            <div class="mb-3">
-              <label for="precio" class="form-label">Precio</label>
-              <input type="number" class="form-control" id="precio" formControlName="precio" placeholder="Ingrese el precio">
-              <div *ngIf="formularioPropiedad.get('precio')?.invalid && formularioPropiedad.get('precio')?.touched" class="text-danger">
-                El precio debe ser mayor a 0.
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
-              <select class="form-control" id="tipoDocumento" formControlName="tipoDocumentoId">
-                <option value="">Seleccione un tipo de documento</option>
-                <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
-                  {{ tipo.nombre }}
-                </option>
-              </select>
-              <div *ngIf="formularioPropiedad.get('tipoDocumentoId')?.invalid && formularioPropiedad.get('tipoDocumentoId')?.touched" class="text-danger">
-                Debe seleccionar un tipo de documento.
-              </div>
-            </div>
-
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-agregar" [disabled]="formularioPropiedad.invalid">
-                {{ esEdicion ? 'Actualizar' : 'Registrar' }} Propiedad
-              </button>
-              <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
-            </div>
-          </form>
+        <span class="texto-paso">Información</span>
+      </div>
+      <div class="linea-paso" [class.activa]="pasoActual > 1"></div>
+      <div class="paso" [class.activo]="pasoActual >= 2">
+        <div class="circulo-paso">
+          <i class="bi bi-file-earmark-text"></i>
         </div>
+        <span class="texto-paso">Documento</span>
       </div>
     </div>
+
+    <!-- Paso 1: Información de la propiedad (o formulario completo si es edición) -->
+    <form [formGroup]="formularioPropiedad" (ngSubmit)="guardarPropiedad()" class="formulario-paso" *ngIf="esEdicion || pasoActual === 1">
+      <!-- Campos básicos -->
+      <div class="fila-campos">
+        <div class="grupo-campo">
+          <label for="nombre" class="etiqueta">
+            <i class="bi bi-building"></i>
+            Nombre de la Propiedad
+          </label>
+          <input id="nombre" formControlName="nombre" type="text" class="campo-entrada"
+            [class.invalido]="formularioPropiedad.get('nombre')?.invalid && formularioPropiedad.get('nombre')?.touched"
+            placeholder="Ej. Casa en el centro" />
+          <div class="mensaje-error" *ngIf="formularioPropiedad.get('nombre')?.invalid && formularioPropiedad.get('nombre')?.touched">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>{{ obtenerMensajeError('nombre') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="grupo-campo" *ngIf="esEdicion">
+        <label for="estado" class="etiqueta">
+          <i class="bi bi-geo-alt"></i>
+          Estado Visible
+        </label>
+        <select id="estado" formControlName="estado" class="campo-entrada"
+          [class.invalido]="formularioPropiedad.get('estado')?.invalid && formularioPropiedad.get('estado')?.touched">
+          <option value="">Seleccione un estado</option>
+          <option value="Disponible">Disponible</option>
+          <option value="Ocupada">Ocupada</option>
+        </select>
+        <div class="mensaje-error" *ngIf="formularioPropiedad.get('estado')?.invalid && formularioPropiedad.get('estado')?.touched">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ obtenerMensajeError('estado') }}</span>
+        </div>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="grupo-campo">
+        <label class="etiqueta">
+          <i class="bi bi-map"></i>
+          Ubicación
+        </label>
+        <div class="fila-campos">
+          <input formControlName="ubicacionCalle" type="text" class="campo-entrada" placeholder="Calle" />
+          <input formControlName="ubicacionNumero" type="text" class="campo-entrada" placeholder="Número" />
+        </div>
+        <div class="fila-campos">
+          <input formControlName="ubicacionColonia" type="text" class="campo-entrada" placeholder="Colonia" />
+          <input formControlName="ubicacionCodigoPostal" type="text" class="campo-entrada" placeholder="Código Postal" />
+        </div>
+        <div class="fila-campos">
+          <input formControlName="ubicacionMunicipio" type="text" class="campo-entrada" placeholder="Municipio" />
+          <input formControlName="ubicacionEstado" type="text" class="campo-entrada" placeholder="Estado" />
+        </div>
+        <div class="fila-campos">
+          <input formControlName="ubicacionLatitud" type="number" step="0.000001" class="campo-entrada"
+            placeholder="Latitud (-90 a 90)" />
+          <input formControlName="ubicacionLongitud" type="number" step="0.000001" class="campo-entrada"
+            placeholder="Longitud (-180 a 180)" />
+        </div>
+      </div>
+
+      <!-- Tipo de Documento (si aplica) -->
+      <div class="grupo-campo" *ngIf="tiposDocumento.length > 0 && !esEdicion">
+        <label for="tipoDocumentoId" class="etiqueta">
+          <i class="bi bi-file-earmark"></i>
+          Tipo de Documento
+        </label>
+        <select id="tipoDocumentoId" formControlName="tipoDocumentoId" class="campo-entrada">
+          <option value="">Seleccione un tipo de documento</option>
+          <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
+            {{ tipo.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Botones del paso 1 o formulario de edición -->
+      <div class="grupo-botones" *ngIf="esEdicion">
+        <button type="button" (click)="cancelar()" class="boton boton-secundario">
+          <i class="bi bi-arrow-left"></i>
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="!datosValidos || procesando" class="boton boton-primario">
+          Actualizar Propiedad
+          <i class="bi bi-check-lg"></i>
+        </button>
+      </div>
+
+      <button type="button" *ngIf="!esEdicion" (click)="siguientePaso()" [disabled]="!datosValidos" class="boton boton-primario">
+        Siguiente
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </form>
+
+    <!-- Paso 2: Subir documento -->
+    <div *ngIf="!esEdicion && pasoActual === 2" class="formulario-paso">
+      <div class="grupo-campo">
+        <label class="etiqueta">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+          Documento de la propiedad
+        </label>
+
+        <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
+          <input id="archivo" type="file" (change)="onArchivoSeleccionado($event)" accept="image/*,.pdf"
+            class="input-archivo" />
+          <label for="archivo" class="etiqueta-archivo">
+            <i class="bi bi-cloud-upload icono-archivo"></i>
+            <span class="texto-principal">
+              {{ archivoSeleccionado ? archivoSeleccionado.name : 'Haz clic para seleccionar' }}
+            </span>
+            <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Previsualización -->
+      <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
+        <h4 class="titulo-previsualizacion">
+          <i class="bi bi-eye"></i>
+          Previsualización
+        </h4>
+        <div class="contenedor-previsualizacion">
+          <img *ngIf="esImagen" [src]="urlPrevisualizacion" alt="Previsualización del documento"
+            class="imagen-previsualizacion" />
+          <div *ngIf="esPdf" class="previsualizacion-pdf">
+            <i class="bi bi-file-pdf icono-pdf"></i>
+            <p class="nombre-archivo">{{ archivoSeleccionado?.name }}</p>
+            <small class="info-archivo">Archivo PDF seleccionado</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="grupo-botones">
+        <button type="button" (click)="anteriorPaso()" class="boton boton-secundario" [disabled]="procesando">
+          <i class="bi bi-arrow-left"></i>
+          Anterior
+        </button>
+        <button type="button" (click)="guardarPropiedad()" [disabled]="!archivoValido || procesando"
+          class="boton boton-primario">
+          Registrar Propiedad
+          <i class="bi bi-check-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Procesamiento de documento -->
+    <app-procesamiento-documento [visible]="procesando" mensaje="Procesando propiedad..."></app-procesamiento-documento>
   </div>
 </div>
-
-<!-- Procesamiento de documento -->
-<app-procesamiento-documento [visible]="procesando" mensaje="Procesando propiedad..."></app-procesamiento-documento>

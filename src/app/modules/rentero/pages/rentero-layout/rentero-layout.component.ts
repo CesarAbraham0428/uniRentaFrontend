@@ -11,6 +11,6 @@ export class RenteroLayoutComponent {
   constructor(private router: Router) {}
 
   navegarAFormulario(): void {
-    this.router.navigate(['/rentero/formulario/nuevo']);  // Navega a formulario para creación
+    this.router.navigate(['/rentero/formulario-propiedad']);  // Navega a formulario para creación
   }
 }

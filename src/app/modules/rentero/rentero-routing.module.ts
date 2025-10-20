@@ -6,9 +6,10 @@ import { FormularioPropiedadComponent } from './components/formulario-propiedad/
 import { LoginRenteroComponent } from './pages/login-rentero/login-rentero.component';
 
 const routes: Routes = [
+  { path: '', component: RenteroLayoutComponent },
   { path: 'registro', component: RegistroRenteroComponent },
-  { path: '', component: RenteroLayoutComponent },  // Ruta por defecto para el layout
-  { path: 'formulario/:id', component: FormularioPropiedadComponent },  // Ruta para crear/editar propiedad
+  { path: 'formulario', component: FormularioPropiedadComponent },  // Ruta para crear nueva propiedad (sin ID)
+  { path: 'formulario/:id', component: FormularioPropiedadComponent },  // Ruta para editar propiedad (con ID)
   { path: 'login', component: LoginRenteroComponent}
 ];
 
