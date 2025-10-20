@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { DocumentoService } from '../../../../core/services/documento.service';
 import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
@@ -39,6 +40,9 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   mostrarPassword: boolean = false;
   mostrarPasos: boolean = true;
 
+  direccionBusqueda: string | null = null;
+  coordsIniciales: [number, number] | null = null;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -66,7 +70,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.idPropiedad = this.route.snapshot.paramMap.get('id');
     this.esEdicion = !!this.idPropiedad;
-    this.mostrarPasos = !this.esEdicion; // Solo mostrar pasos si no es edición
+    this.mostrarPasos = !this.esEdicion; 
 
     if (this.mostrarPasos) {
       this.pasoActual = 1;
@@ -77,6 +81,59 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     if (this.esEdicion) {
       this.cargarDatosPropiedad();
     }
+
+    const lat = parseFloat(this.formularioPropiedad.get('ubicacionLatitud')?.value);
+    const lng = parseFloat(this.formularioPropiedad.get('ubicacionLongitud')?.value);
+    if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
+      this.coordsIniciales = [lng, lat];
+    }
+
+    this.formularioPropiedad.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(() => {
+        this.direccionBusqueda = this.isDireccionCompleta()
+          ? this.buildSearchText()
+          : null;
+      });
+
+    this.direccionBusqueda = this.isDireccionCompleta() ? this.buildSearchText() : null;
+  }
+
+  private isDireccionCompleta(): boolean {
+    const f = this.formularioPropiedad.value;
+    const req = [
+      f.ubicacionCalle,
+      f.ubicacionNumero,
+      f.ubicacionColonia,
+      f.ubicacionCodigoPostal,
+      f.ubicacionMunicipio,
+      f.ubicacionEstado
+    ];
+    return req.every((v: any) => !!v && String(v).trim() !== '');
+  }
+
+  private buildSearchText(): string {
+    const v = this.formularioPropiedad.value;
+    return [
+      v.ubicacionCalle,
+      v.ubicacionNumero,
+      v.ubicacionColonia,
+      v.ubicacionCodigoPostal,
+      v.ubicacionMunicipio,
+      v.ubicacionEstado
+    ]
+      .map((x: string) => String(x).trim())
+      .join(', ');
+  }
+
+  onCoordsChange(ev: { lng: number; lat: number }) {
+    this.formularioPropiedad.patchValue(
+      {
+        ubicacionLatitud: ev.lat.toFixed(6),
+        ubicacionLongitud: ev.lng.toFixed(6)
+      },
+      { emitEvent: false } // evita disparar otra búsqueda al confirmar coords
+    );
   }
 
   ngOnDestroy(): void {
@@ -86,7 +143,17 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   }
 
   get datosValidos(): boolean {
-    const campos = ['nombre', 'ubicacionCalle', 'ubicacionColonia', 'ubicacionNumero', 'ubicacionCodigoPostal', 'ubicacionMunicipio', 'ubicacionEstado', 'ubicacionLatitud', 'ubicacionLongitud'];
+    const campos = [
+      'nombre',
+      'ubicacionCalle',
+      'ubicacionColonia',
+      'ubicacionNumero',
+      'ubicacionCodigoPostal',
+      'ubicacionMunicipio',
+      'ubicacionEstado',
+      'ubicacionLatitud',
+      'ubicacionLongitud'
+    ];
     return campos.every(campo => this.formularioPropiedad.get(campo)?.valid);
   }
 
@@ -114,7 +181,6 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   }
 
   cargarDatosPropiedad(): void {
-    // Aquí iría la lógica para cargar datos reales de la propiedad
     const propiedadEjemplo = {
       nombre: 'Casa Ejemplo',
       estado: 'Disponible',
@@ -186,7 +252,6 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Construir el objeto ubicación según la interfaz
     const ubicacion = {
       nombre: datosPropiedad.nombre,
       direccion: `${datosPropiedad.ubicacionCalle} ${datosPropiedad.ubicacionNumero}, ${datosPropiedad.ubicacionColonia}`,

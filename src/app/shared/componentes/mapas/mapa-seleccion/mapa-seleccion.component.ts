@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild, Input
+  Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild, Input, OnChanges, SimpleChanges
 } from '@angular/core';
 import mapboxgl, { Map, Marker, LngLatLike } from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
@@ -10,13 +10,16 @@ import { environment } from '../../../../../environments/environment';
   templateUrl: './mapa-seleccion.component.html',
   styleUrls: ['./mapa-seleccion.component.scss']
 })
-export class MapaSeleccionComponent implements OnInit, OnDestroy {
+export class MapaSeleccionComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
-  /** Coordenadas iniciales opcionales [lng, lat] (por ejemplo, último valor guardado) */
+  /** Coordenadas iniciales opcionales [lng, lat] */
   @Input() initialCoords: [number, number] | null = null;
 
-  /** Emite cada vez que se confirme/ajuste la ubicación (geocoder o dragend o botón) */
+  /** Texto de búsqueda proveniente del formulario (calle/colonia/CP/municipio/estado) */
+  @Input() searchText: string | null = null;
+
+  /** Emite cada vez que se confirma/ajusta la ubicación */
   @Output() coordenadasChange = new EventEmitter<{ lng: number; lat: number }>();
 
   private map?: Map;
@@ -26,7 +29,7 @@ export class MapaSeleccionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     (mapboxgl as any).accessToken = environment.mapboxToken;
 
-    const startCenter: LngLatLike = this.initialCoords ?? [-99.1332, 19.4326]; // CDMX fallback
+    const startCenter: LngLatLike = this.initialCoords ?? [-99.1332, 19.4326]; // CDMX
     const startZoom = this.initialCoords ? 16 : 12;
 
     this.map = new mapboxgl.Map({
@@ -38,40 +41,46 @@ export class MapaSeleccionComponent implements OnInit, OnDestroy {
 
     this.map.addControl(new mapboxgl.NavigationControl());
 
-    // Geocoder (barra de búsqueda)
+    // Geocoder "silencioso" (lo usamos programáticamente)
     this.geocoder = new MapboxGeocoder({
       accessToken: environment.mapboxToken,
       mapboxgl: mapboxgl as any,
-      marker: false,              // manejamos nuestro propio marcador
+      marker: false,
       language: 'es',
-      placeholder: 'Buscar: calle, número, colonia, municipio…',
-      countries: 'mx'             // opcional, limita a México
+      countries: 'mx',
+      proximity: { longitude: -99.1332, latitude: 19.4326 }
     });
 
+    // Lo añadimos y lo ocultamos vía CSS (no mostramos barra en el mapa)
     this.map.addControl(this.geocoder, 'top-left');
 
-    // Cuando el usuario selecciona un resultado del geocoder
     this.geocoder.on('result', (e: any) => {
       const center = e?.result?.center as [number, number] | undefined;
       if (!center || !this.map) return;
-
       this.setMarker(center);
       this.map.flyTo({ center, zoom: 16 });
       this.emitCurrentCoords();
     });
 
-    // Si hay coordenadas iniciales, pon marcador draggable
-    if (this.initialCoords) {
-      this.setMarker(this.initialCoords);
-    }
+    if (this.initialCoords) this.setMarker(this.initialCoords);
 
-    // Click en el mapa: mover el pin ahí (útil si el usuario prefiere clicar)
+    // También permitimos click en el mapa para mover el pin
     this.map.on('click', (ev) => {
       const lngLat: [number, number] = [ev.lngLat.lng, ev.lngLat.lat];
       this.setMarker(lngLat);
       this.emitCurrentCoords();
     });
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['searchText']) {
+      const q = (this.searchText ?? '').trim();
+      if (q.length > 0 && this.geocoder) {
+        this.geocoder.query(q);
+      }
+    }
+  }
+
 
   private setMarker(coords: [number, number]) {
     if (!this.map) return;
@@ -80,15 +89,12 @@ export class MapaSeleccionComponent implements OnInit, OnDestroy {
       this.marker = new mapboxgl.Marker({ draggable: true })
         .setLngLat(coords)
         .addTo(this.map);
-
-      // Cuando termina de arrastrar, informamos coordenadas
       this.marker.on('dragend', () => this.emitCurrentCoords());
     } else {
       this.marker.setLngLat(coords);
     }
   }
 
-  /** Emite las coords actuales del marcador */
   emitCurrentCoords() {
     const pos = this.marker?.getLngLat();
     if (!pos) return;
