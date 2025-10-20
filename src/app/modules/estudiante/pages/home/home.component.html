@@ -257,9 +257,11 @@
       *ngIf="!cargando && !error && propiedades.length === 0"
       class="text-center py-5"
     >
-      <i class="bi bi-house-x-fill text-muted" style="font-size: 3rem"></i>
-      <p class="text-muted mt-3">
-        No se encontraron propiedades con los filtros seleccionados
+      <i class="bi bi-house-heart text-muted" style="font-size: 3rem"></i>
+      <p class="text-muted mt-3 fs-5">
+        Lamentamos no haber encontrado tu lugar perfecto<br />
+        ¿Por qué no intentas con otra opción? Quizá está más cerca de lo que
+        crees.
       </p>
       <button class="btn btn-primary btn-sm" (click)="limpiarFiltros()">
         <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
@@ -268,9 +270,10 @@
   </div>
 
   <!-- Mapa de resultados -->
-  <!-- Mapa de resultados -->
   <div
-    class="container pb-5" id="mapContainer" #mapContainer
+    class="container pb-5"
+    id="mapContainer"
+    #mapContainer
     *ngIf="!cargando && !error && propiedades.length > 0"
   >
     <div class="card map-card shadow-sm">

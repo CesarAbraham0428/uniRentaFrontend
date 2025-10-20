@@ -1,8 +1,4 @@
-import {
-  Component, Input, ElementRef, ViewChild,
-  OnInit, OnDestroy, OnChanges, SimpleChanges,
-  ViewEncapsulation, HostListener
-} from '@angular/core';
+import { Component, Input, ElementRef, ViewChild, OnInit, OnDestroy, OnChanges, SimpleChanges, ViewEncapsulation, HostListener } from '@angular/core';
 import mapboxgl, { Map as MapboxMap, Marker, LngLatBounds } from 'mapbox-gl';
 import { environment } from '../../../../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +18,10 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
   private map?: MapboxMap;
   private markers: Marker[] = [];
 
+  // Loader flags
+  isMapLoading = true;
+  isDataLoading = false;
+
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   @HostListener('window:resize')
@@ -31,6 +31,8 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     (mapboxgl as any).accessToken = environment.mapboxToken;
+
+    this.isMapLoading = true;
 
     this.map = new mapboxgl.Map({
       container: this.mapContainer.nativeElement,
@@ -44,6 +46,7 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
     this.map.on('load', () => {
       this.renderMarkers();
       setTimeout(() => this.map?.resize(), 0);
+      this.isMapLoading = false; 
     });
   }
 
@@ -56,12 +59,17 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
   private renderMarkers(): void {
     if (!this.map) return;
+    this.isDataLoading = true; 
 
     this.markers.forEach(m => m.remove());
     this.markers = [];
 
     const groups = this.groupByCoordinates(this.propiedades);
-    if (groups.length === 0) return;
+
+    if (groups.length === 0) {
+      this.isDataLoading = false;
+      return;
+    }
 
     const bounds = new LngLatBounds();
 
@@ -74,7 +82,6 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
       const count = g.items.length;
 
-      // Badge
       if (count > 1) {
         el.classList.add('has-badge');
         el.setAttribute('data-count', String(count));
@@ -137,11 +144,11 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
       setTimeout(() => this.map?.resize(), 0);
     }
 
+    setTimeout(() => this.isDataLoading = false, 300);
   }
 
   private groupByCoordinates(items: any[]): { coords: Coords; items: any[] }[] {
     const map = new Map<string, { coords: Coords; items: any[] }>();
-
     for (const it of (items || [])) {
       const coords: number[] | undefined = it?.ubicacion?.coordenadas?.coordinates;
       if (!Array.isArray(coords) || coords.length < 2) continue;
@@ -157,7 +164,6 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
         map.get(key)!.items.push(it);
       }
     }
-
     return Array.from(map.values());
   }
 
@@ -176,8 +182,7 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
             <span class="pp-item-price">${precio}/mes</span>
           </li>
         </ul>
-      </div>
-    `;
+      </div>`;
     } else {
       const maxShow = 8;
       const list = items.slice(0, maxShow).map((p: any) => {

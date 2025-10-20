@@ -8,13 +8,15 @@ import { RegistroRenteroComponent } from './pages/registro-rentero/registro-rent
 import { FormularioPropiedadComponent } from './components/formulario-propiedad/formulario-propiedad.component';
 import { LoginRenteroComponent } from './pages/login-rentero/login-rentero.component';
 import { SharedModule } from '../../shared/shared.module';
+import { MapaSeleccionComponent } from '../../shared/componentes/mapas/mapa-seleccion/mapa-seleccion.component';
 
 @NgModule({
   declarations: [
     RenteroLayoutComponent,
     RegistroRenteroComponent,
     FormularioPropiedadComponent,
-    LoginRenteroComponent
+    LoginRenteroComponent,
+    MapaSeleccionComponent
   ],
   imports: [
     CommonModule,
