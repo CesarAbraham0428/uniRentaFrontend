@@ -241,8 +241,24 @@
         <div class="grupo-campo">
           <label class="etiqueta">
             <i class="bi bi-file-earmark-arrow-up"></i>
-            Documento de identidad
+            Documento de identidad (INE)
           </label>
+
+          <!-- Nota informativa sobre tipos de archivos -->
+          <div class="nota-tipos-archivo">
+            <div class="nota-contenido">
+              <i class="bi bi-info-circle-fill"></i>
+              <div class="nota-texto">
+                <p class="nota-principal">Solo se permiten los siguientes formatos:</p>
+                <div class="tipos-permitidos">
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> PNG</span>
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> JPG/JPEG</span>
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-pdf"></i> PDF</span>
+                </div>
+                <p class="nota-secundaria">El documento debe ser tu INE vigente</p>
+              </div>
+            </div>
+          </div>
 
           <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
             <input

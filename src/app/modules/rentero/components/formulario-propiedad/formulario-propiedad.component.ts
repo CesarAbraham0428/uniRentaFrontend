@@ -296,7 +296,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
         next: (respuesta) => {
           console.log('Propiedad creada exitosamente:', respuesta);
           this.procesando = false;
-          this.documentoValidacionService.mostrarExito('Propiedad creada exitosamente');
+          this.documentoValidacionService.mostrarExitoPropiedad('Propiedad creada exitosamente');
           this.router.navigate(['/rentero']);
         },
         error: (error) => {

@@ -54,3 +54,49 @@ app-root {
 }
 
 
+/* Estilos para las alertas personalizadas al validar documentos*/
+.alerta-custom .alerta-popup {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+}
+
+.alerta-custom .alerta-titulo {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.alerta-custom .alerta-contenido {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Estilos para campos faltantes */
+.campos-contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.campo-faltante {
+  background: #fff3cd;
+  color: #856404;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #ffeaa7;
+  font-weight: 500;
+  font-size: 13px;
+  display: inline-block;
+}
+
+/* Para errores, usar color rojo */
+.alerta-custom.swal2-icon-error .campo-faltante {
+  background: #fadbd8;
+  color: #78281f;
+  border-color: #f5b7b1;
+}

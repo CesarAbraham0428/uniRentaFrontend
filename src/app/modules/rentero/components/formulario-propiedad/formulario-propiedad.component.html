@@ -342,24 +342,6 @@
           </div> -->
         </div>
 
-        <!-- Tipo de Documento (si aplica) - Ahora en su posición original -->
-        <div class="grupo-campo" *ngIf="tiposDocumento.length > 0 && !esEdicion">
-          <label for="tipoDocumentoId" class="etiqueta">
-            <i class="bi bi-file-earmark"></i>
-            Tipo de Documento
-          </label>
-          <select
-            id="tipoDocumentoId"
-            formControlName="tipoDocumentoId"
-            class="campo-entrada"
-          >
-            <option value="">Seleccione un tipo de documento</option>
-            <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
-              {{ tipo.nombre }}
-            </option>
-          </select>
-        </div>
-
         <!-- Botones del paso 1 o formulario de edición -->
         <div class="grupo-botones" *ngIf="esEdicion">
           <button
@@ -394,11 +376,61 @@
 
       <!-- Paso 2: Subir documento -->
       <div *ngIf="!esEdicion && pasoActual === 2" class="formulario-paso">
+        
+        <!-- Nota informativa sobre tipos de documentos -->
+        <div class="nota-tipos-archivo">
+          <div class="nota-contenido">
+            <i class="bi bi-info-circle-fill"></i>
+            <div class="nota-texto">
+              <p class="nota-principal">Selecciona el tipo de documento de tu propiedad</p>
+              <div class="tipos-permitidos">
+                <span class="tipo-archivo"><i class="bi bi-file-earmark-text"></i> Recibo de Agua</span>
+                <span class="tipo-archivo"><i class="bi bi-file-earmark-text"></i> Recibo de Luz</span>
+              </div>
+              <p class="nota-secundaria">Documento oficial que valide la propiedad</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tipo de Documento (si aplica) - Ahora en su posición original -->
+        <div class="grupo-campo" *ngIf="tiposDocumento.length > 0 && !esEdicion">
+          <label for="tipoDocumentoId" class="etiqueta">
+            <i class="bi bi-file-earmark"></i>
+            Elige el tipo de documento de la propiedad a validar
+          </label>
+          <select
+            id="tipoDocumentoId"
+            formControlName="tipoDocumentoId"
+            class="campo-entrada"
+          >
+            <option value="">Seleccione un tipo de documento</option>
+            <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
+              {{ tipo.nombre }}
+            </option>
+          </select>
+        </div>
+
         <div class="grupo-campo">
           <label class="etiqueta">
             <i class="bi bi-file-earmark-arrow-up"></i>
             Documento de la propiedad
           </label>
+
+          <!-- Nota informativa sobre tipos de archivos -->
+          <div class="nota-tipos-archivo">
+            <div class="nota-contenido">
+              <i class="bi bi-info-circle-fill"></i>
+              <div class="nota-texto">
+                <p class="nota-principal">Solo se permiten los siguientes formatos:</p>
+                <div class="tipos-permitidos">
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> PNG</span>
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> JPG/JPEG</span>
+                  <span class="tipo-archivo"><i class="bi bi-file-earmark-pdf"></i> PDF</span>
+                </div>
+                <p class="nota-secundaria">Documento oficial que acredite la propiedad</p>
+              </div>
+            </div>
+          </div>
 
           <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
             <input

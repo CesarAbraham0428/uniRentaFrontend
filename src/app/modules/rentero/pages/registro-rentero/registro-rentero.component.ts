@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';                       // 👈 IMPORTA Router
-import { trigger, transition, style, animate } from '@angular/animations'; // 👈 IMPORTA Animations
+import { Router } from '@angular/router';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 import { RenteroService } from '../../../../core/services/rentero.service';
 import { DocumentoValidacionService } from '../../../../core/services/documento-validacion.service';
@@ -35,7 +35,7 @@ export class RegistroRenteroComponent implements OnDestroy {
     private fb: FormBuilder,
     private renteroService: RenteroService,
     private documentoValidacionService: DocumentoValidacionService,
-    private router: Router                                       // 👈 INYECTA Router
+    private router: Router
   ) {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -85,7 +85,7 @@ export class RegistroRenteroComponent implements OnDestroy {
     if (this.urlPrevisualizacion) URL.revokeObjectURL(this.urlPrevisualizacion);
 
     if (archivo) {
-      if (this.documentoValidacionService.procesarDocumento(archivo, 'registro')) {
+      if (this.documentoValidacionService.validarDocumentoINE(archivo)) {
         this.archivoSeleccionado = archivo;
         this.urlPrevisualizacion = URL.createObjectURL(archivo);
         this.formulario.patchValue({ archivo });
