@@ -290,3 +290,28 @@
 .mapboxgl-popup-anchor-bottom .mapboxgl-popup-content {
   margin-top: 6px;
 }
+
+/* Marcador de universidad */
+.marker-uni {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #7c3aed; /* morado */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.marker-uni::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3 1 8l11 5 9-4.091V17h2V8L12 3Zm-5 9.236V15c0 1.657 2.91 3 5 3s5-1.343 5-3v-2.764L12 15 7 12.236Z'/></svg>") center/contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M12 3 1 8l11 5 9-4.091V17h2V8L12 3Zm-5 9.236V15c0 1.657 2.91 3 5 3s5-1.343 5-3v-2.764L12 15 7 12.236Z'/></svg>") center/contain no-repeat;
+}
+.marker-uni:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}

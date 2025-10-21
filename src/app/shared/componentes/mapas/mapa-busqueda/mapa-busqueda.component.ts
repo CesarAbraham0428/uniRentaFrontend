@@ -2,6 +2,8 @@ import { Component, Input, ElementRef, ViewChild, OnInit, OnDestroy, OnChanges, 
 import mapboxgl, { Map as MapboxMap, Marker, LngLatBounds } from 'mapbox-gl';
 import { environment } from '../../../../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UniversidadService } from '../../../../core/universidad.service';
+import { UniversidadBasica } from '../../../../interfaces/universidad.interface';
 
 type Coords = [number, number];
 
@@ -18,11 +20,20 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
   private map?: MapboxMap;
   private markers: Marker[] = [];
 
-  // Loader flags
+  private uniMarkers: Marker[] = [];
+  private universidadesCache: UniversidadBasica[] = [];
+  private moveDebounce?: any;
+  private readonly DEBOUNCE_MS = 200;
+  private readonly MIN_ZOOM_TO_RENDER_UNIS = 9;
+
   isMapLoading = true;
   isDataLoading = false;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private universidadSrv: UniversidadService
+  ) {}
 
   @HostListener('window:resize')
   onWinResize() {
@@ -45,8 +56,9 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
     this.map.on('load', () => {
       this.renderMarkers();
+      this.initUniversidadesLayer();
       setTimeout(() => this.map?.resize(), 0);
-      this.isMapLoading = false; 
+      this.isMapLoading = false;
     });
   }
 
@@ -59,7 +71,7 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
   private renderMarkers(): void {
     if (!this.map) return;
-    this.isDataLoading = true; 
+    this.isDataLoading = true;
 
     this.markers.forEach(m => m.remove());
     this.markers = [];
@@ -99,23 +111,6 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
         anchor: 'bottom',
         className: 'prop-popup'
       }).setHTML(this.buildPopupHTML(g.items));
-
-      popup.on('open', () => {
-        const popupEl = popup.getElement();
-        if (!popupEl) return;
-        const links = popupEl.querySelectorAll<HTMLElement>('.pp-nav');
-        links.forEach(link => {
-          link.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            const id = (ev.currentTarget as HTMLElement).dataset['id'];
-            if (id) {
-              this.router.navigate(['propiedad', id], { relativeTo: this.route });
-              popup.remove();
-            }
-          }, { once: true });
-        });
-      });
 
       marker.setPopup(popup);
 
@@ -204,6 +199,74 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  private initUniversidadesLayer(): void {
+    if (!this.map) return;
+
+    this.isDataLoading = true;
+    this.universidadSrv.obtenerUniversidades().subscribe({
+      next: (resp) => {
+        this.universidadesCache = resp.data ?? [];
+        this.renderUniversidadesInView();
+
+        this.map!.on('moveend', () => {
+          if (this.moveDebounce) clearTimeout(this.moveDebounce);
+          this.moveDebounce = setTimeout(() => this.renderUniversidadesInView(), this.DEBOUNCE_MS);
+        });
+      },
+      error: (err) => {
+        console.error('Error cargando universidades', err);
+        this.isDataLoading = false;
+      }
+    });
+  }
+
+  private renderUniversidadesInView(): void {
+    if (!this.map) return;
+
+    this.uniMarkers.forEach(m => m.remove());
+    this.uniMarkers = [];
+
+    const zoom = this.map.getZoom();
+    if (zoom < this.MIN_ZOOM_TO_RENDER_UNIS) {
+      this.isDataLoading = false;
+      return;
+    }
+
+    const bounds = this.map?.getBounds();
+    if (!bounds) {
+      this.isDataLoading = false;
+      return;
+    }
+
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+
+    const minLng = Math.min(sw.lng, ne.lng);
+    const maxLng = Math.max(sw.lng, ne.lng);
+    const minLat = Math.min(sw.lat, ne.lat);
+    const maxLat = Math.max(sw.lat, ne.lat);
+
+    const visibles = this.universidadesCache.filter(u => {
+      const [lng, lat] = u.coordenadas || [];
+      if (lng == null || lat == null) return false;
+      return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
+    });
+
+    for (const u of visibles) {
+      const el = document.createElement('div');
+      el.classList.add('mapboxgl-marker', 'marker-uni');
+      el.setAttribute('title', u.nombre);
+
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat(u.coordenadas as [number, number]);
+
+      marker.addTo(this.map!);
+      this.uniMarkers.push(marker);
+    }
+
+    setTimeout(() => this.isDataLoading = false, 150);
+  }
+
   private formatMoney(v: any): string {
     const n = Number(v || 0);
     return n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
@@ -217,6 +280,7 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnDestroy(): void {
     this.markers.forEach(m => m.remove());
+    this.uniMarkers.forEach(m => m.remove());
     this.map?.remove();
   }
 }
