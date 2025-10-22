@@ -41,9 +41,60 @@ export class DocumentoValidacionService {
     const tipo = payload?.tipo as string | undefined;
     const subtipo = payload?.subtipo as string | undefined;
     const detalles: string[] = payload?.detalles || payload?.faltantes || [];
+    const mensaje = payload?.mensaje || error?.message || 'Error desconocido';
+
+    // Errores de Base de Datos
+    if (tipo === 'BASE_DATOS') {
+      // Email duplicado
+      if (mensaje.includes('correo electronico') && mensaje.includes('Ya existe')) {
+        this.mostrarAlertaSweet(
+          'Correo ya registrado',
+          'Este correo electrónico ya está asociado a una cuenta. Ingresa otro correo.',
+          'error'
+        );
+        return;
+      }
+
+      // Teléfono duplicado
+      if (mensaje.includes('telefono') && mensaje.includes('Ya existe')) {
+        this.mostrarAlertaSweet(
+          'Teléfono ya registrado',
+          'Este teléfono ya está asociado a una cuenta. Ingresa otro teléfono.',
+          'error'
+        );
+        return;
+      }
+
+      // Error genérico de base de datos
+      this.mostrarAlertaSweet(
+        'Error en la base de datos',
+        mensaje,
+        'error'
+      );
+      return;
+    }
 
     // Errores de Validación de Documento
     if (tipo === 'VALIDACION_DOCUMENTO') {
+      // NUEVO: Nombre no coincide
+      if (subtipo === 'NOMBRE_NO_COINCIDE') {
+        const similitud = payload?.detalles?.similitud || 0;
+        const porcentaje = Math.round(similitud * 100);
+        const html = `
+          <div class="nombre-no-coincide-contenedor">
+            <p>El nombre que escribiste en el formulario no coincide con el del documento.</p>
+            <p><strong>Similitud detectada: ${porcentaje}%</strong></p>
+            <p>Verifica que hayas escrito correctamente tu nombre tal como aparece en tu credencial de lector (INE).</p>
+          </div>
+        `;
+        this.mostrarAlertaSweet(
+          'Nombre no coincide',
+          html,
+          'warning'
+        );
+        return;
+      }
+
       if (subtipo === 'FALTAN CAMPOS AL DOCUMENTO') {
         const camposHTML = this.generarCamposHTML(detalles);
         this.mostrarAlertaSweet(
@@ -72,8 +123,24 @@ export class DocumentoValidacionService {
     }
 
     // Errores de Documento
-    if (tipo === 'DOCUMENTO' && payload?.mensaje) {
-      const { hayCampos, campos, conteo } = this.detectarCamposFaltantes(payload.mensaje);
+    if (tipo === 'DOCUMENTO' && mensaje) {
+      // Nombre no coincide
+      if (mensaje.includes('nombre del documento no coincide')) {
+        const html = `
+          <div class="nombre-no-coincide-contenedor">
+            <p>El nombre que escribiste en el formulario no coincide con el del documento.</p>
+            <p>Verifica que hayas escrito correctamente tu nombre tal como aparece en tu credencial de lector (INE).</p>
+          </div>
+        `;
+        this.mostrarAlertaSweet(
+          'Nombre no coincide',
+          html,
+          'warning'
+        );
+        return;
+      }
+
+      const { hayCampos, campos, conteo } = this.detectarCamposFaltantes(mensaje);
       if (hayCampos) {
         if (conteo >= 4) {
           this.mostrarAlertaSweet(
@@ -113,9 +180,8 @@ export class DocumentoValidacionService {
       return;
     }
 
-    // Errores de red
-    const esErrorRed = error?.status === 0 || error?.status === 500;
-    if (esErrorRed) {
+    // Errores de red (solo si NO hay un tipo específico)
+    if (!tipo && (error?.status === 0 || error?.status === 500)) {
       this.mostrarAlertaSweet(
         'Error de conexión',
         'Verifica tu conexión e intenta de nuevo',
@@ -124,7 +190,6 @@ export class DocumentoValidacionService {
       return;
     }
 
-    const mensaje = payload?.mensaje || error?.message || 'Error desconocido';
     this.mostrarAlertaSweet('Error', mensaje, 'error');
   }
 
@@ -179,7 +244,7 @@ export class DocumentoValidacionService {
       icon: icono,
       title: titulo,
       html: html,
-      timer: 6000,
+      timer: 8000,
       timerProgressBar: true,
       showConfirmButton: false,
       position: 'center',
