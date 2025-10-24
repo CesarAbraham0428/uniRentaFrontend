@@ -68,8 +68,9 @@ registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, t
   // Agregar el archivo
   formData.append('documento', archivo, archivo.name);
   
-  // Agregar tipo_id
-  formData.append('tipo_id', tipoDocumentoId?.toString() || '1');
+  // Agregar tipo_id - usar el valor proporcionado o 1 por defecto
+  const tipoId = tipoDocumentoId && tipoDocumentoId > 0 ? tipoDocumentoId : 1;
+  formData.append('tipo_id', tipoId.toString());
 
   return this.http.post<FormularioRegistroPropiedad>(`${this.apiUrl}/registrar`, formData);
 }

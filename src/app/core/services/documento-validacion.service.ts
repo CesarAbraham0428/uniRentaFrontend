@@ -40,57 +40,19 @@ export class DocumentoValidacionService {
     const payload = error?.error ?? error ?? {};
     const tipo = payload?.tipo as string | undefined;
     const subtipo = payload?.subtipo as string | undefined;
-    const detalles: string[] = payload?.detalles || payload?.faltantes || [];
+    const detalles = payload?.detalles || [];
+    const mensaje = payload?.mensaje || error?.message || 'Error desconocido';
 
-    // Errores de Validación de Documento
-    if (tipo === 'VALIDACION_DOCUMENTO') {
-      if (subtipo === 'FALTAN CAMPOS AL DOCUMENTO') {
-        const camposHTML = this.generarCamposHTML(detalles);
-        this.mostrarAlertaSweet(
-          'Campos no visibles',
-          camposHTML,
-          'warning'
-        );
-        return;
-      }
-
-      if (subtipo === 'DOCUMENTO INVALIDO') {
-        this.mostrarAlertaSweet(
-          'Documento inválido',
-          'Verifica que sea el documento correcto e intenta de nuevo',
-          'error'
-        );
-        return;
-      }
-
-      this.mostrarAlertaSweet(
-        'Documento inválido',
-        'Verifica que sea el documento correcto e intenta de nuevo',
-        'error'
-      );
+    // Errores de Base de Datos
+    if (tipo === 'BASE_DATOS') {
+      this.manejarErrorBaseDatos(mensaje);
       return;
     }
 
-    // Errores de Documento
-    if (tipo === 'DOCUMENTO' && payload?.mensaje) {
-      const { hayCampos, campos, conteo } = this.detectarCamposFaltantes(payload.mensaje);
-      if (hayCampos) {
-        if (conteo >= 4) {
-          this.mostrarAlertaSweet(
-            'Documento inválido',
-            'Verifica que sea el documento correcto e intenta de nuevo',
-            'error'
-          );
-        } else {
-          const camposHTML = this.generarCamposHTML(campos);
-          this.mostrarAlertaSweet(
-            'Campos no visibles',
-            camposHTML,
-            'warning'
-          );
-        }
-        return;
-      }
+    // Errores de Validación de Documento
+    if (tipo === 'VALIDACION_DOCUMENTO') {
+      this.manejarErrorValidacionDocumento(subtipo, detalles, payload);
+      return;
     }
 
     // Errores de Archivo
@@ -113,9 +75,8 @@ export class DocumentoValidacionService {
       return;
     }
 
-    // Errores de red
-    const esErrorRed = error?.status === 0 || error?.status === 500;
-    if (esErrorRed) {
+    // Errores de red (solo si NO hay un tipo específico)
+    if (!tipo && (error?.status === 0 || error?.status === 500)) {
       this.mostrarAlertaSweet(
         'Error de conexión',
         'Verifica tu conexión e intenta de nuevo',
@@ -124,8 +85,93 @@ export class DocumentoValidacionService {
       return;
     }
 
-    const mensaje = payload?.mensaje || error?.message || 'Error desconocido';
+    // Error genérico
     this.mostrarAlertaSweet('Error', mensaje, 'error');
+  }
+
+  private manejarErrorBaseDatos(mensaje: string): void {
+    // Email duplicado
+    if (mensaje.includes('correo electronico') && mensaje.includes('Ya existe')) {
+      this.mostrarAlertaSweet(
+        'Correo ya registrado',
+        'Este correo electrónico ya está asociado a una cuenta. Ingresa otro correo.',
+        'error'
+      );
+      return;
+    }
+
+    // Teléfono duplicado
+    if (mensaje.includes('telefono') && mensaje.includes('Ya existe')) {
+      this.mostrarAlertaSweet(
+        'Teléfono ya registrado',
+        'Este teléfono ya está asociado a una cuenta. Ingresa otro teléfono.',
+        'error'
+      );
+      return;
+    }
+
+    // Error genérico de base de datos
+    this.mostrarAlertaSweet(
+      'Error en la base de datos',
+      mensaje,
+      'error'
+    );
+  }
+
+  private manejarErrorValidacionDocumento(
+    subtipo: string | undefined, 
+    detalles: any, 
+    payload: any
+  ): void {
+    switch (subtipo) {
+      case 'nombre_no_coincide':
+        this.mostrarErrorNombreNoCoincide(detalles);
+        break;
+
+      case 'faltan_campos_al_documento':
+        this.mostrarErrorCamposFaltantes(detalles);
+        break;
+
+      case 'documento_invalido':
+        this.mostrarErrorDocumentoInvalido();
+        break;
+
+      default:
+        // Si no hay subtipo específico, mostrar error genérico de documento inválido
+        this.mostrarErrorDocumentoInvalido();
+        break;
+    }
+  }
+
+  private mostrarErrorNombreNoCoincide(detalles: any): void {
+    const html = `
+      <div class="nombre-no-coincide-contenedor">
+        <p>El nombre que escribiste en el formulario no coincide con el del documento.</p>
+        <p>Verifica que hayas escrito correctamente tu nombre tal como aparece en tu credencial de elector (INE).</p>
+      </div>
+    `;
+    this.mostrarAlertaSweet(
+      'Nombre no coincide',
+      html,
+      'warning'
+    );
+  }
+
+  private mostrarErrorCamposFaltantes(detalles: string[]): void {
+    const camposHTML = this.generarCamposHTML(detalles);
+    this.mostrarAlertaSweet(
+      'Campos no visibles',
+      camposHTML,
+      'warning'
+    );
+  }
+
+  private mostrarErrorDocumentoInvalido(): void {
+    this.mostrarAlertaSweet(
+      'Documento inválido',
+      'Verifica que sea el documento correcto e intenta de nuevo',
+      'error'
+    );
   }
 
   mostrarExito(mensaje: string = 'Operación completada', titulo: string = 'Éxito'): void {
@@ -160,18 +206,6 @@ export class DocumentoValidacionService {
       .replace(/\b\w/g, l => l.toUpperCase());
   }
 
-  private detectarCamposFaltantes(mensaje: string): { hayCampos: boolean; campos: string[]; conteo: number } {
-    const patronCampos = /Faltan?\s+(\d+)\s+campo\(s\):\s*([^,}]+)/i;
-    const match = mensaje.match(patronCampos);
-    if (match) {
-      const conteo = parseInt(match[1]);
-      const camposTexto = match[2];
-      const campos = camposTexto.split(',').map((campo: string) => campo.trim());
-      return { hayCampos: true, campos, conteo };
-    }
-    return { hayCampos: false, campos: [], conteo: 0 };
-  }
-
   private mostrarAlertaSweet(titulo: string, html: string, icono: 'warning' | 'error'): void {
     const colorBorder = icono === 'warning' ? '#ff9800' : '#f44336';
     
@@ -179,7 +213,7 @@ export class DocumentoValidacionService {
       icon: icono,
       title: titulo,
       html: html,
-      timer: 6000,
+      timer: 8000,
       timerProgressBar: true,
       showConfirmButton: false,
       position: 'center',
