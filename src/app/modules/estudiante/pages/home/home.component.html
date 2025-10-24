@@ -1,4 +1,4 @@
-<div class="propiedades-page">
+<div class="propiedades-page" cdkScrollable>
   <!-- Hero Carousel Section -->
   <section class="hero-carousel">
     <div class="carousel-container">
@@ -59,8 +59,9 @@
   <div class="search-section" id="searchSection" [class.is-sticky]="isSticky">
     <div class="container">
       <form (ngSubmit)="aplicarFiltros()" class="search-form">
-        <!-- Destino -->
+        <!-- Barra de búsqueda -->
         <div class="search-bar">
+          <!-- Destino -->
           <div class="search-field">
             <label class="search-label">Destino</label>
             <input
@@ -143,7 +144,7 @@
             />
           </div>
 
-          <!-- Botón de limpiar mejorado dentro de la barra -->
+          <!-- Botón de limpiar -->
           <button
             type="button"
             class="clear-btn"
@@ -163,6 +164,7 @@
     </div>
   </div>
 
+  <!-- Sentinel (para sticky control) -->
   <div #stickySentinel class="sticky-sentinel" aria-hidden="true"></div>
 
   <!-- Resultados Section -->
@@ -197,10 +199,10 @@
         <div class="card propiedad-card h-100 shadow-sm">
           <div class="position-relative">
             <img
-              [src]="propiedad.imagenes[0] || 'assets/default-property.jpg'"
+              [src]="propiedad.imagenes[0] || '/assets/default-property.jpg'"
               class="card-img-top propiedad-img"
               [alt]="propiedad.nombre"
-              onerror="this.src='assets/default-property.jpg'"
+              onerror="this.src='/assets/default-property.jpg'"
             />
             <span class="badge precio-badge">
               ${{ propiedad.precio | number : "1.0-0" }}/mes
@@ -282,7 +284,8 @@
         <p class="map-subtitle mb-0">Explora las propiedades en el mapa</p>
       </div>
 
-      <div class="map-card-body">
+      <!-- Contenedor aislante para prevenir reflows -->
+      <div class="map-card-body map-safe-zone">
         <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
       </div>
     </div>

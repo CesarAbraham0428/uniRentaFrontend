@@ -25,14 +25,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isSticky = false;
   private io?: IntersectionObserver;
-  private sentinelVisible = true;
-  private mapVisible = false;
 
   @ViewChild('stickySentinel') stickySentinel!: ElementRef<HTMLDivElement>;
-  @ViewChild('resultsContainer') resultsRef!: ElementRef<HTMLDivElement>;
-  @ViewChild('mapContainer') mapRef!: ElementRef<HTMLDivElement>;
 
-  constructor(private propiedadService: PropiedadService) { }
+  constructor(private propiedadService: PropiedadService) {}
 
   ngOnInit(): void {
     this.cargarPropiedades();
@@ -47,27 +43,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.io) this.io.disconnect();
 
     this.io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const target = entry.target as HTMLElement;
-        if (this.stickySentinel && target === this.stickySentinel.nativeElement) {
-          this.sentinelVisible = entry.isIntersecting;
+      for (const entry of entries) {
+        if (this.stickySentinel && entry.target === this.stickySentinel.nativeElement) {
+          // sticky cuando el sentinel sale por arriba
+          this.isSticky = !entry.isIntersecting;
         }
-        if (this.mapRef && target === this.mapRef.nativeElement) {
-          this.mapVisible = entry.isIntersecting;
-        }
-      });
-      this.isSticky = !this.sentinelVisible && !this.mapVisible;
+      }
     }, {
       root: null,
       threshold: 0,
+      // Evita “flapping” al cruzar el umbral por 1px
+      rootMargin: '0px 0px -1px 0px',
     });
 
     setTimeout(() => {
       if (this.stickySentinel?.nativeElement) this.io!.observe(this.stickySentinel.nativeElement);
-      if (this.mapRef?.nativeElement) this.io!.observe(this.mapRef.nativeElement);
     });
   }
-
 
   startCarousel(): void {
     this.carouselInterval = setInterval(() => {
@@ -176,4 +168,4 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.carouselInterval) clearInterval(this.carouselInterval);
     if (this.io) this.io.disconnect();
   }
-}	
+}

@@ -52,9 +52,21 @@ export class MapaBusquedaComponent implements OnInit, OnDestroy, OnChanges {
       zoom: 11
     });
 
+    // Controles de navegación (+/-)
     this.map.addControl(new mapboxgl.NavigationControl());
 
     this.map.on('load', () => {
+      // Evita que el mapa “agarre” el scroll al pasar por encima
+      this.map!.scrollZoom.disable();
+      // Permite zoom solo si el usuario mantiene Ctrl (mejor UX)
+      this.map!.getCanvas().addEventListener('wheel', (e: WheelEvent) => {
+        if (e.ctrlKey) {
+          this.map!.scrollZoom.enable();
+        } else {
+          this.map!.scrollZoom.disable();
+        }
+      }, { passive: true });
+
       this.renderMarkers();
       this.initUniversidadesLayer();
       setTimeout(() => this.map?.resize(), 0);

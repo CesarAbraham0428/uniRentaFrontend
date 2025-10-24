@@ -176,6 +176,8 @@
   box-shadow: none;
   border-bottom: none;
   transition: all 0.3s ease;         /* Suaviza el cambio */
+  /* Altura estable para evitar “saltos” al activarse sticky */
+  min-height: 84px;
 }
 
 .search-section.is-sticky {
@@ -470,7 +472,6 @@
 @media (min-width: 992px) {
   .map-card-body { height: 520px; }
 }
-
 
 @media (max-width: 992px) {
   .hero-title {
