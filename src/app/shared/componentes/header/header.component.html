@@ -9,6 +9,7 @@
     <nav class="header-nav" [class.open]="isMenuOpen">
       <!-- Si NO está autenticado -->
       <ng-container *ngIf="!estaAutenticado">
+        <a routerLink="/estudiante" class="nav-link">Inicio</a>
         <a routerLink="/rentero/login" class="nav-link" (click)="closeMenu()">
           Iniciar Sesión
         </a>
@@ -16,17 +17,22 @@
 
       <!-- Si SÍ está autenticado -->
       <ng-container *ngIf="estaAutenticado">
-        <!-- <CHANGE> Mejorado el diseño del saludo de usuario con icono y mejor estructura -->
+        <a routerLink="/estudiante" class="nav-link">Inicio</a>
+        <a routerLink="/rentero" class="nav-link">Gestionar Propiedades</a>
         <div class="user-profile">
-          <div class="user-avatar">
-            <i class="bi bi-person-circle"></i>
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <div class="greeting-container">
+                <span class="user-greeting">Bienvenido</span>
+                <span class="user-name">{{ nombreUsuario }}</span>
+              </div>
+            </div>
+            <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
           </div>
-          <div class="user-info">
-            <span class="user-greeting">Bienvenido</span>
-            <span class="user-name">{{ nombreUsuario }}</span>
-          </div>
-        </div>
-        <button class="nav-link" (click)="cerrarSesion()">Cerrar Sesión</button>
       </ng-container>
     </nav>
 
