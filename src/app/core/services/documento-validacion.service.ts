@@ -193,7 +193,7 @@ export class DocumentoValidacionService {
   private generarCamposHTML(campos: string[]): string {
     const camposFormateados = campos
       .map(campo => `<span class="campo-faltante">${this.limpiarNombreCampo(campo)}</span>`)
-      .join(', ');
+      .join(' ');
     
     return `Toma una foto más clara donde se vean estos campos: <br><div class="campos-contenedor">${camposFormateados}</div>`;
   }
