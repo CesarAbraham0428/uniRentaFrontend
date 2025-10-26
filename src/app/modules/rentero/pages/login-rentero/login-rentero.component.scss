@@ -36,6 +36,8 @@ $color-borde-hover: #9ca3af;
     position: absolute;
     top: 0;
     left: 0;
+    filter: blur(6px); 
+    transform: scale(1.05);
   }
   
   .overlay-imagen {

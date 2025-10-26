@@ -1,10 +1,10 @@
 // Variables de colores
-$color-fondo: #EAEDEF;
-$color-tarjeta: #FEFDFE;
-$color-texto: #1B1C1D;
-$color-primario: #1A3B55;
-$color-agregar: #228B22;
-$color-error: #DC143C;
+$color-fondo: #eaedef;
+$color-tarjeta: #fefdfe;
+$color-texto: #1b1c1d;
+$color-primario: #1a3b55;
+$color-agregar: #228b22;
+$color-error: #dc143c;
 $color-borde: #d1d5db;
 $color-borde-hover: #9ca3af;
 
@@ -17,7 +17,6 @@ $color-borde-hover: #9ca3af;
   }
 }
 
-// Contenedor de imagen izquierdo
 .contenedor-imagen {
   flex: 1;
   position: relative;
@@ -36,6 +35,8 @@ $color-borde-hover: #9ca3af;
     position: absolute;
     top: 0;
     left: 0;
+    filter: blur(6px); 
+    transform: scale(1.05);
   }
 
   .overlay-imagen {
@@ -44,7 +45,11 @@ $color-borde-hover: #9ca3af;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(26, 59, 85, 0.45) 0%, rgba(52, 73, 94, 0.35) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(26, 59, 85, 0.45) 0%,
+      rgba(52, 73, 94, 0.35) 100%
+    );
     backdrop-filter: blur(1px);
     display: flex;
     align-items: center;
@@ -603,7 +608,11 @@ $color-borde-hover: #9ca3af;
 
 // Nota informativa sobre tipos de archivos
 .nota-tipos-archivo {
-  background: linear-gradient(135deg, rgba($color-primario, 0.05) 0%, rgba($color-primario, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba($color-primario, 0.05) 0%,
+    rgba($color-primario, 0.02) 100%
+  );
   border: 1px solid rgba($color-primario, 0.15);
   border-radius: 10px;
   padding: 1rem;
