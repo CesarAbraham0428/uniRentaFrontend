@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   PropiedadNueva,
   FormularioRegistroPropiedad,
@@ -74,7 +75,11 @@ export class PropiedadService {
 
   // ========== ENDPOINTS AUTENTICADOS - PROPIEDADES ==========
 
-  registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, tipoDocumentoId?: number): Observable<FormularioRegistroPropiedad> {
+  registrarPropiedad(
+    datosPropiedad: FormularioRegistroPropiedad,
+    archivo: File,
+    tipoDocumentoId?: number
+  ): Observable<FormularioRegistroPropiedad> {
     const formData = new FormData();
 
     // Agregar campos individuales
@@ -100,6 +105,25 @@ export class PropiedadService {
   obtenerPropiedadesDelRentero(): Observable<PropiedadesRenteroResponse> {
     const headers = this.getAuthHeaders();
     return this.http.get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers });
+  }
+
+  obtenerPropiedadDelRenteroPorId(propiedadId: number): Observable<PropiedadNueva | any | null> {
+    const headers = this.getAuthHeaders();
+    return this.http
+      .get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers })
+      .pipe(
+        map((resp) => {
+          if (resp?.success && Array.isArray(resp.data)) {
+            return (resp.data as any[]).find(p => p.id === propiedadId) ?? null;
+          }
+          return null;
+        })
+      );
+  }
+
+  actualizarPropiedad(propiedadId: number, payload: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${propiedadId}`, payload, { headers });
   }
 
   // ========== GESTIÓN DE UNIDADES (MÉTODOS CORREGIDOS) ==========

@@ -2,7 +2,7 @@ import { Component, Input, ElementRef, ViewChild, OnInit, OnDestroy, OnChanges, 
 import mapboxgl, { Map as MapboxMap, Marker, LngLatBounds } from 'mapbox-gl';
 import { environment } from '../../../../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UniversidadService } from '../../../../core/universidad.service';
+import { UniversidadService } from '../../../../core/services/universidad.service'; 
 import { UniversidadBasica } from '../../../../interfaces/universidad.interface';
 
 type Coords = [number, number];

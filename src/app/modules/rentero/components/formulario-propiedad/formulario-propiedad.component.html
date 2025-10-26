@@ -3,10 +3,18 @@
   <div class="contenedor-imagen">
     <div class="overlay-imagen">
       <h2 class="frase-animada">
-        {{ esEdicion ? "Actualiza la información de tu propiedad" : "Registra tu propiedad y comienza a generar ingresos" }}
+        {{
+          esEdicion
+            ? "Actualiza la información de tu propiedad"
+            : "Registra tu propiedad y comienza a generar ingresos"
+        }}
       </h2>
     </div>
-    <img src="/assets/fondo_fr.png" alt="Registro de Propiedad" class="imagen-fondo" />
+    <img
+      src="/assets/fondo_fr.png"
+      alt="Registro de Propiedad"
+      class="imagen-fondo"
+    />
   </div>
 
   <!-- Contenedor de formulario derecho -->
@@ -174,7 +182,10 @@
                 {{ tipo.nombre }}
               </option>
             </select>
-            <div class="mensaje-error" *ngIf="esCampoInvalido('tipoDocumentoId')">
+            <div
+              class="mensaje-error"
+              *ngIf="esCampoInvalido('tipoDocumentoId')"
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
               <span>Debes seleccionar un tipo de documento</span>
             </div>

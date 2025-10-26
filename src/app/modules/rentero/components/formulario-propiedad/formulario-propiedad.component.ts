@@ -132,6 +132,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     this.inicializarCoordenadas();
   }
 
+
   private inicializarCoordenadas(): void {
     const lat = parseFloat(this.formularioPropiedad.get('ubicacionLatitud')?.value);
     const lng = parseFloat(this.formularioPropiedad.get('ubicacionLongitud')?.value);
@@ -231,15 +232,19 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     if (!this.validarFormulario()) return;
 
     this.procesando = true;
-    const usuarioActual = this.renteroService.obtenerUsuarioActual();
 
-    if (!usuarioActual) {
-      return this.mostrarError('Usuario no autenticado', 'Error de autenticación');
+    if (this.esEdicion) {
+      this.actualizarPropiedad();
+      return;
     }
 
+    const usuarioActual = this.renteroService.obtenerUsuarioActual();
+    if (!usuarioActual) return this.mostrarError('Usuario no autenticado', 'Error de autenticación');
+
     const datosPropiedad = this.construirDatosPropiedad(usuarioActual.id);
-    this.esEdicion ? this.actualizarPropiedad() : this.crearPropiedad(datosPropiedad);
+    this.crearPropiedad(datosPropiedad);
   }
+
 
   private validarFormulario(): boolean {
     if (!this.formularioPropiedad.valid) {
@@ -296,11 +301,57 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
       });
   }
 
-  private actualizarPropiedad(): void {
-    this.procesando = false;
-    this.documentoValidacionService.mostrarExito('Propiedad actualizada exitosamente');
-    this.router.navigate(['/rentero']);
+  private construirPayloadActualizacion(): any {
+    const v = this.formularioPropiedad.value;
+
+    const visible = String(v.estado || '').toLowerCase() === 'disponible';
+
+    const lat = parseFloat(v.ubicacionLatitud);
+    const lng = parseFloat(v.ubicacionLongitud);
+    const hasCoords = !Number.isNaN(lat) && !Number.isNaN(lng);
+
+    const ubicacion: any = {
+      calle: v.ubicacionCalle,
+      colonia: v.ubicacionColonia,
+      numero: v.ubicacionNumero,
+      codigo_postal: v.ubicacionCodigoPostal,
+      municipio: v.ubicacionMunicipio,
+      estado: v.ubicacionEstado
+    };
+
+    if (hasCoords) {
+      ubicacion.type = 'Point';
+      ubicacion.coordinates = [lng, lat];
+    }
+
+    const payload: any = {
+      nombre: v.nombre,
+      visible,
+      ubicacion
+    };
+
+    return payload;
   }
+
+
+  private actualizarPropiedad(): void {
+    if (!this.idPropiedad) return;
+    const id = parseInt(this.idPropiedad, 10);
+
+    const payload = this.construirPayloadActualizacion();
+    this.propiedadService.actualizarPropiedad(id, payload).subscribe({
+      next: () => {
+        this.procesando = false;
+        this.documentoValidacionService.mostrarExito('Propiedad actualizada exitosamente');
+        this.router.navigate(['/rentero']);
+      },
+      error: (error) => {
+        this.procesando = false;
+        this.documentoValidacionService.manejarErrores(error, 'actualización de propiedad');
+      }
+    });
+  }
+
 
   // ========== UTILIDADES ==========
   cancelar(): void {
