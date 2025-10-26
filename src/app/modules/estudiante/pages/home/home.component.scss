@@ -30,7 +30,7 @@
   height: 100%;
   opacity: 0;
   transition: opacity 1s ease-in-out;
-  
+
   &.active {
     opacity: 1;
     z-index: 1;
@@ -446,7 +446,7 @@
 .map-card {
   border: 2px solid #dee2e6;
   border-radius: 16px;
-  overflow: hidden; 
+  overflow: hidden;
   background: #fff;
 }
 
@@ -458,9 +458,9 @@
 }
 
 .map-card-body {
-  padding: 0;            
-  height: 420px;         
-  position: relative;    
+  padding: 0;
+  height: 420px;
+  position: relative;
 }
 
 .map-card-body app-mapa-busqueda,

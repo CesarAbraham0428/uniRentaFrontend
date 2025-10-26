@@ -1,4 +1,4 @@
-<div class="propiedades-page" cdkScrollable>
+<div class="propiedades-page">
   <!-- Hero Carousel Section -->
   <section class="hero-carousel">
     <div class="carousel-container">
@@ -56,12 +56,11 @@
   </section>
 
   <!-- Search Bar Section -->
-  <div class="search-section" id="searchSection" [class.is-sticky]="isSticky">
+  <div class="search-section" id="searchSection">
     <div class="container">
       <form (ngSubmit)="aplicarFiltros()" class="search-form">
-        <!-- Barra de búsqueda -->
+        <!-- Destino -->
         <div class="search-bar">
-          <!-- Destino -->
           <div class="search-field">
             <label class="search-label">Destino</label>
             <input
@@ -113,38 +112,7 @@
             </div>
           </div>
 
-          <div class="search-divider"></div>
-
-          <!-- Universidad -->
-          <div class="search-field">
-            <label class="search-label">Universidad</label>
-            <input
-              type="text"
-              class="search-input"
-              [(ngModel)]="universidadNombre"
-              name="universidadNombre"
-              placeholder="Ej: UTNG, UDHI"
-            />
-          </div>
-
-          <div class="search-divider"></div>
-
-          <!-- Rango -->
-          <div class="search-field search-field-small">
-            <label class="search-label">Rango (km)</label>
-            <input
-              type="number"
-              class="search-input"
-              [(ngModel)]="rangoKm"
-              name="rangoKm"
-              placeholder="2"
-              min="0.5"
-              step="0.5"
-              [disabled]="!universidadNombre"
-            />
-          </div>
-
-          <!-- Botón de limpiar -->
+          <!-- Botón de limpiar mejorado dentro de la barra -->
           <button
             type="button"
             class="clear-btn"
@@ -164,11 +132,8 @@
     </div>
   </div>
 
-  <!-- Sentinel (para sticky control) -->
-  <div #stickySentinel class="sticky-sentinel" aria-hidden="true"></div>
-
   <!-- Resultados Section -->
-  <div class="container pb-5" id="resultsContainer" #resultsContainer>
+  <div class="container pb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h5 class="results-title mb-0">
         <i class="bi bi-house-door me-2"></i>Propiedades Disponibles
@@ -199,10 +164,10 @@
         <div class="card propiedad-card h-100 shadow-sm">
           <div class="position-relative">
             <img
-              [src]="propiedad.imagenes[0] || '/assets/default-property.jpg'"
+              [src]="propiedad.imagenes[0] || 'assets/default-property.jpg'"
               class="card-img-top propiedad-img"
               [alt]="propiedad.nombre"
-              onerror="this.src='/assets/default-property.jpg'"
+              onerror="this.src='assets/default-property.jpg'"
             />
             <span class="badge precio-badge">
               ${{ propiedad.precio | number : "1.0-0" }}/mes
@@ -259,11 +224,9 @@
       *ngIf="!cargando && !error && propiedades.length === 0"
       class="text-center py-5"
     >
-      <i class="bi bi-house-heart text-muted" style="font-size: 3rem"></i>
-      <p class="text-muted mt-3 fs-5">
-        Lamentamos no haber encontrado tu lugar perfecto<br />
-        ¿Por qué no intentas con otra opción? Quizá está más cerca de lo que
-        crees.
+      <i class="bi bi-house-x-fill text-muted" style="font-size: 3rem"></i>
+      <p class="text-muted mt-3">
+        No se encontraron propiedades con los filtros seleccionados
       </p>
       <button class="btn btn-primary btn-sm" (click)="limpiarFiltros()">
         <i class="bi bi-arrow-clockwise me-2"></i>Ver todas las propiedades
@@ -274,8 +237,6 @@
   <!-- Mapa de resultados -->
   <div
     class="container pb-5"
-    id="mapContainer"
-    #mapContainer
     *ngIf="!cargando && !error && propiedades.length > 0"
   >
     <div class="card map-card shadow-sm">
@@ -284,8 +245,7 @@
         <p class="map-subtitle mb-0">Explora las propiedades en el mapa</p>
       </div>
 
-      <!-- Contenedor aislante para prevenir reflows -->
-      <div class="map-card-body map-safe-zone">
+      <div class="map-card-body">
         <app-mapa-busqueda [propiedades]="propiedades"></app-mapa-busqueda>
       </div>
     </div>
