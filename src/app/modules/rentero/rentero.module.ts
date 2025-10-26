@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { RenteroRoutingModule } from './rentero-routing.module';
+import { FormularioUnidadComponent } from './components/formulario-unidad/formulario-unidad.component';
 import { RenteroLayoutComponent } from './pages/rentero-layout/rentero-layout.component';
 import { RegistroRenteroComponent } from './pages/registro-rentero/registro-rentero.component';
 import { FormularioPropiedadComponent } from './components/formulario-propiedad/formulario-propiedad.component';
@@ -16,7 +17,8 @@ import { MapaSeleccionComponent } from '../../shared/componentes/mapas/mapa-sele
     RegistroRenteroComponent,
     FormularioPropiedadComponent,
     LoginRenteroComponent,
-    MapaSeleccionComponent
+    MapaSeleccionComponent,
+    FormularioUnidadComponent
   ],
   imports: [
     CommonModule,

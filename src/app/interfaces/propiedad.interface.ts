@@ -43,6 +43,16 @@ export interface Propiedad {
   rentero: Rentero;
 }
 
+export interface PropiedadBackend {
+  id: number;
+  nombre: string;
+  calle: string;
+  colonia: string;
+  numero: string;
+  municipio: string;
+  visible?: boolean; // Si viene del backend
+}
+
 export interface UbicacionNueva {
   nombre: string;
   direccion: string;
@@ -78,6 +88,33 @@ export interface FormularioRegistroPropiedad {
   rentero_id: number;
 }
 
+// Nuevas interfaces para unidades
+export interface Unidad {
+  id: number;
+  propiedad_id: number;
+  precio: number;
+  descripcion: Descripcion;
+  imagenes: string[];
+  disponible: boolean;
+  created_at?: string;
+  updated_at?: string;
+  propiedad?: Propiedad;
+}
+
+export interface FormularioRegistroUnidad {
+  propiedad_id: number;
+  precio: number;
+  descripcion: Descripcion;
+  imagenes: string[];
+}
+
+export interface FormularioActualizacionUnidad {
+  precio?: number;
+  descripcion?: Descripcion;
+  imagenes?: string[];
+  disponible?: boolean;
+}
+
 // Interfaz para la respuesta de la API
 export interface ApiResponse {
   success: boolean;
@@ -90,4 +127,23 @@ export interface ApiResponse {
 export interface SinglePropertyResponse {
   success: boolean;
   data?: Propiedad;
+}
+
+// Nuevas interfaces para respuestas de unidades
+export interface UnidadesResponse {
+  success: boolean;
+  cantidad?: number;
+  data?: Unidad[];
+}
+
+export interface SingleUnidadResponse {
+  success: boolean;
+  data?: Unidad;
+}
+
+// Interfaz para propiedades del rentero
+export interface PropiedadesRenteroResponse {
+  success: boolean;
+  cantidad?: number;
+  data?: PropiedadBackend[]; // Cambia de PropiedadNueva[] a PropiedadBackend[]
 }
