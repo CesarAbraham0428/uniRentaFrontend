@@ -76,18 +76,6 @@
                 <span>{{ obtenerMensajeError('precio') }}</span>
               </div>
             </div>
-
-            <!-- Campo disponible solo para edición -->
-            <div class="grupo-campo" *ngIf="esEdicion">
-              <label for="disponible" class="etiqueta">
-                <i class="bi bi-toggle-on"></i>
-                Disponibilidad
-              </label>
-              <select id="disponible" formControlName="disponible" class="campo-entrada">
-                <option [value]="true">Disponible</option>
-                <option [value]="false">No Disponible</option>
-              </select>
-            </div>
           </div>
         </div>
 
@@ -159,11 +147,11 @@
           </div>
         </div>
 
-        <!-- Imágenes de la propiedad -->
+        <!-- Imágenes de la unidad -->
         <div class="seccion-formulario">
           <h3 class="titulo-seccion">
             <i class="bi bi-images"></i>
-            Imágenes de la Propiedad
+            Imágenes de la Unidad
           </h3>
 
           <!-- Información sobre archivos permitidos -->
@@ -227,7 +215,7 @@
           <!-- Mensaje si no hay imágenes -->
           <div class="sin-imagenes" *ngIf="!hayImagenes">
             <i class="bi bi-image"></i>
-            <small>Las imágenes ayudan a mostrar mejor tu propiedad</small>
+            <small>Las imágenes ayudan a mostrar mejor tu unidad</small>
           </div>
         </div>
 

@@ -129,7 +129,6 @@ export class PropiedadService {
   // ========== GESTIÓN DE UNIDADES (MÉTODOS CORREGIDOS) ==========
 
   registrarUnidad(datosUnidad: FormularioRegistroUnidad): Observable<RegistroUnidadResponse> {
-    console.log('🚀 Enviando datos de unidad al backend:', datosUnidad);
 
     // Validar datos antes de enviar
     if (!datosUnidad.propiedad_id) {
@@ -153,8 +152,6 @@ export class PropiedadService {
       imagenes: datosUnidad.imagenes || null
     };
 
-    console.log('📤 Payload final para el backend:', payload);
-
     return this.http.post<RegistroUnidadResponse>(
       `${this.apiUrl}/unidades/registrar`,
       payload,
@@ -163,7 +160,6 @@ export class PropiedadService {
   }
 
   eliminarUnidad(unidadId: number): Observable<EliminacionUnidadResponse> {
-    console.log('🗑️ Eliminando unidad ID:', unidadId);
 
     if (!unidadId || isNaN(unidadId)) {
       throw new Error('ID de unidad inválido');
@@ -201,7 +197,6 @@ export class PropiedadService {
   }
 
   obtenerUnidadesPorPropiedad(propiedadId: number): Observable<UnidadesResponse> {
-    console.log('📋 Obteniendo unidades para propiedad ID:', propiedadId);
 
     if (!propiedadId || isNaN(propiedadId)) {
       throw new Error('ID de propiedad inválido');
