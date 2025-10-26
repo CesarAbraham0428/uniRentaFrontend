@@ -9,7 +9,6 @@
     <nav class="header-nav" [class.open]="isMenuOpen">
       <!-- Si NO está autenticado -->
       <ng-container *ngIf="!estaAutenticado">
-        <a routerLink="/estudiante" class="nav-link">Inicio</a>
         <a routerLink="/rentero/login" class="nav-link" (click)="closeMenu()">
           Iniciar Sesión
         </a>
@@ -17,7 +16,6 @@
 
       <!-- Si SÍ está autenticado -->
       <ng-container *ngIf="estaAutenticado">
-        <a routerLink="/estudiante" class="nav-link">Inicio</a>
         <a routerLink="/rentero" class="nav-link">Gestionar Propiedades</a>
         <div class="user-profile">
             <div class="user-info">

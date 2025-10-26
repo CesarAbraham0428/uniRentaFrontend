@@ -135,7 +135,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   private inicializarCoordenadas(): void {
     const lat = parseFloat(this.formularioPropiedad.get('ubicacionLatitud')?.value);
     const lng = parseFloat(this.formularioPropiedad.get('ubicacionLongitud')?.value);
-    
+
     if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
       this.coordsIniciales = [lng, lat];
     }
@@ -145,7 +145,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     this.formularioPropiedad.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(() => {
-        this.direccionBusqueda = this.isDireccionCompleta() 
+        this.direccionBusqueda = this.isDireccionCompleta()
           ? this.CAMPOS_UBICACION.map(c => this.formularioPropiedad.get(c)?.value?.trim()).join(', ')
           : null;
       });
@@ -164,6 +164,8 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
       ubicacionLatitud: ev.lat.toFixed(6),
       ubicacionLongitud: ev.lng.toFixed(6)
     }, { emitEvent: false });
+
+    this.coordsIniciales = [ev.lng, ev.lat];
   }
 
   // ========== CARGA DE DATOS ==========
