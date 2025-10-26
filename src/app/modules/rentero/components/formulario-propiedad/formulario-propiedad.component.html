@@ -415,8 +415,10 @@
 
       <!-- Procesamiento de documento -->
       <app-procesamiento-documento
-        [visible]="procesando"
-        [mensaje]="'Procesando propiedad...'"
+        [visible]="!esEdicion && procesando"
+        [mensaje]="
+          esEdicion ? 'Actualizando propiedad...' : 'Procesando propiedad...'
+        "
       ></app-procesamiento-documento>
     </div>
   </div>
