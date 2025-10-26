@@ -130,7 +130,7 @@
                           Unidades de {{ propiedad.nombre }}
                         </h4>
                         <button
-                          class="boton boton-recargar"
+                          class="boton-recargar"
                           (click)="recargarDatos()"
                           title="Recargar datos">
                           <i class="bi bi-arrow-clockwise"></i>
@@ -155,7 +155,7 @@
                         </button>
                       </div>
 
-                      <!-- Tabla de unidades -->
+                      <!-- Tabla de unidades CORREGIDA -->
                       <div *ngIf="!cargandoUnidades && unidadesActuales.length > 0" class="tabla-unidades-container">
                         <table class="tabla-unidades">
                           <thead>
@@ -198,8 +198,6 @@
                                 <div class="servicios-unidad">
                                   {{ obtenerServicios(unidad) }}
                                 </div>
-                              </td>
-                              <td>
                               </td>
                               <td>
                                 <div class="acciones-unidad">

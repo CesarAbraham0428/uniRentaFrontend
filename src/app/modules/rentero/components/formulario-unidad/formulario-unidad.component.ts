@@ -237,23 +237,26 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       console.log('📁 Archivo eliminado, archivos restantes:', this.imagenesSeleccionadas.length);
     }
 
-    // Limpiar URL de preview
+    // Liberar memoria y eliminar de preview
     if (this.urlsPreview[index] && this.urlsPreview[index].startsWith('blob:')) {
       URL.revokeObjectURL(this.urlsPreview[index]);
     }
     this.urlsPreview.splice(index, 1);
+
+    console.log('🖼️ Vista previa actualizada, total:', this.urlsPreview.length);
   }
 
   private limpiarPrevisualizacionesDeArchivos(): void {
-    // Solo limpiar URLs de blob (archivos nuevos), mantener URLs existentes
-    this.urlsPreview.forEach((url, index) => {
+    // Solo liberar URLs de blob (archivos nuevos), mantener URLs existentes
+    this.urlsPreview.forEach(url => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
     });
 
-    // Mantener solo las URLs que no sean blob (imágenes existentes)
-    this.urlsPreview = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+    // Limpiar solo los archivos nuevos, mantener URLs existentes si es edición
+    const urlsExistentes = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+    this.urlsPreview = [...urlsExistentes];
     this.imagenesSeleccionadas = [];
   }
 
@@ -267,20 +270,15 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     this.imagenesSeleccionadas = [];
   }
 
-  // ========== GETTERS PARA EL TEMPLATE ==========
-
-  get textoBotonImagenes(): string {
-    const nuevas = this.imagenesSeleccionadas.length;
-    if (nuevas === 0) return 'No hay imágenes nuevas';
-    return `${nuevas} imagen${nuevas > 1 ? 'es' : ''} nueva${nuevas > 1 ? 's' : ''}`;
-  }
-
-  get puedeAgregarImagenes(): boolean {
-    return this.urlsPreview.length < this.maxImagenes;
-  }
+  // ========== GETTERS ==========
 
   get hayImagenes(): boolean {
     return this.urlsPreview.length > 0;
+  }
+
+  get textoBotonImagenes(): string {
+    const cantidad = this.imagenesSeleccionadas.length;
+    return cantidad === 1 ? '1 imagen seleccionada' : `${cantidad} imágenes seleccionadas`;
   }
 
   // ========== CONVERSIÓN DE IMÁGENES ==========
