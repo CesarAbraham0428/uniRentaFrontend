@@ -45,10 +45,8 @@ export class RenteroLayoutComponent implements OnInit {
 
     this.propiedadService.obtenerPropiedadesDelRentero().subscribe({
       next: (response) => {
-        console.log('Respuesta del backend:', response);
         if (response.success && response.data) {
           this.propiedades = response.data as PropiedadBackend[];
-          console.log('Propiedades cargadas:', this.propiedades);
           this.cargarContadoresUnidades();
         } else {
           this.error = 'No se pudieron cargar las propiedades';
@@ -56,7 +54,6 @@ export class RenteroLayoutComponent implements OnInit {
         this.cargando = false;
       },
       error: (error) => {
-        console.error('Error al cargar propiedades:', error);
         this.error = 'Error al cargar las propiedades. Intenta de nuevo.';
         this.cargando = false;
       }
@@ -74,7 +71,6 @@ export class RenteroLayoutComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error(`Error al cargar unidades para propiedad ${propiedad.id}:`, error);
           this.unidadesPorPropiedad[propiedad.id] = 0;
         }
       });
@@ -106,8 +102,8 @@ export class RenteroLayoutComponent implements OnInit {
         this.cargandoUnidades = false;
       },
       error: (error) => {
-        console.error('Error al cargar unidades detalle:', error);
         this.cargandoUnidades = false;
+        alert('Error al cargar las unidades de esta propiedad');
       }
     });
   }
@@ -116,24 +112,65 @@ export class RenteroLayoutComponent implements OnInit {
     this.router.navigate(['/rentero/unidades', unidadId, 'editar']);
   }
 
+  // MÉTODO CORREGIDO: eliminarUnidad con mejor manejo
   eliminarUnidad(unidadId: number): void {
-    if (confirm('¿Estás seguro de eliminar esta unidad? Esta acción no se puede deshacer.')) {
-      this.propiedadService.eliminarUnidad(unidadId).subscribe({
-        next: (response) => {
-          // Actualizar la lista de unidades
-          this.unidadesActuales = this.unidadesActuales.filter(u => u.id !== unidadId);
+    if (!unidadId || isNaN(unidadId)) {
+      alert('Error: ID de unidad inválido');
+      return;
+    }
 
-          // Actualizar el contador
-          if (this.propiedadExpandida) {
-            this.unidadesPorPropiedad[this.propiedadExpandida] = this.unidadesActuales.length;
-          }
+    // Buscar información de la unidad para mostrar en la confirmación
+    const unidad = this.unidadesActuales.find(u => u.id === unidadId);
+    const nombreUnidad = unidad ? unidad.nombre : `Unidad ID ${unidadId}`;
 
-          console.log('Unidad eliminada exitosamente');
-        },
-        error: (error) => {
-          console.error('Error al eliminar unidad:', error);
+    const mensaje = `¿Estás seguro de eliminar "${nombreUnidad}"?\n\n` +
+                   `⚠️ ATENCIÓN: Esta acción eliminará completamente la unidad y NO se puede deshacer.`;
+
+    if (!confirm(mensaje)) {
+      return;
+    }
+
+    this.propiedadService.eliminarUnidad(unidadId).subscribe({
+      next: (response) => {
+        if (response.success || response.mensaje) {
+          // ACTUALIZACIÓN INMEDIATA DEL UI
+          this.actualizarUITrasEliminacion(unidadId);
+
+          const mensajeExito = response.mensaje || 'Unidad eliminada exitosamente';
+          alert(`✅ ${mensajeExito}`);
+        } else {
+          alert('❌ Error: No se pudo confirmar la eliminación');
         }
-      });
+      },
+      error: (error) => {
+        let mensajeError = 'Error interno del servidor';
+
+        if (error.status === 404) {
+          mensajeError = 'La unidad no existe o ya fue eliminada';
+        } else if (error.status === 403) {
+          mensajeError = 'No tienes permisos para eliminar esta unidad';
+        } else if (error.status === 400) {
+          mensajeError = error.error?.mensaje || 'No se puede eliminar esta unidad';
+        } else if (error.error?.mensaje) {
+          mensajeError = error.error.mensaje;
+        }
+
+        alert(`❌ Error al eliminar unidad: ${mensajeError}\n\nStatus: ${error.status}`);
+      }
+    });
+  }
+
+  // MÉTODO NUEVO: Actualizar UI tras eliminación exitosa
+  private actualizarUITrasEliminacion(unidadId: number): void {
+    // 1. Remover la unidad de la lista actual
+    const indiceUnidad = this.unidadesActuales.findIndex(u => u.id === unidadId);
+    if (indiceUnidad !== -1) {
+      this.unidadesActuales.splice(indiceUnidad, 1);
+    }
+
+    // 2. Actualizar el contador
+    if (this.propiedadExpandida && this.unidadesPorPropiedad[this.propiedadExpandida] > 0) {
+      this.unidadesPorPropiedad[this.propiedadExpandida] = this.unidadesActuales.length;
     }
   }
 
@@ -143,6 +180,11 @@ export class RenteroLayoutComponent implements OnInit {
   }
 
   agregarUnidad(propiedadId: number): void {
+    if (!propiedadId || isNaN(propiedadId)) {
+      alert('Error: ID de propiedad inválido');
+      return;
+    }
+
     this.router.navigate(['/rentero/propiedades', propiedadId, 'nueva-unidad']);
   }
 
@@ -156,7 +198,7 @@ export class RenteroLayoutComponent implements OnInit {
 
   eliminarPropiedad(propiedadId: number): void {
     if (confirm('¿Estás seguro de eliminar esta propiedad? Esta acción no se puede deshacer.')) {
-      console.log('Eliminar propiedad:', propiedadId);
+      alert('Funcionalidad de eliminar propiedad pendiente de implementación');
     }
   }
 
@@ -176,11 +218,45 @@ export class RenteroLayoutComponent implements OnInit {
     }).format(precio);
   }
 
-  // Método para obtener servicios como string
+  // MÉTODO CORREGIDO: obtenerServicios
   obtenerServicios(unidad: Unidad): string {
-    if (unidad.descripcion && unidad.descripcion.servicios) {
+    if (unidad.descripcion && unidad.descripcion.servicios && Array.isArray(unidad.descripcion.servicios)) {
       return unidad.descripcion.servicios.join(', ');
     }
     return 'Sin servicios especificados';
+  }
+
+  // MÉTODOS NUEVOS: Para manejar estado en lugar de disponible
+  esUnidadDisponible(unidad: Unidad): boolean {
+    // Usar el método del servicio para convertir estado a disponible
+    return this.propiedadService.estadoADisponible(unidad.estado);
+  }
+
+  obtenerEstadoTexto(unidad: Unidad): string {
+    // Usar el método del servicio para formatear estado
+    return this.propiedadService.formatearEstado(unidad.estado);
+  }
+
+  obtenerClaseEstado(unidad: Unidad): string {
+    switch (unidad.estado) {
+      case 'libre':
+        return 'disponible';
+      case 'ocupada':
+        return 'ocupada';
+      case 'mantenimiento':
+        return 'mantenimiento';
+      default:
+        return 'desconocido';
+    }
+  }
+
+  // MÉTODO NUEVO: Recargar datos tras cambios
+  recargarDatos(): void {
+    this.cargarPropiedades();
+
+    // Si hay una propiedad expandida, recargar sus unidades
+    if (this.propiedadExpandida) {
+      this.cargarUnidadesDetalle(this.propiedadExpandida);
+    }
   }
 }

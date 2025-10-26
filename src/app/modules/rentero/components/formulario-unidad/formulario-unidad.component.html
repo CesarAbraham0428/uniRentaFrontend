@@ -48,6 +48,27 @@
           </h3>
 
           <div class="fila-campos">
+            <!-- Campo nombre -->
+            <div class="grupo-campo">
+              <label for="nombre" class="etiqueta">
+                <i class="bi bi-tag"></i>
+                Nombre de la Unidad
+              </label>
+              <input
+                id="nombre"
+                formControlName="nombre"
+                type="text"
+                class="campo-entrada"
+                [class.invalido]="esCampoInvalido('nombre')"
+                placeholder="Ej. Habitación Principal, Estudio A1"
+              />
+              <div class="mensaje-error" *ngIf="esCampoInvalido('nombre')">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span>{{ obtenerMensajeError('nombre') }}</span>
+              </div>
+            </div>
+
+            <!-- Campo precio -->
             <div class="grupo-campo">
               <label for="precio" class="etiqueta">
                 <i class="bi bi-currency-dollar"></i>
@@ -83,35 +104,48 @@
           </div>
         </div>
 
-        <!-- Características principales -->
+        <!-- Características -->
         <div class="seccion-formulario">
           <h3 class="titulo-seccion">
-            <i class="bi bi-house-gear"></i>
-            Características Principales
+            <i class="bi bi-house"></i>
+            Características
           </h3>
 
-          <div class="caracteristicas-grid">
-            <label class="checkbox-personalizado">
-              <input type="checkbox" formControlName="terraza">
-              <span class="checkmark">
-                <i class="bi bi-check-lg"></i>
-              </span>
-              <div class="checkbox-content">
-                <i class="bi bi-building"></i>
-                <span>Terraza o Balcón</span>
-              </div>
-            </label>
+          <div class="fila-campos">
+            <!-- Terraza -->
+            <div class="grupo-campo checkbox-campo">
+              <label for="terraza" class="checkbox-label">
+                <input id="terraza" formControlName="terraza" type="checkbox" />
+                <span class="checkmark"></span>
+                <i class="bi bi-tree"></i>
+                Tiene Terraza
+              </label>
+            </div>
 
-            <label class="checkbox-personalizado">
-              <input type="checkbox" formControlName="amueblado">
-              <span class="checkmark">
-                <i class="bi bi-check-lg"></i>
-              </span>
-              <div class="checkbox-content">
-                <i class="bi bi-house-door"></i>
-                <span>Amueblado</span>
-              </div>
+            <!-- Amueblado -->
+            <div class="grupo-campo checkbox-campo">
+              <label for="amueblado" class="checkbox-label">
+                <input id="amueblado" formControlName="amueblado" type="checkbox" />
+                <span class="checkmark"></span>
+                <i class="bi bi-house-gear"></i>
+                Amueblado
+              </label>
+            </div>
+          </div>
+
+          <!-- Características adicionales -->
+          <div class="grupo-campo">
+            <label for="caracteristicas" class="etiqueta">
+              <i class="bi bi-card-text"></i>
+              Características Adicionales
             </label>
+            <textarea
+              id="caracteristicas"
+              formControlName="caracteristicas"
+              class="campo-entrada"
+              rows="3"
+              placeholder="Describe otras características de la unidad...">
+            </textarea>
           </div>
         </div>
 
@@ -132,53 +166,18 @@
                 [checked]="isServicioSeleccionado(servicio)"
                 (change)="toggleServicio(servicio)">
               <span class="servicio-content">
-                <!-- Iconos estáticos por servicio -->
                 <i class="bi bi-droplet" *ngIf="servicio === 'Agua'"></i>
                 <i class="bi bi-lightning" *ngIf="servicio === 'Luz'"></i>
                 <i class="bi bi-fire" *ngIf="servicio === 'Gas'"></i>
                 <i class="bi bi-wifi" *ngIf="servicio === 'Internet'"></i>
                 <i class="bi bi-tv" *ngIf="servicio === 'Cable'"></i>
-                <i class="bi bi-brush" *ngIf="servicio === 'Limpieza'"></i>
+                <i class="bi bi-broom" *ngIf="servicio === 'Limpieza'"></i>
                 <i class="bi bi-shield-check" *ngIf="servicio === 'Seguridad'"></i>
                 <i class="bi bi-car-front" *ngIf="servicio === 'Estacionamiento'"></i>
-                <i class="bi bi-washing-machine" *ngIf="servicio === 'Lavandería'"></i>
+                <i class="bi bi-shop" *ngIf="servicio === 'Lavandería'"></i>
                 {{ servicio }}
               </span>
             </label>
-          </div>
-
-          <div class="servicios-seleccionados" *ngIf="serviciosSeleccionados.length > 0">
-            <h4>Servicios seleccionados:</h4>
-            <div class="tags-servicios">
-              <span *ngFor="let servicio of serviciosSeleccionados" class="tag-servicio">
-                {{ servicio }}
-                <button type="button" (click)="toggleServicio(servicio)" class="btn-quitar-tag">
-                  <i class="bi bi-x"></i>
-                </button>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Descripción adicional -->
-        <div class="seccion-formulario">
-          <h3 class="titulo-seccion">
-            <i class="bi bi-card-text"></i>
-            Descripción Adicional
-          </h3>
-
-          <div class="grupo-campo">
-            <label for="caracteristicas" class="etiqueta">
-              <i class="bi bi-text-paragraph"></i>
-              Características Específicas
-            </label>
-            <textarea
-              id="caracteristicas"
-              formControlName="caracteristicas"
-              class="campo-entrada textarea"
-              rows="4"
-              placeholder="Describe cualquier característica especial de esta unidad (opcional)">
-            </textarea>
           </div>
         </div>
 
@@ -189,35 +188,38 @@
             Imágenes de la Unidad
           </h3>
 
-          <div class="seccion-imagenes">
-            <button type="button" class="boton-agregar-imagen" (click)="agregarImagen()">
-              <i class="bi bi-plus-circle"></i>
-              Agregar Imagen
+          <!-- Botón agregar imagen -->
+          <div class="grupo-campo">
+            <button
+              type="button"
+              (click)="agregarImagen()"
+              class="boton boton-agregar-imagen"
+              [disabled]="imagenesFormArray.length >= 10">
+              <i class="bi bi-plus-lg"></i>
+              Agregar Imagen ({{ imagenesFormArray.length }}/10)
             </button>
+          </div>
 
-            <div class="imagenes-lista" *ngIf="imagenesFormArray.length > 0">
-              <div
-                *ngFor="let imagen of imagenesFormArray; let i = index"
-                class="imagen-item">
-                <img [src]="imagen" [alt]="'Imagen ' + (i + 1)" class="imagen-preview" />
-                <button
-                  type="button"
-                  class="btn-eliminar-imagen"
-                  (click)="eliminarImagen(i)"
-                  title="Eliminar imagen">
-                  <i class="bi bi-x"></i>
-                </button>
-              </div>
+          <!-- Lista de imágenes -->
+          <div class="imagenes-lista" *ngIf="imagenesFormArray.length > 0">
+            <div
+              *ngFor="let imagen of imagenesFormArray; let i = index"
+              class="imagen-item">
+              <img [src]="imagen" [alt]="'Imagen ' + (i + 1)" class="imagen-preview" />
+              <button
+                type="button"
+                (click)="eliminarImagen(i)"
+                class="boton-eliminar-imagen"
+                title="Eliminar imagen">
+                <i class="bi bi-trash"></i>
+              </button>
             </div>
+          </div>
 
-            <p class="nota-imagenes" *ngIf="imagenesFormArray.length === 0">
-              <i class="bi bi-info-circle"></i>
-              Las imágenes ayudan a atraer más inquilinos. Puedes agregar hasta 10 imágenes.
-            </p>
-
-            <p class="contador-imagenes" *ngIf="imagenesFormArray.length > 0">
-              {{ imagenesFormArray.length }}/10 imágenes agregadas
-            </p>
+          <!-- Mensaje si no hay imágenes -->
+          <div class="sin-imagenes" *ngIf="imagenesFormArray.length === 0">
+            <i class="bi bi-image"></i>
+            <p>No hay imágenes agregadas</p>
           </div>
         </div>
 

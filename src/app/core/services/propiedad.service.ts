@@ -10,8 +10,12 @@ import {
   FormularioRegistroUnidad,
   FormularioActualizacionUnidad,
   UnidadesResponse,
+  SingleUnidadCompletaResponse,
   SingleUnidadResponse,
-  PropiedadesRenteroResponse
+  RegistroUnidadResponse,
+  EliminacionUnidadResponse,
+  PropiedadesRenteroResponse,
+  ErrorResponse
 } from '../../interfaces/propiedad.interface';
 
 @Injectable({
@@ -68,7 +72,7 @@ export class PropiedadService {
     return this.http.get<ApiResponse>(`${this.apiUrl}/filtrar`, { params });
   }
 
-  // ========== ENDPOINTS AUTENTICADOS ==========
+  // ========== ENDPOINTS AUTENTICADOS - PROPIEDADES ==========
 
   registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, tipoDocumentoId?: number): Observable<FormularioRegistroPropiedad> {
     const formData = new FormData();
@@ -98,55 +102,104 @@ export class PropiedadService {
     return this.http.get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers });
   }
 
-  // ========== GESTIÓN DE UNIDADES ==========
+  // ========== GESTIÓN DE UNIDADES (MÉTODOS CORREGIDOS) ==========
 
-  registrarUnidad(datosUnidad: FormularioRegistroUnidad): Observable<SingleUnidadResponse> {
-    const headers = this.getAuthHeaders();
+  registrarUnidad(datosUnidad: FormularioRegistroUnidad): Observable<RegistroUnidadResponse> {
+    console.log('🚀 Enviando datos de unidad al backend:', datosUnidad);
 
-    // ✅ CAMBIO PRINCIPAL: Enviar objetos directamente, NO como strings JSON
+    // Validar datos antes de enviar
+    if (!datosUnidad.propiedad_id) {
+      throw new Error('propiedad_id es requerido');
+    }
+
+    if (!datosUnidad.precio || datosUnidad.precio <= 0) {
+      throw new Error('precio debe ser mayor a 0');
+    }
+
+    if (!datosUnidad.nombre || datosUnidad.nombre.trim() === '') {
+      throw new Error('nombre es requerido');
+    }
+
+    // Construir el payload según lo que espera tu backend
     const payload = {
-      propiedad_id: datosUnidad.propiedad_id,
-      precio: datosUnidad.precio,
-      descripcion: datosUnidad.descripcion,  // ← QUITAR JSON.stringify()
-      imagenes: datosUnidad.imagenes         // ← QUITAR JSON.stringify()
+      propiedad_id: Number(datosUnidad.propiedad_id),
+      nombre: datosUnidad.nombre.trim(),
+      precio: Number(datosUnidad.precio),
+      descripcion: datosUnidad.descripcion || null,
+      imagenes: datosUnidad.imagenes || null
     };
 
-    console.log('🔍 Payload enviado al backend:', payload);
-    return this.http.post<SingleUnidadResponse>(`${this.apiUrl}/unidades/registrar`, payload, { headers });
+    console.log('📤 Payload final para el backend:', payload);
+
+    return this.http.post<RegistroUnidadResponse>(
+      `${this.apiUrl}/unidades/registrar`,
+      payload,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  eliminarUnidad(unidadId: number): Observable<EliminacionUnidadResponse> {
+    console.log('🗑️ Eliminando unidad ID:', unidadId);
+
+    if (!unidadId || isNaN(unidadId)) {
+      throw new Error('ID de unidad inválido');
+    }
+
+    return this.http.delete<EliminacionUnidadResponse>(
+      `${this.apiUrl}/unidades/${unidadId}`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  actualizarUnidad(unidadId: number, datos: FormularioActualizacionUnidad): Observable<SingleUnidadResponse> {
+    console.log('✏️ Actualizando unidad ID:', unidadId, 'con datos:', datos);
+
+    if (!unidadId || isNaN(unidadId)) {
+      throw new Error('ID de unidad inválido');
+    }
+
+    // Construir payload para actualización
+    const payload: any = {};
+
+    if (datos.nombre && datos.nombre.trim()) payload.nombre = datos.nombre.trim();
+    if (datos.precio !== undefined && datos.precio > 0) payload.precio = Number(datos.precio);
+    if (datos.estado) payload.estado = datos.estado;
+    if (datos.descripcion !== undefined) payload.descripcion = datos.descripcion;
+    if (datos.imagenes !== undefined) payload.imagenes = datos.imagenes;
+
+    console.log('📤 Payload de actualización:', payload);
+
+    return this.http.put<SingleUnidadResponse>(
+      `${this.apiUrl}/unidades/${unidadId}`,
+      payload,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
   obtenerUnidadesPorPropiedad(propiedadId: number): Observable<UnidadesResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<UnidadesResponse>(`${this.apiUrl}/unidades/propiedad/${propiedadId}`, { headers });
+    console.log('📋 Obteniendo unidades para propiedad ID:', propiedadId);
+
+    if (!propiedadId || isNaN(propiedadId)) {
+      throw new Error('ID de propiedad inválido');
+    }
+
+    return this.http.get<UnidadesResponse>(
+      `${this.apiUrl}/unidades/propiedad/${propiedadId}`,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
-  actualizarUnidad(unidadId: number, datosActualizacion: FormularioActualizacionUnidad): Observable<SingleUnidadResponse> {
-    const headers = this.getAuthHeaders();
+  obtenerUnidadCompletaPorId(unidadId: number): Observable<SingleUnidadCompletaResponse> {
+    console.log('🔍 Obteniendo unidad completa ID:', unidadId);
 
-    const payload: any = {};
-
-    if (datosActualizacion.precio !== undefined) {
-      payload.precio = datosActualizacion.precio;
+    if (!unidadId || isNaN(unidadId)) {
+      throw new Error('ID de unidad inválido');
     }
 
-    if (datosActualizacion.descripcion !== undefined) {
-      payload.descripcion = datosActualizacion.descripcion;  // ← QUITAR JSON.stringify()
-    }
-
-    if (datosActualizacion.imagenes !== undefined) {
-      payload.imagenes = datosActualizacion.imagenes;        // ← QUITAR JSON.stringify()
-    }
-
-    if (datosActualizacion.disponible !== undefined) {
-      payload.disponible = datosActualizacion.disponible;
-    }
-
-    return this.http.put<SingleUnidadResponse>(`${this.apiUrl}/unidades/${unidadId}`, payload, { headers });
-  }
-
-  eliminarUnidad(unidadId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/unidades/${unidadId}`, { headers });
+    return this.http.get<SingleUnidadCompletaResponse>(
+      `${this.apiUrl}/unidades/${unidadId}`,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
   // ========== MÉTODOS AUXILIARES ==========
@@ -165,5 +218,65 @@ export class PropiedadService {
       'Authorization': `Bearer ${token}`
       // No incluir Content-Type para FormData - el navegador lo establece automáticamente
     });
+  }
+
+  // ========== MÉTODOS DE UTILIDAD PARA MANEJO DE ERRORES ==========
+
+  /**
+   * Verifica si una respuesta es un error
+   */
+  esError(response: any): response is ErrorResponse {
+    return response && typeof response.error === 'string';
+  }
+
+  /**
+   * Extrae el mensaje de error de una respuesta
+   */
+  obtenerMensajeError(error: any): string {
+    if (error?.error?.mensaje) {
+      return error.error.mensaje;
+    }
+    if (error?.error?.message) {
+      return error.error.message;
+    }
+    if (error?.error?.error) {
+      return error.error.error;
+    }
+    if (error?.message) {
+      return error.message;
+    }
+    return 'Ha ocurrido un error inesperado';
+  }
+
+  // ========== MÉTODOS DE UTILIDAD PARA UNIDADES (NUEVOS) ==========
+
+  /**
+   * Convierte el estado del backend a disponibilidad para el frontend
+   */
+  estadoADisponible(estado: string): boolean {
+    return estado === 'libre';
+  }
+
+  /**
+   * Convierte disponibilidad del frontend a estado para el backend
+   */
+  disponibleAEstado(disponible: boolean): string {
+    return disponible ? 'libre' : 'ocupada';
+  }
+
+  /**
+   * Formatea el texto del estado para mostrar al usuario
+   */
+  formatearEstado(estado: string): string {
+    switch (estado) {
+      case 'libre':
+        return 'Disponible';
+      case 'ocupada':
+        return 'Ocupada';
+      case 'mantenimiento':
+        return 'En Mantenimiento';
+      default:
+        return 'Estado Desconocido';
+    }
   }
 }

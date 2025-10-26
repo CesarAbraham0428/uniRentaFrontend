@@ -369,6 +369,25 @@ $color-blanco: #FEFDFE;
   }
 }
 
+.boton-pequeno {
+  padding: 0.5rem 0.9rem !important;
+  font-size: 0.8rem !important;
+
+  i {
+    font-size: 0.9rem !important;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.75rem !important;
+    width: auto !important; // Anular el width: 100% en móviles
+
+    i {
+      font-size: 0.85rem !important;
+    }
+  }
+}
+
 .boton-agregar-unidad {
   background-color: lighten($color-agregar, 10%);
   color: $color-blanco;

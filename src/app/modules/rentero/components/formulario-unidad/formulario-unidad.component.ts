@@ -5,7 +5,7 @@ import { PropiedadService } from '../../../../core/services/propiedad.service';
 import {
   FormularioRegistroUnidad,
   FormularioActualizacionUnidad,
-  Unidad
+  UnidadCompleta
 } from '../../../../interfaces/propiedad.interface';
 
 @Component({
@@ -20,7 +20,7 @@ export class FormularioUnidadComponent implements OnInit {
   unidadId: number = 0;
   propiedadNombre = '';
   esEdicion = false;
-  unidadActual: Unidad | null = null;
+  unidadActual: UnidadCompleta | null = null; // ← CAMBIADO: ahora usa UnidadCompleta
 
   serviciosDisponibles = [
     'Agua', 'Luz', 'Gas', 'Internet', 'Cable', 'Limpieza',
@@ -51,11 +51,12 @@ export class FormularioUnidadComponent implements OnInit {
       this.esEdicion = false;
       this.propiedadId = +params['propiedadId'];
 
-      // VALIDACIÓN CRÍTICA
+      // VALIDACIÓN CRÍTICA CORREGIDA
       if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
         console.error('❌ PropiedadId INVÁLIDO:', this.propiedadId);
         console.error('❌ Params completos:', params);
         this.mostrarError('ID de propiedad inválido', 'Error de navegación');
+        this.router.navigate(['/rentero']);
         return;
       }
 
@@ -64,12 +65,21 @@ export class FormularioUnidadComponent implements OnInit {
     } else if (this.route.snapshot.url.some(segment => segment.path === 'editar')) {
       this.esEdicion = true;
       this.unidadId = +params['unidadId'];
+
+      if (!this.unidadId || this.unidadId === 0 || isNaN(this.unidadId)) {
+        console.error('❌ UnidadId INVÁLIDO:', this.unidadId);
+        this.mostrarError('ID de unidad inválido', 'Error de navegación');
+        this.router.navigate(['/rentero']);
+        return;
+      }
+
       this.cargarUnidadParaEdicion();
     }
   }
 
   private crearFormulario(): FormGroup {
     return this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
       precio: ['', [Validators.required, Validators.min(1)]],
       terraza: [false],
       amueblado: [false],
@@ -80,31 +90,85 @@ export class FormularioUnidadComponent implements OnInit {
   }
 
   private inicializarFormulario(): void {
-    this.formularioUnidad.get('precio')?.setValidators([
-      Validators.required,
-      Validators.min(1)
-    ]);
+    // Generar nombre por defecto si es nueva unidad
+    if (!this.esEdicion) {
+      const fechaHora = new Date().toLocaleString('es-MX');
+      this.formularioUnidad.patchValue({
+        nombre: `Unidad ${fechaHora}`
+      });
+    }
+
     this.formularioUnidad.updateValueAndValidity();
   }
 
   private cargarNombrePropiedad(): void {
+    if (!this.propiedadId) {
+      console.error('No hay propiedadId para cargar nombre');
+      return;
+    }
+
     this.propiedadService.obtenerPropiedadesDelRentero().subscribe({
       next: (response) => {
+        console.log('✅ Respuesta de propiedades:', response);
         if (response.success && response.data) {
-          const propiedad = response.data.find(p => p.id === this.propiedadId);
-          this.propiedadNombre = propiedad ? propiedad.nombre : `Propiedad ID: ${this.propiedadId}`;
+          const propiedad = response.data.find((p: any) => p.id === this.propiedadId);
+          if (propiedad) {
+            this.propiedadNombre = propiedad.nombre;
+            console.log('✅ Nombre de propiedad cargado:', this.propiedadNombre);
+          } else {
+            console.warn('⚠️ Propiedad no encontrada con ID:', this.propiedadId);
+            this.propiedadNombre = `Propiedad ID: ${this.propiedadId}`;
+          }
         }
       },
       error: (error) => {
-        console.error('Error al cargar nombre de propiedad:', error);
+        console.error('❌ Error al cargar nombre de propiedad:', error);
         this.propiedadNombre = `Propiedad ID: ${this.propiedadId}`;
       }
     });
   }
 
   private cargarUnidadParaEdicion(): void {
-    console.log('Cargar unidad para edición:', this.unidadId);
+    console.log('🔄 Cargando unidad para edición:', this.unidadId);
     this.propiedadNombre = 'Cargando...';
+
+    // ← CAMBIADO: ahora maneja UnidadCompleta
+    this.propiedadService.obtenerUnidadCompletaPorId(this.unidadId).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.unidadActual = response.data; // UnidadCompleta
+          this.llenarFormularioConDatos(this.unidadActual);
+
+          // ← CAMBIADO: obtener nombre directamente de la ubicación
+          this.propiedadId = this.unidadActual.propiedad_id;
+          this.propiedadNombre = this.unidadActual.ubicacion.nombre; // Ya viene en la respuesta
+
+          console.log('✅ Unidad completa cargada:', this.unidadActual);
+          console.log('✅ Nombre de propiedad:', this.propiedadNombre);
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar unidad:', error);
+        this.mostrarError('No se pudo cargar la unidad', 'Error');
+        this.router.navigate(['/rentero']);
+      }
+    });
+  }
+
+  // ← CAMBIADO: ahora recibe UnidadCompleta
+  private llenarFormularioConDatos(unidad: UnidadCompleta): void {
+    this.formularioUnidad.patchValue({
+      nombre: unidad.nombre || '',
+      precio: unidad.precio || 0,
+      terraza: unidad.descripcion?.terraza || false,
+      amueblado: unidad.descripcion?.amueblado || false,
+      caracteristicas: unidad.descripcion?.caracteristicas || '',
+      disponible: unidad.estado === 'libre',
+      imagenes: unidad.imagenes || []
+    });
+
+    // Cargar servicios seleccionados
+    this.serviciosSeleccionados = unidad.descripcion?.servicios || [];
   }
 
   toggleServicio(servicio: string): void {
@@ -148,20 +212,9 @@ export class FormularioUnidadComponent implements OnInit {
     console.log('🚀 INICIANDO GUARDADO DE UNIDAD');
 
     // VALIDACIONES DETALLADAS
-    console.log('🔍 Estado del formulario:', this.formularioUnidad.valid);
-    console.log('🔍 Errores del formulario:', this.formularioUnidad.errors);
-    console.log('🔍 PropiedadId actual:', this.propiedadId);
-    console.log('🔍 Tipo de propiedadId:', typeof this.propiedadId);
-
     if (!this.formularioUnidad.valid) {
       console.error('❌ Formulario inválido');
-      Object.keys(this.formularioUnidad.controls).forEach(key => {
-        const control = this.formularioUnidad.get(key);
-        if (control?.invalid) {
-          console.error(`❌ Campo inválido: ${key}`, control.errors);
-        }
-      });
-      this.mostrarError('Por favor completa todos los campos requeridos', 'Formulario incompleto');
+      this.mostrarErroresFormulario();
       return;
     }
 
@@ -173,7 +226,6 @@ export class FormularioUnidadComponent implements OnInit {
       this.router.navigate(['/rentero/login']);
       return;
     }
-    console.log('✅ Token encontrado:', token.substring(0, 20) + '...');
 
     if (this.esEdicion) {
       this.actualizarUnidad();
@@ -182,13 +234,23 @@ export class FormularioUnidadComponent implements OnInit {
     }
   }
 
+  private mostrarErroresFormulario(): void {
+    Object.keys(this.formularioUnidad.controls).forEach(key => {
+      const control = this.formularioUnidad.get(key);
+      if (control?.invalid) {
+        control.markAsTouched();
+        console.error(`❌ Campo inválido: ${key}`, control.errors);
+      }
+    });
+    this.mostrarError('Por favor completa todos los campos requeridos', 'Formulario incompleto');
+  }
+
   private crearUnidad(): void {
     console.log('📝 CREANDO NUEVA UNIDAD');
     this.procesando = true;
 
     const formValue = this.formularioUnidad.value;
     console.log('🔍 Valor del formulario:', formValue);
-    console.log('🔍 Servicios seleccionados:', this.serviciosSeleccionados);
 
     // VERIFICAR PROPIEDAD ID ANTES DE ENVIAR
     if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
@@ -200,6 +262,7 @@ export class FormularioUnidadComponent implements OnInit {
 
     const datosUnidad: FormularioRegistroUnidad = {
       propiedad_id: this.propiedadId,
+      nombre: formValue.nombre || `Unidad ${Date.now()}`,
       precio: parseFloat(formValue.precio),
       descripcion: {
         terraza: formValue.terraza || false,
@@ -210,20 +273,15 @@ export class FormularioUnidadComponent implements OnInit {
       imagenes: formValue.imagenes || []
     };
 
-    console.log('📤 DATOS FINALES A ENVIAR:');
-    console.log('🔍 datosUnidad completo:', JSON.stringify(datosUnidad, null, 2));
-    console.log('🔍 Precio tipo:', typeof datosUnidad.precio);
-    console.log('🔍 PropiedadId tipo:', typeof datosUnidad.propiedad_id);
-    console.log('🔍 Descripción tipo:', typeof datosUnidad.descripcion);
-    console.log('🔍 Imagenes tipo:', typeof datosUnidad.imagenes);
+    console.log('📤 DATOS FINALES A ENVIAR:', JSON.stringify(datosUnidad, null, 2));
 
     this.propiedadService.registrarUnidad(datosUnidad).subscribe({
       next: (response) => {
         console.log('✅ Respuesta exitosa del servidor:', response);
         this.procesando = false;
 
-        if (response.success) {
-          this.mostrarExito('Unidad registrada exitosamente');
+        if (response.success || response.mensaje) {
+          this.mostrarExito(response.mensaje || 'Unidad registrada exitosamente');
           this.volverAPropiedades();
         } else {
           console.error('❌ Respuesta no exitosa:', response);
@@ -231,21 +289,14 @@ export class FormularioUnidadComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('❌ ERROR COMPLETO DEL SERVIDOR:');
-        console.error('Status:', error.status);
-        console.error('StatusText:', error.statusText);
-        console.error('Error body:', error.error);
-        console.error('Message:', error.message);
-        console.error('Headers:', error.headers);
-        console.error('URL:', error.url);
-
+        console.error('❌ ERROR COMPLETO DEL SERVIDOR:', error);
         this.procesando = false;
 
         let mensaje = 'Error interno del servidor';
-        if (error.error?.message) {
-          mensaje = error.error.message;
-        } else if (error.error?.mensaje) {
+        if (error.error?.mensaje) {
           mensaje = error.error.mensaje;
+        } else if (error.error?.message) {
+          mensaje = error.error.message;
         } else if (error.message) {
           mensaje = error.message;
         }
@@ -259,26 +310,25 @@ export class FormularioUnidadComponent implements OnInit {
     this.procesando = true;
     const formValue = this.formularioUnidad.value;
 
-    const datosActualizacion: FormularioActualizacionUnidad = {};
-
-    if (formValue.precio) datosActualizacion.precio = parseFloat(formValue.precio);
-    if (formValue.disponible !== undefined) datosActualizacion.disponible = formValue.disponible;
-
-    datosActualizacion.descripcion = {
-      terraza: formValue.terraza || false,
-      amueblado: formValue.amueblado || false,
-      servicios: this.serviciosSeleccionados,
-      caracteristicas: formValue.caracteristicas || ''
+    const datosActualizacion: FormularioActualizacionUnidad = {
+      nombre: formValue.nombre,
+      precio: parseFloat(formValue.precio),
+      estado: formValue.disponible ? 'libre' : 'ocupada',
+      descripcion: {
+        terraza: formValue.terraza || false,
+        amueblado: formValue.amueblado || false,
+        servicios: this.serviciosSeleccionados,
+        caracteristicas: formValue.caracteristicas || ''
+      },
+      imagenes: formValue.imagenes || []
     };
-
-    if (formValue.imagenes) datosActualizacion.imagenes = formValue.imagenes;
 
     this.propiedadService.actualizarUnidad(this.unidadId, datosActualizacion).subscribe({
       next: (response) => {
         this.procesando = false;
 
-        if (response.success) {
-          this.mostrarExito('Unidad actualizada exitosamente');
+        if (response.success || response.mensaje) {
+          this.mostrarExito(response.mensaje || 'Unidad actualizada exitosamente');
           this.volverAPropiedades();
         } else {
           this.mostrarError('Error al actualizar la unidad', 'Error');
@@ -287,7 +337,13 @@ export class FormularioUnidadComponent implements OnInit {
       error: (error) => {
         console.error('Error al actualizar unidad:', error);
         this.procesando = false;
-        this.mostrarError('Error al actualizar la unidad', 'Error del servidor');
+
+        let mensaje = 'Error al actualizar la unidad';
+        if (error.error?.mensaje) {
+          mensaje = error.error.mensaje;
+        }
+
+        this.mostrarError(mensaje, 'Error del servidor');
       }
     });
   }
@@ -297,7 +353,9 @@ export class FormularioUnidadComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.volverAPropiedades();
+    if (confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) {
+      this.volverAPropiedades();
+    }
   }
 
   esCampoInvalido(campo: string): boolean {
@@ -311,7 +369,8 @@ export class FormularioUnidadComponent implements OnInit {
 
     const err = control.errors;
     if (err['required']) return `${campo} es requerido`;
-    if (err['min']) return `El precio debe ser mayor a ${err['min'].min}`;
+    if (err['min']) return `El valor debe ser mayor a ${err['min'].min}`;
+    if (err['minlength']) return `Debe tener al menos ${err['minlength'].requiredLength} caracteres`;
 
     return 'Campo inválido';
   }
