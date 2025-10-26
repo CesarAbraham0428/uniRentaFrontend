@@ -698,25 +698,6 @@ $color-blanco: #FEFDFE;
   max-width: 200px;
 }
 
-.estado-unidad {
-  padding: 0.3rem 0.6rem;
-  border-radius: 15px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-
-  &.disponible {
-    background: lighten($color-agregar, 45%);
-    color: darken($color-agregar, 10%);
-  }
-
-  &.no-disponible {
-    background: lighten($color-eliminar, 45%);
-    color: darken($color-eliminar, 10%);
-  }
-}
-
 // Acciones de unidades
 .acciones-unidad {
   display: flex;
@@ -802,7 +783,6 @@ $color-blanco: #FEFDFE;
           &:nth-child(1)::before { content: "Precio:"; }
           &:nth-child(2)::before { content: "Características:"; }
           &:nth-child(3)::before { content: "Servicios:"; }
-          &:nth-child(4)::before { content: "Estado:"; }
           &:nth-child(5)::before { content: "Acciones:"; }
         }
       }

@@ -181,45 +181,86 @@
           </div>
         </div>
 
-        <!-- Imágenes -->
+        <!-- SECCIÓN DE IMÁGENES SIMPLIFICADA (patrón de propiedades) -->
         <div class="seccion-formulario">
           <h3 class="titulo-seccion">
             <i class="bi bi-images"></i>
             Imágenes de la Unidad
           </h3>
 
-          <!-- Botón agregar imagen -->
-          <div class="grupo-campo">
-            <button
-              type="button"
-              (click)="agregarImagen()"
-              class="boton boton-agregar-imagen"
-              [disabled]="imagenesFormArray.length >= 10">
-              <i class="bi bi-plus-lg"></i>
-              Agregar Imagen ({{ imagenesFormArray.length }}/10)
-            </button>
+          <!-- Información sobre archivos permitidos -->
+          <div class="info-archivos">
+            <div class="info-item">
+              <i class="bi bi-info-circle"></i>
+              <span>Formatos: JPG, PNG, WebP</span>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-file-earmark"></i>
+              <span>Máximo: {{ maxTamanoMB }}MB por imagen</span>
+            </div>
           </div>
 
-          <!-- Lista de imágenes -->
-          <div class="imagenes-lista" *ngIf="imagenesFormArray.length > 0">
-            <div
-              *ngFor="let imagen of imagenesFormArray; let i = index"
-              class="imagen-item">
-              <img [src]="imagen" [alt]="'Imagen ' + (i + 1)" class="imagen-preview" />
-              <button
-                type="button"
-                (click)="eliminarImagen(i)"
-                class="boton-eliminar-imagen"
-                title="Eliminar imagen">
-                <i class="bi bi-trash"></i>
-              </button>
+          <!-- Input de archivo (como en el formulario de propiedades) -->
+          <div class="grupo-campo">
+            <label for="imagenes" class="etiqueta">
+              <i class="bi bi-cloud-upload"></i>
+              Seleccionar Imágenes
+            </label>
+            <input
+              id="imagenes"
+              type="file"
+              (change)="onImagenesSeleccionadas($event)"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              multiple
+              class="input-archivo"
+              [disabled]="procesando"
+            />
+            <div class="archivo-info" *ngIf="imagenesSeleccionadas.length > 0">
+              <i class="bi bi-file-check"></i>
+              <span>{{ textoBotonImagenes }}</span>
+            </div>
+          </div>
+
+          <!-- Previsualización de imágenes -->
+          <div class="imagenes-preview" *ngIf="hayImagenes">
+            <div class="imagenes-header">
+              <h4>
+                <i class="bi bi-images"></i>
+                Vista previa ({{ urlsPreview.length }})
+              </h4>
+            </div>
+            <div class="imagenes-grid">
+              <div
+                *ngFor="let url of urlsPreview; let i = index"
+                class="imagen-item">
+                <div class="imagen-container">
+                  <img [src]="url" [alt]="'Imagen ' + (i + 1)" class="imagen-preview" />
+                  <div class="imagen-overlay">
+                    <button
+                      type="button"
+                      (click)="eliminarImagen(i)"
+                      class="boton-eliminar-imagen"
+                      title="Eliminar imagen">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="imagen-info">
+                  <span class="imagen-numero">
+                    {{ imagenesSeleccionadas[i] && imagenesSeleccionadas[i].name || 'Imagen ' + (i + 1) }}
+                  </span>
+                  <span class="imagen-tamano" *ngIf="imagenesSeleccionadas[i]">
+                    {{ (imagenesSeleccionadas[i].size / 1024).toFixed(0) }} KB
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Mensaje si no hay imágenes -->
-          <div class="sin-imagenes" *ngIf="imagenesFormArray.length === 0">
+          <div class="sin-imagenes" *ngIf="!hayImagenes">
             <i class="bi bi-image"></i>
-            <p>No hay imágenes agregadas</p>
+            <small>Las imágenes ayudan a atraer más inquilinos</small>
           </div>
         </div>
 

@@ -9,7 +9,8 @@
             <p class="subtitulo">Administra y controla tus propiedades</p>
           </div>
         </div>
-        <button class="boton boton-agregar" (click)="navegarAFormulario()">
+        <!-- Botón con clase nueva para hacerlo más pequeño -->
+        <button class="boton boton-agregar boton-pequeno" (click)="navegarAFormulario()">
           <i class="bi bi-plus-circle"></i>
           Agregar Propiedad
         </button>
@@ -163,7 +164,6 @@
                               <th>Precio</th>
                               <th>Características</th>
                               <th>Servicios</th>
-                              <th>Estado</th>
                               <th>Acciones</th>
                             </tr>
                           </thead>
@@ -200,11 +200,6 @@
                                 </div>
                               </td>
                               <td>
-                                <!-- CORREGIDO: Usar estado en lugar de disponible -->
-                                <span class="estado-unidad"
-                                      [class]="obtenerClaseEstado(unidad)">
-                                  {{ obtenerEstadoTexto(unidad) }}
-                                </span>
                               </td>
                               <td>
                                 <div class="acciones-unidad">

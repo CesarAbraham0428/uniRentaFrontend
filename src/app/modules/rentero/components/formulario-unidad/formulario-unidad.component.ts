@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PropiedadService } from '../../../../core/services/propiedad.service';
@@ -13,20 +13,27 @@ import {
   templateUrl: './formulario-unidad.component.html',
   styleUrl: './formulario-unidad.component.scss'
 })
-export class FormularioUnidadComponent implements OnInit {
+export class FormularioUnidadComponent implements OnInit, OnDestroy {
   formularioUnidad: FormGroup;
   procesando = false;
   propiedadId: number = 0;
   unidadId: number = 0;
   propiedadNombre = '';
   esEdicion = false;
-  unidadActual: UnidadCompleta | null = null; // ← CAMBIADO: ahora usa UnidadCompleta
+  unidadActual: UnidadCompleta | null = null;
 
   serviciosDisponibles = [
     'Agua', 'Luz', 'Gas', 'Internet', 'Cable', 'Limpieza',
     'Seguridad', 'Estacionamiento', 'Lavandería'
   ];
   serviciosSeleccionados: string[] = [];
+
+  // Propiedades para manejo de archivos
+  imagenesSeleccionadas: File[] = [];
+  urlsPreview: string[] = [];
+  maxImagenes = 10;
+  maxTamanoMB = 5;
+  formatosPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
   constructor(
     private fb: FormBuilder,
@@ -42,32 +49,29 @@ export class FormularioUnidadComponent implements OnInit {
     this.inicializarFormulario();
   }
 
+  ngOnDestroy(): void {
+    this.limpiarPrevisualizaciones();
+  }
+
   private detectarModo(): void {
     const params = this.route.snapshot.params;
-    console.log('🔍 Parámetros de ruta:', params);
-    console.log('🔍 URL actual:', this.router.url);
 
     if (this.route.snapshot.url.some(segment => segment.path === 'nueva-unidad')) {
       this.esEdicion = false;
       this.propiedadId = +params['propiedadId'];
 
-      // VALIDACIÓN CRÍTICA CORREGIDA
       if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
-        console.error('❌ PropiedadId INVÁLIDO:', this.propiedadId);
-        console.error('❌ Params completos:', params);
         this.mostrarError('ID de propiedad inválido', 'Error de navegación');
         this.router.navigate(['/rentero']);
         return;
       }
 
-      console.log('✅ PropiedadId válido:', this.propiedadId);
       this.cargarNombrePropiedad();
     } else if (this.route.snapshot.url.some(segment => segment.path === 'editar')) {
       this.esEdicion = true;
       this.unidadId = +params['unidadId'];
 
       if (!this.unidadId || this.unidadId === 0 || isNaN(this.unidadId)) {
-        console.error('❌ UnidadId INVÁLIDO:', this.unidadId);
         this.mostrarError('ID de unidad inválido', 'Error de navegación');
         this.router.navigate(['/rentero']);
         return;
@@ -84,78 +88,59 @@ export class FormularioUnidadComponent implements OnInit {
       terraza: [false],
       amueblado: [false],
       caracteristicas: [''],
-      disponible: [true],
-      imagenes: [[]]
+      disponible: [true]
     });
   }
 
   private inicializarFormulario(): void {
-    // Generar nombre por defecto si es nueva unidad
     if (!this.esEdicion) {
       const fechaHora = new Date().toLocaleString('es-MX');
       this.formularioUnidad.patchValue({
         nombre: `Unidad ${fechaHora}`
       });
     }
-
     this.formularioUnidad.updateValueAndValidity();
   }
 
   private cargarNombrePropiedad(): void {
-    if (!this.propiedadId) {
-      console.error('No hay propiedadId para cargar nombre');
-      return;
-    }
+    if (!this.propiedadId) return;
 
     this.propiedadService.obtenerPropiedadesDelRentero().subscribe({
       next: (response) => {
-        console.log('✅ Respuesta de propiedades:', response);
         if (response.success && response.data) {
           const propiedad = response.data.find((p: any) => p.id === this.propiedadId);
           if (propiedad) {
             this.propiedadNombre = propiedad.nombre;
-            console.log('✅ Nombre de propiedad cargado:', this.propiedadNombre);
           } else {
-            console.warn('⚠️ Propiedad no encontrada con ID:', this.propiedadId);
             this.propiedadNombre = `Propiedad ID: ${this.propiedadId}`;
           }
         }
       },
       error: (error) => {
-        console.error('❌ Error al cargar nombre de propiedad:', error);
         this.propiedadNombre = `Propiedad ID: ${this.propiedadId}`;
       }
     });
   }
 
   private cargarUnidadParaEdicion(): void {
-    console.log('🔄 Cargando unidad para edición:', this.unidadId);
     this.propiedadNombre = 'Cargando...';
 
-    // ← CAMBIADO: ahora maneja UnidadCompleta
     this.propiedadService.obtenerUnidadCompletaPorId(this.unidadId).subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.unidadActual = response.data; // UnidadCompleta
+          this.unidadActual = response.data;
           this.llenarFormularioConDatos(this.unidadActual);
-
-          // ← CAMBIADO: obtener nombre directamente de la ubicación
           this.propiedadId = this.unidadActual.propiedad_id;
-          this.propiedadNombre = this.unidadActual.ubicacion.nombre; // Ya viene en la respuesta
-
-          console.log('✅ Unidad completa cargada:', this.unidadActual);
-          console.log('✅ Nombre de propiedad:', this.propiedadNombre);
+          this.propiedadNombre = this.unidadActual.ubicacion.nombre;
         }
       },
       error: (error) => {
-        console.error('❌ Error al cargar unidad:', error);
         this.mostrarError('No se pudo cargar la unidad', 'Error');
         this.router.navigate(['/rentero']);
       }
     });
   }
 
-  // ← CAMBIADO: ahora recibe UnidadCompleta
   private llenarFormularioConDatos(unidad: UnidadCompleta): void {
     this.formularioUnidad.patchValue({
       nombre: unidad.nombre || '',
@@ -163,13 +148,19 @@ export class FormularioUnidadComponent implements OnInit {
       terraza: unidad.descripcion?.terraza || false,
       amueblado: unidad.descripcion?.amueblado || false,
       caracteristicas: unidad.descripcion?.caracteristicas || '',
-      disponible: unidad.estado === 'libre',
-      imagenes: unidad.imagenes || []
+      disponible: unidad.estado === 'libre'
     });
 
-    // Cargar servicios seleccionados
     this.serviciosSeleccionados = unidad.descripcion?.servicios || [];
+
+    // Cargar imágenes existentes como URLs de preview
+    if (unidad.imagenes && unidad.imagenes.length > 0) {
+      this.urlsPreview = [...unidad.imagenes];
+      // No agregar a imagenesSeleccionadas porque son URLs, no archivos
+    }
   }
+
+  // ========== MANEJO DE SERVICIOS ==========
 
   toggleServicio(servicio: string): void {
     const index = this.serviciosSeleccionados.indexOf(servicio);
@@ -178,59 +169,166 @@ export class FormularioUnidadComponent implements OnInit {
     } else {
       this.serviciosSeleccionados.splice(index, 1);
     }
-    console.log('🔧 Servicios seleccionados:', this.serviciosSeleccionados);
   }
 
   isServicioSeleccionado(servicio: string): boolean {
     return this.serviciosSeleccionados.includes(servicio);
   }
 
-  agregarImagen(): void {
-    const url = prompt('Ingresa la URL de la imagen:');
-    if (url && url.trim()) {
-      const imagenesActuales = this.formularioUnidad.get('imagenes')?.value || [];
-      if (imagenesActuales.length < 10) {
-        imagenesActuales.push(url.trim());
-        this.formularioUnidad.patchValue({ imagenes: imagenesActuales });
-      } else {
-        this.mostrarError('Solo puedes agregar hasta 10 imágenes', 'Límite alcanzado');
+  // ========== MANEJO DE IMÁGENES ==========
+
+  onImagenesSeleccionadas(event: Event): void {
+    const archivos = (event.target as HTMLInputElement).files;
+    if (!archivos) return;
+
+    console.log('📁 Archivos seleccionados:', archivos.length);
+
+    // Limpiar previsualizaciones anteriores de archivos (mantener URLs existentes si es edición)
+    this.limpiarPrevisualizacionesDeArchivos();
+
+    // Procesar cada archivo
+    Array.from(archivos).forEach(archivo => {
+      if (this.validarImagen(archivo)) {
+        this.imagenesSeleccionadas.push(archivo);
+        this.crearPreview(archivo);
+        console.log('✅ Archivo agregado:', archivo.name);
       }
+    });
+
+    // Limpiar el input
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  private validarImagen(archivo: File): boolean {
+    // Verificar límite de imágenes
+    if (this.urlsPreview.length >= this.maxImagenes) {
+      this.mostrarError(`Solo puedes agregar hasta ${this.maxImagenes} imágenes`, 'Límite alcanzado');
+      return false;
     }
+
+    // Validar tipo de archivo
+    if (!this.formatosPermitidos.includes(archivo.type)) {
+      this.mostrarError(`Formato no permitido: ${archivo.type}. Solo se permiten JPG, PNG y WebP`, 'Formato no válido');
+      return false;
+    }
+
+    // Validar tamaño
+    const tamanoMB = archivo.size / (1024 * 1024);
+    if (tamanoMB > this.maxTamanoMB) {
+      this.mostrarError(`La imagen "${archivo.name}" pesa ${tamanoMB.toFixed(1)}MB. El máximo permitido es ${this.maxTamanoMB}MB`, 'Archivo muy grande');
+      return false;
+    }
+
+    return true;
+  }
+
+  private crearPreview(archivo: File): void {
+    const url = URL.createObjectURL(archivo);
+    this.urlsPreview.push(url);
   }
 
   eliminarImagen(index: number): void {
-    const imagenesActuales = this.formularioUnidad.get('imagenes')?.value || [];
-    imagenesActuales.splice(index, 1);
-    this.formularioUnidad.patchValue({ imagenes: imagenesActuales });
+    console.log('🗑️ Eliminando imagen en índice:', index);
+
+    // Si es una imagen nueva (archivo)
+    if (index >= (this.urlsPreview.length - this.imagenesSeleccionadas.length)) {
+      const archivoIndex = index - (this.urlsPreview.length - this.imagenesSeleccionadas.length);
+      this.imagenesSeleccionadas.splice(archivoIndex, 1);
+      console.log('📁 Archivo eliminado, archivos restantes:', this.imagenesSeleccionadas.length);
+    }
+
+    // Limpiar URL de preview
+    if (this.urlsPreview[index] && this.urlsPreview[index].startsWith('blob:')) {
+      URL.revokeObjectURL(this.urlsPreview[index]);
+    }
+    this.urlsPreview.splice(index, 1);
   }
 
-  get imagenesFormArray() {
-    return this.formularioUnidad.get('imagenes')?.value || [];
+  private limpiarPrevisualizacionesDeArchivos(): void {
+    // Solo limpiar URLs de blob (archivos nuevos), mantener URLs existentes
+    this.urlsPreview.forEach((url, index) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    // Mantener solo las URLs que no sean blob (imágenes existentes)
+    this.urlsPreview = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+    this.imagenesSeleccionadas = [];
   }
 
-  guardarUnidad(): void {
-    console.log('🚀 INICIANDO GUARDADO DE UNIDAD');
+  private limpiarPrevisualizaciones(): void {
+    this.urlsPreview.forEach(url => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    this.urlsPreview = [];
+    this.imagenesSeleccionadas = [];
+  }
 
-    // VALIDACIONES DETALLADAS
+  // ========== GETTERS PARA EL TEMPLATE ==========
+
+  get textoBotonImagenes(): string {
+    const nuevas = this.imagenesSeleccionadas.length;
+    if (nuevas === 0) return 'No hay imágenes nuevas';
+    return `${nuevas} imagen${nuevas > 1 ? 'es' : ''} nueva${nuevas > 1 ? 's' : ''}`;
+  }
+
+  get puedeAgregarImagenes(): boolean {
+    return this.urlsPreview.length < this.maxImagenes;
+  }
+
+  get hayImagenes(): boolean {
+    return this.urlsPreview.length > 0;
+  }
+
+  // ========== CONVERSIÓN DE IMÁGENES ==========
+
+  private async convertirImagenesABase64(): Promise<string[]> {
+    if (this.imagenesSeleccionadas.length === 0) {
+      return [];
+    }
+
+    console.log('🔄 Convirtiendo', this.imagenesSeleccionadas.length, 'imágenes a base64...');
+
+    const promesas = this.imagenesSeleccionadas.map(archivo =>
+      this.convertirArchivoABase64(archivo)
+    );
+
+    const imagenesBase64 = await Promise.all(promesas);
+    console.log('✅ Imágenes convertidas:', imagenesBase64.length);
+    return imagenesBase64;
+  }
+
+  private convertirArchivoABase64(archivo: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(archivo);
+    });
+  }
+
+  // ========== GUARDAR UNIDAD ==========
+
+  async guardarUnidad(): Promise<void> {
     if (!this.formularioUnidad.valid) {
-      console.error('❌ Formulario inválido');
       this.mostrarErroresFormulario();
       return;
     }
 
-    // VERIFICAR TOKEN
     const token = localStorage.getItem('rentero_token') || sessionStorage.getItem('rentero_token');
     if (!token) {
-      console.error('❌ No hay token de autenticación');
       this.mostrarError('No estás autenticado', 'Error de autenticación');
       this.router.navigate(['/rentero/login']);
       return;
     }
 
     if (this.esEdicion) {
-      this.actualizarUnidad();
+      await this.actualizarUnidad();
     } else {
-      this.crearUnidad();
+      await this.crearUnidad();
     }
   }
 
@@ -239,114 +337,146 @@ export class FormularioUnidadComponent implements OnInit {
       const control = this.formularioUnidad.get(key);
       if (control?.invalid) {
         control.markAsTouched();
-        console.error(`❌ Campo inválido: ${key}`, control.errors);
       }
     });
     this.mostrarError('Por favor completa todos los campos requeridos', 'Formulario incompleto');
   }
 
-  private crearUnidad(): void {
-    console.log('📝 CREANDO NUEVA UNIDAD');
+  private async crearUnidad(): Promise<void> {
     this.procesando = true;
-
     const formValue = this.formularioUnidad.value;
-    console.log('🔍 Valor del formulario:', formValue);
 
-    // VERIFICAR PROPIEDAD ID ANTES DE ENVIAR
     if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
-      console.error('❌ PropiedadId inválido al momento de enviar:', this.propiedadId);
       this.procesando = false;
       this.mostrarError('ID de propiedad inválido', 'Error de datos');
       return;
     }
 
-    const datosUnidad: FormularioRegistroUnidad = {
-      propiedad_id: this.propiedadId,
-      nombre: formValue.nombre || `Unidad ${Date.now()}`,
-      precio: parseFloat(formValue.precio),
-      descripcion: {
-        terraza: formValue.terraza || false,
-        amueblado: formValue.amueblado || false,
-        servicios: this.serviciosSeleccionados,
-        caracteristicas: formValue.caracteristicas || ''
-      },
-      imagenes: formValue.imagenes || []
-    };
-
-    console.log('📤 DATOS FINALES A ENVIAR:', JSON.stringify(datosUnidad, null, 2));
-
-    this.propiedadService.registrarUnidad(datosUnidad).subscribe({
-      next: (response) => {
-        console.log('✅ Respuesta exitosa del servidor:', response);
-        this.procesando = false;
-
-        if (response.success || response.mensaje) {
-          this.mostrarExito(response.mensaje || 'Unidad registrada exitosamente');
-          this.volverAPropiedades();
-        } else {
-          console.error('❌ Respuesta no exitosa:', response);
-          this.mostrarError('Error al registrar la unidad', 'Error');
-        }
-      },
-      error: (error) => {
-        console.error('❌ ERROR COMPLETO DEL SERVIDOR:', error);
-        this.procesando = false;
-
-        let mensaje = 'Error interno del servidor';
-        if (error.error?.mensaje) {
-          mensaje = error.error.mensaje;
-        } else if (error.error?.message) {
-          mensaje = error.error.message;
-        } else if (error.message) {
-          mensaje = error.message;
-        }
-
-        this.mostrarError(`${mensaje} (Status: ${error.status})`, 'Error al registrar unidad');
+    try {
+      // Convertir imágenes a base64 si hay archivos seleccionados
+      let imagenesBase64: string[] = [];
+      if (this.imagenesSeleccionadas.length > 0) {
+        imagenesBase64 = await this.convertirImagenesABase64();
       }
-    });
+
+      const datosUnidad: FormularioRegistroUnidad = {
+        propiedad_id: this.propiedadId,
+        nombre: formValue.nombre || `Unidad ${Date.now()}`,
+        precio: parseFloat(formValue.precio),
+        descripcion: {
+          terraza: formValue.terraza || false,
+          amueblado: formValue.amueblado || false,
+          servicios: this.serviciosSeleccionados,
+          caracteristicas: formValue.caracteristicas || ''
+        },
+        imagenes: imagenesBase64
+      };
+
+      console.log('📤 Enviando datos de unidad:', {
+        ...datosUnidad,
+        imagenes: `${imagenesBase64.length} imágenes`
+      });
+
+      this.propiedadService.registrarUnidad(datosUnidad).subscribe({
+        next: (response) => {
+          this.procesando = false;
+          if (response.success || response.mensaje) {
+            this.mostrarExito(response.mensaje || 'Unidad registrada exitosamente');
+            this.volverAPropiedades();
+          } else {
+            this.mostrarError('Error al registrar la unidad', 'Error');
+          }
+        },
+        error: (error) => {
+          this.procesando = false;
+          this.manejarErrorGuardado(error, 'registrar');
+        }
+      });
+    } catch (error) {
+      this.procesando = false;
+      console.error('❌ Error al procesar imágenes:', error);
+      this.mostrarError('Error al procesar las imágenes', 'Error');
+    }
   }
 
-  private actualizarUnidad(): void {
+  private async actualizarUnidad(): Promise<void> {
     this.procesando = true;
     const formValue = this.formularioUnidad.value;
 
-    const datosActualizacion: FormularioActualizacionUnidad = {
-      nombre: formValue.nombre,
-      precio: parseFloat(formValue.precio),
-      estado: formValue.disponible ? 'libre' : 'ocupada',
-      descripcion: {
-        terraza: formValue.terraza || false,
-        amueblado: formValue.amueblado || false,
-        servicios: this.serviciosSeleccionados,
-        caracteristicas: formValue.caracteristicas || ''
-      },
-      imagenes: formValue.imagenes || []
-    };
+    try {
+      // Combinar imágenes existentes con nuevas
+      let imagenesFinales: string[] = [];
 
-    this.propiedadService.actualizarUnidad(this.unidadId, datosActualizacion).subscribe({
-      next: (response) => {
-        this.procesando = false;
+      // Mantener imágenes existentes (URLs que no son blob)
+      const imagenesExistentes = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+      imagenesFinales = [...imagenesExistentes];
 
-        if (response.success || response.mensaje) {
-          this.mostrarExito(response.mensaje || 'Unidad actualizada exitosamente');
-          this.volverAPropiedades();
-        } else {
-          this.mostrarError('Error al actualizar la unidad', 'Error');
-        }
-      },
-      error: (error) => {
-        console.error('Error al actualizar unidad:', error);
-        this.procesando = false;
-
-        let mensaje = 'Error al actualizar la unidad';
-        if (error.error?.mensaje) {
-          mensaje = error.error.mensaje;
-        }
-
-        this.mostrarError(mensaje, 'Error del servidor');
+      // Agregar nuevas imágenes convertidas a base64
+      if (this.imagenesSeleccionadas.length > 0) {
+        const imagenesNuevas = await this.convertirImagenesABase64();
+        imagenesFinales = [...imagenesFinales, ...imagenesNuevas];
       }
-    });
+
+      const datosActualizacion: FormularioActualizacionUnidad = {
+        nombre: formValue.nombre,
+        precio: parseFloat(formValue.precio),
+        estado: formValue.disponible ? 'libre' : 'ocupada',
+        descripcion: {
+          terraza: formValue.terraza || false,
+          amueblado: formValue.amueblado || false,
+          servicios: this.serviciosSeleccionados,
+          caracteristicas: formValue.caracteristicas || ''
+        },
+        imagenes: imagenesFinales
+      };
+
+      console.log('📤 Enviando actualización:', {
+        ...datosActualizacion,
+        imagenes: `${imagenesFinales.length} imágenes (${this.imagenesSeleccionadas.length} nuevas)`
+      });
+
+      this.propiedadService.actualizarUnidad(this.unidadId, datosActualizacion).subscribe({
+        next: (response) => {
+          this.procesando = false;
+          if (response.success || response.mensaje) {
+            this.mostrarExito(response.mensaje || 'Unidad actualizada exitosamente');
+            this.volverAPropiedades();
+          } else {
+            this.mostrarError('Error al actualizar la unidad', 'Error');
+          }
+        },
+        error: (error) => {
+          this.procesando = false;
+          this.manejarErrorGuardado(error, 'actualizar');
+        }
+      });
+    } catch (error) {
+      this.procesando = false;
+      console.error('❌ Error al procesar imágenes:', error);
+      this.mostrarError('Error al procesar las imágenes', 'Error');
+    }
   }
+
+  private manejarErrorGuardado(error: any, operacion: string): void {
+    console.error(`❌ Error al ${operacion} unidad:`, error);
+
+    let mensaje = `Error al ${operacion} la unidad`;
+    if (error.error?.mensaje) {
+      mensaje = error.error.mensaje;
+    } else if (error.status === 413) {
+      mensaje = 'Las imágenes son demasiado grandes. Intenta con imágenes más pequeñas.';
+    } else if (error.status === 400) {
+      mensaje = 'Datos inválidos. Verifica la información ingresada.';
+    } else if (error.status === 403) {
+      mensaje = 'No tienes permisos para realizar esta acción.';
+    } else if (error.status === 404) {
+      mensaje = 'La unidad no existe.';
+    }
+
+    this.mostrarError(mensaje, 'Error del servidor');
+  }
+
+  // ========== NAVEGACIÓN Y UTILIDADES ==========
 
   volverAPropiedades(): void {
     this.router.navigate(['/rentero']);
@@ -381,12 +511,5 @@ export class FormularioUnidadComponent implements OnInit {
 
   private mostrarExito(mensaje: string): void {
     alert(mensaje);
-  }
-
-  formatearPrecio(valor: number): string {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(valor);
   }
 }

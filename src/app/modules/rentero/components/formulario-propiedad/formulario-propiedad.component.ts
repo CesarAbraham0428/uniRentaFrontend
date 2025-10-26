@@ -44,6 +44,21 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     'ubicacionCodigoPostal', 'ubicacionMunicipio', 'ubicacionEstado'
   ] as const;
 
+  // Configuración de campos para generación dinámica
+  readonly camposConfig = {
+    paso1: [
+      { id: 'nombre', label: 'Nombre de la Propiedad', icon: 'bi-building', placeholder: 'Ej. Casa en el centro', type: 'text' }
+    ],
+    ubicacion: [
+      { id: 'ubicacionCalle', label: 'Calle', icon: 'bi-signpost', placeholder: 'Nombre de la calle' },
+      { id: 'ubicacionNumero', label: 'Número', icon: 'bi-hash', placeholder: 'Número exterior' },
+      { id: 'ubicacionColonia', label: 'Colonia', icon: 'bi-houses', placeholder: 'Colonia o barrio' },
+      { id: 'ubicacionCodigoPostal', label: 'Código Postal', icon: 'bi-mailbox', placeholder: 'C.P.' },
+      { id: 'ubicacionMunicipio', label: 'Municipio', icon: 'bi-pin-map', placeholder: 'Municipio o delegación' },
+      { id: 'ubicacionEstado', label: 'Estado', icon: 'bi-geo-alt', placeholder: 'Estado' }
+    ]
+  };
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -57,20 +72,12 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.detectarModoEdicion();
     this.inicializarComponente();
     this.configurarCambiosDireccion();
   }
 
   ngOnDestroy(): void {
     this.limpiarPrevisualizacion();
-  }
-
-  // ========== DETECCIÓN DE MODO EDICIÓN ==========
-  private detectarModoEdicion(): void {
-    const params = this.route.snapshot.params;
-    this.idPropiedad = params['id'] || null;
-    this.esEdicion = !!this.idPropiedad;
   }
 
   // ========== GETTERS ==========
@@ -98,61 +105,33 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   // ========== INICIALIZACIÓN ==========
   private crearFormulario(): FormGroup {
     return this.fb.group({
-      nombre: [''],
-      ubicacionCalle: [''],
-      ubicacionColonia: [''],
-      ubicacionNumero: [''],
-      ubicacionCodigoPostal: [''],
-      ubicacionMunicipio: [''],
-      ubicacionEstado: [''],
-      ubicacionLatitud: [''],
-      ubicacionLongitud: [''],
-      tipoDocumentoId: [''],
+      nombre: ['', Validators.required],
+      ubicacionCalle: ['', Validators.required],
+      ubicacionColonia: ['', Validators.required],
+      ubicacionNumero: ['', Validators.required],
+      ubicacionCodigoPostal: ['', Validators.required],
+      ubicacionMunicipio: ['', Validators.required],
+      ubicacionEstado: ['', Validators.required],
+      ubicacionLatitud: ['', [Validators.required, Validators.min(-90), Validators.max(90)]],
+      ubicacionLongitud: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
+      tipoDocumentoId: ['', Validators.required],
       estado: ['']
     });
   }
 
   private inicializarComponente(): void {
-    this.configurarValidadores();
+    this.idPropiedad = this.route.snapshot.paramMap.get('id');
+    this.esEdicion = !!this.idPropiedad;
     this.cargarTiposDocumento();
+
     if (this.esEdicion) {
       this.cargarDatosPropiedad();
+      this.formularioPropiedad.get('estado')?.setValidators(Validators.required);
     }
+
     this.inicializarCoordenadas();
   }
 
-  private configurarValidadores(): void {
-    this.formularioPropiedad.get('nombre')?.setValidators(Validators.required);
-    this.CAMPOS_UBICACION.forEach(campo => {
-      this.formularioPropiedad.get(campo)?.setValidators(Validators.required);
-    });
-    this.formularioPropiedad.get('ubicacionLatitud')?.setValidators([
-      Validators.required, Validators.min(-90), Validators.max(90)
-    ]);
-    this.formularioPropiedad.get('ubicacionLongitud')?.setValidators([
-      Validators.required, Validators.min(-180), Validators.max(180)
-    ]);
-    this.formularioPropiedad.get('tipoDocumentoId')?.setValidators(Validators.required);
-
-    if (this.esEdicion) {
-      this.formularioPropiedad.get('estado')?.setValidators(Validators.required);
-    }
-  }
-
-  // ========== CARGA DE DATOS ==========
-  cargarTiposDocumento(): void {
-    this.documentoService.obtenerTiposDocumento().subscribe({
-      next: (tipos) => this.tiposDocumento = tipos,
-      error: (error) => this.documentoValidacionService.manejarErrores(error, 'carga de tipos de documento')
-    });
-  }
-
-  cargarDatosPropiedad(): void {
-    // Implementar cuando tengas el endpoint para cargar datos de propiedad
-    console.log('Cargar datos de propiedad:', this.idPropiedad);
-  }
-
-  // ========== COORDENADAS Y MAPA ==========
   private inicializarCoordenadas(): void {
     const lat = parseFloat(this.formularioPropiedad.get('ubicacionLatitud')?.value);
     const lng = parseFloat(this.formularioPropiedad.get('ubicacionLongitud')?.value);
@@ -179,16 +158,42 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ========== MANEJO DE COORDENADAS ==========
   onCoordsChange(ev: { lng: number; lat: number }): void {
     this.formularioPropiedad.patchValue({
       ubicacionLatitud: ev.lat.toFixed(6),
       ubicacionLongitud: ev.lng.toFixed(6)
     }, { emitEvent: false });
-
-    this.coordsIniciales = [ev.lng, ev.lat];
   }
 
-  // ========== PASOS DEL FORMULARIO ==========
+  // ========== CARGA DE DATOS ==========
+  cargarTiposDocumento(): void {
+    this.documentoService.obtenerTiposDocumento().subscribe({
+      next: (tipos) => this.tiposDocumento = tipos,
+      error: (error) => this.documentoValidacionService.manejarErrores(error, 'carga de tipos de documento')
+    });
+  }
+
+  cargarDatosPropiedad(): void {
+    // Implementar con servicio real
+    const propiedadEjemplo = {
+      nombre: 'Casa Ejemplo',
+      estado: 'Disponible',
+      ubicacionCalle: 'Principal',
+      ubicacionColonia: 'Centro',
+      ubicacionNumero: '123',
+      ubicacionCodigoPostal: '12345',
+      ubicacionMunicipio: 'Ciudad Ejemplo',
+      ubicacionEstado: 'Estado Ejemplo',
+      ubicacionLatitud: '19.4326',
+      ubicacionLongitud: '-99.1332',
+      tipoDocumentoId: '3'
+    };
+
+    this.formularioPropiedad.patchValue(propiedadEjemplo);
+  }
+
+  // ========== NAVEGACIÓN DE PASOS ==========
   siguientePaso(): void {
     if (this.datosValidos) {
       this.pasoActual = 2;
@@ -201,7 +206,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     this.pasoActual = 1;
   }
 
-  // ========== MANEJO DE ARCHIVOS ==========
+  // ========== MANEJO DE ARCHIVO ==========
   onArchivoSeleccionado(event: Event): void {
     const archivo = (event.target as HTMLInputElement).files?.[0];
     this.limpiarPrevisualizacion();
@@ -238,7 +243,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
 
   private validarFormulario(): boolean {
     if (!this.formularioPropiedad.valid) {
-      this.mostrarError('Por favor completa todos los campos requeridos', 'Formulario incompleto');
+      this.mostrarError('Por favor completa todos los campos', 'Formulario incompleto');
       return false;
     }
 
@@ -297,7 +302,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     this.router.navigate(['/rentero']);
   }
 
-  // ========== NAVEGACIÓN Y UTILIDADES ==========
+  // ========== UTILIDADES ==========
   cancelar(): void {
     this.router.navigate(['/rentero']);
   }
@@ -322,6 +327,7 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     this.documentoValidacionService.manejarErrores({ mensaje }, titulo);
   }
 
+  // Método auxiliar para validación de campos
   esCampoInvalido(campo: string): boolean {
     const control = this.formularioPropiedad.get(campo);
     return !!(control?.invalid && control?.touched);

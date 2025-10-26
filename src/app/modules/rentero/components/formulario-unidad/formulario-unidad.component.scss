@@ -535,3 +535,297 @@ $color-eliminar: #dc3545;
     padding: 1rem;
   }
 }
+
+.input-archivo {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px dashed lighten($color-letras, 60%);
+  border-radius: 8px;
+  background: lighten($color-fondo-pantalla, 5%);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $color-header-footer;
+    background: lighten($color-header-footer, 75%);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-header-footer;
+    box-shadow: 0 0 0 3px lighten($color-header-footer, 70%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: lighten($color-letras, 70%);
+  }
+
+  // Personalizar texto del input file
+  &::file-selector-button {
+    background: $color-agregar;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: darken($color-agregar, 8%);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.65rem;
+    font-size: 0.85rem;
+
+    &::file-selector-button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      margin-right: 0.75rem;
+    }
+  }
+}
+
+// Información del archivo seleccionado
+.archivo-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: lighten($color-agregar, 70%);
+  border: 1px solid lighten($color-agregar, 50%);
+  border-radius: 6px;
+  color: darken($color-agregar, 15%);
+
+  i {
+    font-size: 1.1rem;
+    color: $color-agregar;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.65rem;
+    font-size: 0.85rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Contenedor de preview de imágenes
+.imagenes-preview {
+  margin-top: 1.5rem;
+
+  .imagenes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      font-size: 1rem;
+      color: $color-letras;
+      font-weight: 600;
+
+      i {
+        color: $color-header-footer;
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+  }
+}
+
+// Grid de imágenes
+.imagenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.imagen-item {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid lighten($color-letras, 70%);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    .imagen-overlay {
+      opacity: 1;
+    }
+  }
+}
+
+.imagen-container {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+
+  .imagen-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+  }
+
+  .imagen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    .boton-eliminar-imagen {
+      background: $color-eliminar;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: darken($color-eliminar, 10%);
+        transform: scale(1.1);
+      }
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.imagen-info {
+  padding: 0.5rem;
+  text-align: center;
+
+  .imagen-numero {
+    display: block;
+    font-size: 0.75rem;
+    color: $color-letras;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .imagen-tamano {
+    display: block;
+    font-size: 0.7rem;
+    color: lighten($color-letras, 30%);
+    margin-top: 0.25rem;
+  }
+}
+
+// Estado sin imágenes
+.sin-imagenes {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: lighten($color-letras, 30%);
+  background: lighten($color-fondo-pantalla, 5%);
+  border-radius: 8px;
+  border: 1px dashed lighten($color-letras, 60%);
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    color: lighten($color-letras, 40%);
+  }
+
+  p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: lighten($color-letras, 25%);
+  }
+
+  small {
+    font-size: 0.8rem;
+    color: lighten($color-letras, 40%);
+  }
+}
+
+// Información sobre archivos permitidos
+.info-archivos {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: lighten($color-fondo-pantalla, 3%);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: lighten($color-letras, 20%);
+
+    i {
+      color: $color-header-footer;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .info-item {
+      justify-content: center;
+    }
+  }
+}
+
+// Responsive para pantallas muy pequeñas
+@media (max-width: 480px) {
+  .imagenes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .imagen-info .imagen-numero {
+    font-size: 0.7rem;
+  }
+}

@@ -112,19 +112,17 @@ export class RenteroLayoutComponent implements OnInit {
     this.router.navigate(['/rentero/unidades', unidadId, 'editar']);
   }
 
-  // MÉTODO CORREGIDO: eliminarUnidad con mejor manejo
   eliminarUnidad(unidadId: number): void {
     if (!unidadId || isNaN(unidadId)) {
       alert('Error: ID de unidad inválido');
       return;
     }
 
-    // Buscar información de la unidad para mostrar en la confirmación
     const unidad = this.unidadesActuales.find(u => u.id === unidadId);
     const nombreUnidad = unidad ? unidad.nombre : `Unidad ID ${unidadId}`;
 
     const mensaje = `¿Estás seguro de eliminar "${nombreUnidad}"?\n\n` +
-                   `⚠️ ATENCIÓN: Esta acción eliminará completamente la unidad y NO se puede deshacer.`;
+                   ` ATENCIÓN: Esta acción eliminará completamente la unidad y NO se puede deshacer.`;
 
     if (!confirm(mensaje)) {
       return;
@@ -137,9 +135,9 @@ export class RenteroLayoutComponent implements OnInit {
           this.actualizarUITrasEliminacion(unidadId);
 
           const mensajeExito = response.mensaje || 'Unidad eliminada exitosamente';
-          alert(`✅ ${mensajeExito}`);
+          alert(` ${mensajeExito}`);
         } else {
-          alert('❌ Error: No se pudo confirmar la eliminación');
+          alert(' Error: No se pudo confirmar la eliminación');
         }
       },
       error: (error) => {
@@ -155,7 +153,7 @@ export class RenteroLayoutComponent implements OnInit {
           mensajeError = error.error.mensaje;
         }
 
-        alert(`❌ Error al eliminar unidad: ${mensajeError}\n\nStatus: ${error.status}`);
+        alert(` Error al eliminar unidad: ${mensajeError}\n\nStatus: ${error.status}`);
       }
     });
   }
@@ -250,11 +248,9 @@ export class RenteroLayoutComponent implements OnInit {
     }
   }
 
-  // MÉTODO NUEVO: Recargar datos tras cambios
   recargarDatos(): void {
     this.cargarPropiedades();
 
-    // Si hay una propiedad expandida, recargar sus unidades
     if (this.propiedadExpandida) {
       this.cargarUnidadesDetalle(this.propiedadExpandida);
     }
