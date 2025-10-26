@@ -3,10 +3,18 @@
   <div class="contenedor-imagen">
     <div class="overlay-imagen">
       <h2 class="frase-animada">
-        {{ esEdicion ? "Actualiza la información de tu propiedad" : "Registra tu propiedad y comienza a generar ingresos" }}
+        {{
+          esEdicion
+            ? "Actualiza la información de tu propiedad"
+            : "Registra tu propiedad y comienza a generar ingresos"
+        }}
       </h2>
     </div>
-    <img src="/assets/fondo_fr.png" alt="Registro de Propiedad" class="imagen-fondo" />
+    <img
+      src="/assets/fondo_fr.png"
+      alt="Registro de Propiedad"
+      class="imagen-fondo"
+    />
   </div>
 
   <!-- Contenedor de formulario derecho -->
@@ -23,9 +31,7 @@
         </h2>
 
         <!-- Subtítulo -->
-        <p class="subtitulo">
-          Completa la información de tu propiedad
-        </p>
+        <p class="subtitulo">Completa la información de tu propiedad</p>
       </div>
 
       <!-- Indicador de pasos (solo para registro nuevo) -->
@@ -125,7 +131,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionCalle')"
                 placeholder="Nombre de la calle"
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionCalle')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionCalle')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>La calle es requerida</span>
               </div>
@@ -144,7 +153,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionNumero')"
                 placeholder="Número exterior"
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionNumero')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionNumero')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>El número es requerido</span>
               </div>
@@ -163,7 +175,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionColonia')"
                 placeholder="Colonia o barrio"
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionColonia')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionColonia')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>La colonia es requerida</span>
               </div>
@@ -184,7 +199,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionCodigoPostal')"
                 placeholder="C.P."
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionCodigoPostal')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionCodigoPostal')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>El código postal es requerido</span>
               </div>
@@ -203,7 +221,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionMunicipio')"
                 placeholder="Municipio o delegación"
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionMunicipio')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionMunicipio')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>El municipio es requerido</span>
               </div>
@@ -222,7 +243,10 @@
                 [class.invalido]="esCampoInvalido('ubicacionEstado')"
                 placeholder="Estado"
               />
-              <div class="mensaje-error" *ngIf="esCampoInvalido('ubicacionEstado')">
+              <div
+                class="mensaje-error"
+                *ngIf="esCampoInvalido('ubicacionEstado')"
+              >
                 <i class="bi bi-exclamation-circle-fill"></i>
                 <span>El estado es requerido</span>
               </div>
@@ -257,7 +281,11 @@
           </button>
           <button
             type="submit"
-            [disabled]="!formularioPropiedad.valid || procesando"
+            [disabled]="
+              formularioPropiedad.invalid ||
+              !formularioPropiedad.dirty ||
+              procesando
+            "
             class="boton boton-primario"
           >
             <span *ngIf="!procesando">
@@ -316,7 +344,10 @@
                 {{ tipo.nombre }}
               </option>
             </select>
-            <div class="mensaje-error" *ngIf="esCampoInvalido('tipoDocumentoId')">
+            <div
+              class="mensaje-error"
+              *ngIf="esCampoInvalido('tipoDocumentoId')"
+            >
               <i class="bi bi-exclamation-circle-fill"></i>
               <span>Debe seleccionar un tipo de documento</span>
             </div>

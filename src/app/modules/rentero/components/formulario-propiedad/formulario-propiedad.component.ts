@@ -114,29 +114,42 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
 
   private inicializarComponente(): void {
     this.configurarValidadores();
-    this.cargarTiposDocumento();
+    if (!this.esEdicion) {
+      this.cargarTiposDocumento();
+    }
     if (this.esEdicion) {
       this.cargarDatosPropiedad();
     }
     this.inicializarCoordenadas();
   }
 
+
   private configurarValidadores(): void {
     this.formularioPropiedad.get('nombre')?.setValidators(Validators.required);
     this.CAMPOS_UBICACION.forEach(campo => {
       this.formularioPropiedad.get(campo)?.setValidators(Validators.required);
     });
-    this.formularioPropiedad.get('ubicacionLatitud')?.setValidators([
-      Validators.required, Validators.min(-90), Validators.max(90)
-    ]);
-    this.formularioPropiedad.get('ubicacionLongitud')?.setValidators([
-      Validators.required, Validators.min(-180), Validators.max(180)
-    ]);
-    this.formularioPropiedad.get('tipoDocumentoId')?.setValidators(Validators.required);
+
+    const tipoDoc = this.formularioPropiedad.get('tipoDocumentoId');
+    const latCtrl = this.formularioPropiedad.get('ubicacionLatitud');
+    const lngCtrl = this.formularioPropiedad.get('ubicacionLongitud');
 
     if (this.esEdicion) {
+      tipoDoc?.clearValidators();
+      latCtrl?.clearValidators();
+      lngCtrl?.clearValidators();
+
       this.formularioPropiedad.get('estado')?.setValidators(Validators.required);
+    } else {
+      tipoDoc?.setValidators(Validators.required);
+      latCtrl?.setValidators([Validators.required, Validators.min(-90), Validators.max(90)]);
+      lngCtrl?.setValidators([Validators.required, Validators.min(-180), Validators.max(180)]);
     }
+
+    tipoDoc?.updateValueAndValidity({ emitEvent: false });
+    latCtrl?.updateValueAndValidity({ emitEvent: false });
+    lngCtrl?.updateValueAndValidity({ emitEvent: false });
+    this.formularioPropiedad.updateValueAndValidity({ emitEvent: false });
   }
 
   // ========== CARGA DE DATOS ==========
@@ -148,9 +161,36 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
   }
 
   cargarDatosPropiedad(): void {
-    // Implementar cuando tengas el endpoint para cargar datos de propiedad
-    console.log('Cargar datos de propiedad:', this.idPropiedad);
+    if (!this.idPropiedad) return;
+    const id = parseInt(this.idPropiedad, 10);
+
+    this.propiedadService.obtenerPropiedadDelRenteroPorId(id).subscribe({
+      next: (prop) => {
+        if (!prop) {
+          this.mostrarError('No se encontró la propiedad solicitada', 'Edición de propiedad');
+          return;
+        }
+
+        this.formularioPropiedad.patchValue({
+          nombre: prop.nombre ?? '',
+          ubicacionCalle: prop.calle ?? '',
+          ubicacionNumero: prop.numero ?? '',
+          ubicacionColonia: prop.colonia ?? '',
+          ubicacionCodigoPostal: prop.codigo_postal ?? '',
+          ubicacionMunicipio: prop.municipio ?? '',
+          ubicacionEstado: prop.estado ?? '',
+          estado: prop.visible ? 'Disponible' : 'Ocupada'
+        });
+
+        this.formularioPropiedad.markAsPristine();
+        this.formularioPropiedad.updateValueAndValidity({ emitEvent: false });
+
+
+      },
+      error: () => this.mostrarError('Error al cargar la propiedad', 'Edición de propiedad')
+    });
   }
+
 
   // ========== COORDENADAS Y MAPA ==========
   private inicializarCoordenadas(): void {
@@ -226,15 +266,19 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
     if (!this.validarFormulario()) return;
 
     this.procesando = true;
-    const usuarioActual = this.renteroService.obtenerUsuarioActual();
 
-    if (!usuarioActual) {
-      return this.mostrarError('Usuario no autenticado', 'Error de autenticación');
+    if (this.esEdicion) {
+      this.actualizarPropiedad();
+      return;
     }
 
+    const usuarioActual = this.renteroService.obtenerUsuarioActual();
+    if (!usuarioActual) return this.mostrarError('Usuario no autenticado', 'Error de autenticación');
+
     const datosPropiedad = this.construirDatosPropiedad(usuarioActual.id);
-    this.esEdicion ? this.actualizarPropiedad() : this.crearPropiedad(datosPropiedad);
+    this.crearPropiedad(datosPropiedad);
   }
+
 
   private validarFormulario(): boolean {
     if (!this.formularioPropiedad.valid) {
@@ -291,11 +335,57 @@ export class FormularioPropiedadComponent implements OnInit, OnDestroy {
       });
   }
 
-  private actualizarPropiedad(): void {
-    this.procesando = false;
-    this.documentoValidacionService.mostrarExito('Propiedad actualizada exitosamente');
-    this.router.navigate(['/rentero']);
+  private construirPayloadActualizacion(): any {
+    const v = this.formularioPropiedad.value;
+
+    const visible = String(v.estado || '').toLowerCase() === 'disponible';
+
+    const lat = parseFloat(v.ubicacionLatitud);
+    const lng = parseFloat(v.ubicacionLongitud);
+    const hasCoords = !Number.isNaN(lat) && !Number.isNaN(lng);
+
+    const ubicacion: any = {
+      calle: v.ubicacionCalle,
+      colonia: v.ubicacionColonia,
+      numero: v.ubicacionNumero,
+      codigo_postal: v.ubicacionCodigoPostal,
+      municipio: v.ubicacionMunicipio,
+      estado: v.ubicacionEstado
+    };
+
+    if (hasCoords) {
+      ubicacion.type = 'Point';
+      ubicacion.coordinates = [lng, lat];
+    }
+
+    const payload: any = {
+      nombre: v.nombre,
+      visible,
+      ubicacion
+    };
+
+    return payload;
   }
+
+
+  private actualizarPropiedad(): void {
+    if (!this.idPropiedad) return;
+    const id = parseInt(this.idPropiedad, 10);
+
+    const payload = this.construirPayloadActualizacion();
+    this.propiedadService.actualizarPropiedad(id, payload).subscribe({
+      next: () => {
+        this.procesando = false;
+        this.documentoValidacionService.mostrarExito('Propiedad actualizada exitosamente');
+        this.router.navigate(['/rentero']);
+      },
+      error: (error) => {
+        this.procesando = false;
+        this.documentoValidacionService.manejarErrores(error, 'actualización de propiedad');
+      }
+    });
+  }
+
 
   // ========== NAVEGACIÓN Y UTILIDADES ==========
   cancelar(): void {

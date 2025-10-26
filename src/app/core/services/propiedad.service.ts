@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   PropiedadNueva,
   FormularioRegistroPropiedad,
@@ -70,7 +71,11 @@ export class PropiedadService {
 
   // ========== ENDPOINTS AUTENTICADOS ==========
 
-  registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, tipoDocumentoId?: number): Observable<FormularioRegistroPropiedad> {
+  registrarPropiedad(
+    datosPropiedad: FormularioRegistroPropiedad,
+    archivo: File,
+    tipoDocumentoId?: number
+  ): Observable<FormularioRegistroPropiedad> {
     const formData = new FormData();
 
     // Agregar campos individuales
@@ -98,17 +103,36 @@ export class PropiedadService {
     return this.http.get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers });
   }
 
+  obtenerPropiedadDelRenteroPorId(propiedadId: number): Observable<PropiedadNueva | any | null> {
+    const headers = this.getAuthHeaders();
+    return this.http
+      .get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers })
+      .pipe(
+        map((resp) => {
+          if (resp?.success && Array.isArray(resp.data)) {
+            return (resp.data as any[]).find(p => p.id === propiedadId) ?? null;
+          }
+          return null;
+        })
+      );
+  }
+
+  actualizarPropiedad(propiedadId: number, payload: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${propiedadId}`, payload, { headers });
+  }
+
   // ========== GESTIÓN DE UNIDADES ==========
 
   registrarUnidad(datosUnidad: FormularioRegistroUnidad): Observable<SingleUnidadResponse> {
     const headers = this.getAuthHeaders();
 
-    // ✅ CAMBIO PRINCIPAL: Enviar objetos directamente, NO como strings JSON
+    // Enviar objetos directamente (no JSON.stringify)
     const payload = {
       propiedad_id: datosUnidad.propiedad_id,
       precio: datosUnidad.precio,
-      descripcion: datosUnidad.descripcion,  // ← QUITAR JSON.stringify()
-      imagenes: datosUnidad.imagenes         // ← QUITAR JSON.stringify()
+      descripcion: datosUnidad.descripcion,
+      imagenes: datosUnidad.imagenes
     };
 
     console.log('🔍 Payload enviado al backend:', payload);
@@ -130,11 +154,11 @@ export class PropiedadService {
     }
 
     if (datosActualizacion.descripcion !== undefined) {
-      payload.descripcion = datosActualizacion.descripcion;  // ← QUITAR JSON.stringify()
+      payload.descripcion = datosActualizacion.descripcion;
     }
 
     if (datosActualizacion.imagenes !== undefined) {
-      payload.imagenes = datosActualizacion.imagenes;        // ← QUITAR JSON.stringify()
+      payload.imagenes = datosActualizacion.imagenes;
     }
 
     if (datosActualizacion.disponible !== undefined) {
