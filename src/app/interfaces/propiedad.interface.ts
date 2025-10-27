@@ -168,6 +168,12 @@ export interface EliminacionUnidadResponse {
   unidadId: number;
 }
 
+export interface EliminarPropiedadRenteroResponse {
+  success: boolean;
+  mensaje: string;
+  propiedadId: number;
+}
+
 export interface ErrorResponse {
   error: string;
   mensaje?: string;

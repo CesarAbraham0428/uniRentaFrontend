@@ -794,18 +794,54 @@ $color-blanco: #FEFDFE;
   }
 }
 
-// Actualizar responsive de tabla principal
-@media (max-width: 576px) {
-  .tabla-propiedades {
-    tbody {
-      tr {
-        td {
-          &:nth-child(1)::before { content: "Nombre:"; }
-          &:nth-child(2)::before { content: "Ubicación:"; }
-          &:nth-child(3)::before { content: "Unidades:"; }    // Actualizado
-          &:nth-child(4)::before { content: "Acciones:"; }    // Actualizado
-        }
-      }
+// Estilos para SweetAlert2
+.swal-wide {
+  width: 90% !important;
+  max-width: 500px !important;
+}
+
+.swal2-popup {
+  font-family: inherit !important;
+  border-radius: 12px !important;
+
+  .swal2-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: $color-letras !important;
+  }
+
+  .swal2-html-container {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    color: $color-letras !important;
+  }
+
+  .swal2-confirm {
+    background-color: $color-eliminar !important;
+    border-color: $color-eliminar !important;
+    font-weight: 500 !important;
+    padding: 0.75rem 2rem !important;
+
+    &:hover {
+      background-color: darken($color-eliminar, 8%) !important;
+      border-color: darken($color-eliminar, 8%) !important;
     }
   }
+
+  .swal2-cancel {
+    background-color: $color-blanco !important;
+    color: $color-letras !important;
+    border: 2px solid lighten($color-letras, 50%) !important;
+    font-weight: 500 !important;
+    padding: 0.75rem 2rem !important;
+
+    &:hover {
+      background-color: lighten($color-letras, 65%) !important;
+      border-color: lighten($color-letras, 40%) !important;
+    }
+  }
+}
+
+.swal2-loader {
+  border-color: $color-header-footer transparent $color-header-footer transparent !important;
 }

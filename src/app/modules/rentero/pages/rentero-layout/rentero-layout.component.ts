@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PropiedadService } from '../../../../core/services/propiedad.service';
 import { Unidad } from '../../../../interfaces/propiedad.interface';
+import Swal from 'sweetalert2';
 
 // Define la interfaz temporal que coincide con los datos reales
 interface PropiedadBackend {
@@ -195,9 +196,101 @@ export class RenteroLayoutComponent implements OnInit {
   }
 
   eliminarPropiedad(propiedadId: number): void {
-    if (confirm('¿Estás seguro de eliminar esta propiedad? Esta acción no se puede deshacer.')) {
-      alert('Funcionalidad de eliminar propiedad pendiente de implementación');
+    // Buscar la propiedad para obtener su nombre
+    const propiedad = this.propiedades.find(p => p.id === propiedadId);
+    if (!propiedad) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo encontrar la propiedad a eliminar'
+      });
+      return;
     }
+
+    // Obtener el conteo de unidades
+    const unidadesCount = this.contarUnidades(propiedadId);
+
+    // Construir el mensaje de confirmación
+    let mensaje = `¿Estás seguro de eliminar la propiedad "${propiedad.nombre}"?`;
+    if (unidadesCount > 0) {
+      mensaje += `\n\n Esta propiedad tiene ${unidadesCount} ${unidadesCount === 1 ? 'unidad' : 'unidades'} que también serán eliminadas.`;
+    }
+    mensaje += `\n\nEsta acción no se puede deshacer.`;
+
+    Swal.fire({
+      title: 'Confirmar eliminación',
+      text: mensaje,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'swal-wide'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Mostrar loading
+        Swal.fire({
+          title: 'Eliminando propiedad...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Llamar al servicio para eliminar
+        this.propiedadService.eliminarPropiedd(propiedadId).subscribe({
+          next: (response) => {
+            if (response.success) {
+              // Actualizar la lista de propiedades
+              this.propiedades = this.propiedades.filter(p => p.id !== propiedadId);
+
+              // Actualizar contadores de unidades
+              delete this.unidadesPorPropiedad[propiedadId];
+
+              // Cerrar loading y mostrar éxito
+              Swal.fire({
+                icon: 'success',
+                title: '¡Eliminado!',
+                text: response.mensaje || 'La propiedad ha sido eliminada exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.mensaje || 'No se pudo eliminar la propiedad'
+              });
+            }
+          },
+          error: (error) => {
+            let mensajeError = 'Error interno del servidor';
+
+            if (error.status === 404) {
+              mensajeError = 'La propiedad no existe o ya fue eliminada';
+            } else if (error.status === 403) {
+              mensajeError = 'No tienes permisos para eliminar esta propiedad';
+            } else if (error.status === 400) {
+              mensajeError = error.error?.mensaje || 'No se puede eliminar esta propiedad';
+            } else if (error.error?.mensaje) {
+              mensajeError = error.error.mensaje;
+            }
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: mensajeError,
+              confirmButtonText: 'Entendido'
+            });
+          }
+        });
+      }
+    });
   }
 
   trackByPropiedadId(index: number, propiedad: PropiedadBackend): number {

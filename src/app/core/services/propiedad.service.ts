@@ -15,6 +15,7 @@ import {
   RegistroUnidadResponse,
   EliminacionUnidadResponse,
   PropiedadesRenteroResponse,
+  EliminarPropiedadRenteroResponse,
   ErrorResponse
 } from '../../interfaces/propiedad.interface';
 
@@ -100,6 +101,11 @@ export class PropiedadService {
   obtenerPropiedadesDelRentero(): Observable<PropiedadesRenteroResponse> {
     const headers = this.getAuthHeaders();
     return this.http.get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers });
+  }
+
+  eliminarPropiedd(propiedadId: number):Observable<EliminarPropiedadRenteroResponse>{
+
+    return this.http.delete<EliminarPropiedadRenteroResponse>(`${this.apiUrl}/eliminar/${propiedadId}`, { headers: this.getAuthHeaders() });
   }
 
   // ========== GESTIÓN DE UNIDADES (MÉTODOS CORREGIDOS) ==========
