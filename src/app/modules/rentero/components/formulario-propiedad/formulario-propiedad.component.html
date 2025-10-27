@@ -336,8 +336,12 @@
             <select
               id="tipoDocumento"
               formControlName="tipoDocumentoId"
+              (change)="
+                formularioPropiedad
+                  .get('tipoDocumentoId')
+                  ?.updateValueAndValidity()
+              "
               class="campo-entrada"
-              [class.invalido]="esCampoInvalido('tipoDocumentoId')"
             >
               <option value="">Seleccione el tipo de documento</option>
               <option *ngFor="let tipo of tiposDocumento" [value]="tipo.id">
@@ -354,34 +358,78 @@
           </div>
 
           <div class="grupo-campo">
-            <label for="archivo" class="etiqueta">
-              <i class="bi bi-cloud-upload"></i>
+            <label class="etiqueta">
+              <i class="bi bi-file-earmark-arrow-up"></i>
               Subir Documento
             </label>
-            <input
-              id="archivo"
-              type="file"
-              (change)="onArchivoSeleccionado($event)"
-              accept=".pdf,.jpg,.jpeg,.png"
-              class="input-archivo"
-            />
-            <div class="archivo-info" *ngIf="archivoSeleccionado">
-              <i class="bi bi-file-check"></i>
-              <span>{{ archivoSeleccionado.name }}</span>
+
+            <!-- <CHANGE> Agregada nota informativa sobre tipos de archivos permitidos -->
+            <div class="nota-tipos-archivo">
+              <div class="nota-contenido">
+                <i class="bi bi-info-circle-fill"></i>
+                <div class="nota-texto">
+                  <p class="nota-principal">
+                    Solo se permiten los siguientes formatos:
+                  </p>
+                  <div class="tipos-permitidos">
+                    <span class="tipo-archivo"
+                      ><i class="bi bi-file-earmark-image"></i> PNG</span
+                    >
+                    <span class="tipo-archivo"
+                      ><i class="bi bi-file-earmark-image"></i> JPG/JPEG</span
+                    >
+                    <span class="tipo-archivo"
+                      ><i class="bi bi-file-earmark-pdf"></i> PDF</span
+                    >
+                  </div>
+                  <p class="nota-secundaria">
+                    El documento debe ser legible y estar completo
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- <CHANGE> Mejorada la zona de carga de archivos -->
+            <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
+              <input
+                id="archivo"
+                type="file"
+                (change)="onArchivoSeleccionado($event)"
+                accept=".pdf,.jpg,.jpeg,.png"
+                class="input-archivo"
+              />
+              <label for="archivo" class="etiqueta-archivo">
+                <i class="bi bi-cloud-upload icono-archivo"></i>
+                <span class="texto-principal">
+                  {{
+                    archivoSeleccionado
+                      ? archivoSeleccionado.name
+                      : "Haz clic para seleccionar"
+                  }}
+                </span>
+                <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
+              </label>
             </div>
           </div>
 
-          <!-- Previsualización -->
-          <div class="previsualizacion" *ngIf="urlPrevisualizacion">
-            <img
-              *ngIf="esImagen"
-              [src]="urlPrevisualizacion"
-              alt="Previsualización"
-              class="imagen-preview"
-            />
-            <div *ngIf="esPdf" class="pdf-preview">
-              <i class="bi bi-file-earmark-pdf"></i>
-              <span>Documento PDF cargado</span>
+          <!-- <CHANGE> Mejorada la sección de previsualización -->
+          <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
+            <h4 class="titulo-previsualizacion">
+              <i class="bi bi-eye"></i>
+              Previsualización
+            </h4>
+            <div class="contenedor-previsualizacion">
+              <img
+                *ngIf="esImagen"
+                [src]="urlPrevisualizacion"
+                alt="Previsualización del documento"
+                class="imagen-previsualizacion"
+              />
+              <div *ngIf="esPdf" class="previsualizacion-pdf">
+                <i class="bi bi-file-pdf icono-pdf"></i>
+                <p class="nombre-archivo">{{ archivoSeleccionado?.name }}</p>
+                <small class="info-archivo">Archivo PDF seleccionado</small>
+              </div>
             </div>
           </div>
         </div>
