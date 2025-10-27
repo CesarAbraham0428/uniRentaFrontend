@@ -117,8 +117,7 @@ export class RegistroRenteroComponent implements OnDestroy {
         if (respuesta.exito) {
           this.documentoValidacionService.mostrarExito(respuesta.mensaje, '¡Registro exitoso!');
           this.reiniciarFormulario();
-          // Ejemplo: llevar a login
-          // this.router.navigate(['/rentero/login']);
+          this.router.navigate(['/rentero/login']);
         } else {
           const mensaje = respuesta.errores?.join(', ') || respuesta.mensaje;
           this.documentoValidacionService.mostrarExito(mensaje, 'Error en el registro');
