@@ -54,6 +54,7 @@ export interface PropiedadBackend {
   numero: string;
   codigo_postal?: string;
   municipio: string;
+  estado?:string | null,
   visible?: boolean;
 }
 
