@@ -22,6 +22,5 @@ declare module '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions' {
     setOrigin(origin: LngLatLike | string): void;
     setDestination(dest: LngLatLike | string): void;
     setProfile(profile: string): void;
-    // agrega aquí métodos que necesites y no estén
   }
 }
