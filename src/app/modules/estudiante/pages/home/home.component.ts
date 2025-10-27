@@ -12,13 +12,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   cargando = false;
   error = '';
 
-  // Filtros
+  // Filtros (solo los que necesitas)
   precioMin: number | null = null;
   precioMax: number | null = null;
   colonia = '';
   municipio = '';
-  universidadNombre = '';
-  rangoKm: number | null = null;
 
   currentSlide = 0;
   private carouselInterval: any;
@@ -52,7 +50,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }, {
       root: null,
       threshold: 0,
-      // Evita “flapping” al cruzar el umbral por 1px
+      // Evita "flapping" al cruzar el umbral por 1px
       rootMargin: '0px 0px -1px 0px',
     });
 
@@ -118,10 +116,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.precioMax !== null && this.precioMax > 0) filtros.precioMax = this.precioMax;
     if (this.colonia.trim()) filtros.colonia = this.colonia.trim();
     if (this.municipio.trim()) filtros.municipio = this.municipio.trim();
-    if (this.universidadNombre.trim()) {
-      filtros.universidadNombre = this.universidadNombre.trim();
-      filtros.rangoKm = (this.rangoKm !== null && this.rangoKm > 0) ? this.rangoKm : 2;
-    }
+
+    // REMOVIDO: Lógica de universidad y rango
+    // if (this.universidadNombre.trim()) {
+    //   filtros.universidadNombre = this.universidadNombre.trim();
+    //   filtros.rangoKm = (this.rangoKm !== null && this.rangoKm > 0) ? this.rangoKm : 2;
+    // }
 
     this.propiedadService.filtrarPropiedades(filtros).subscribe({
       next: (response) => {
@@ -151,15 +151,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.precioMax = null;
     this.colonia = '';
     this.municipio = '';
-    this.universidadNombre = '';
-    this.rangoKm = null;
+
+    // REMOVIDO: Variables de universidad y rango
+    // this.universidadNombre = '';
+    // this.rangoKm = null;
+
     this.cargarPropiedades();
   }
 
   contactarRentero(telefono: string | undefined): void {
     if (!telefono) return;
     const telefonoLimpio = telefono.replace(/\D/g, '');
-    const mensaje = encodeURIComponent('Hola, me interesa una de tus propiedades en UniRenta 🏠');
+    const mensaje = encodeURIComponent('Hola, me interesa una de tus propiedades en UniRenta');
     const url = `https://wa.me/52${telefonoLimpio}?text=${mensaje}`;
     window.open(url, '_blank');
   }

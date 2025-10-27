@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PropiedadService } from '../../../../core/services/propiedad.service';
+import { AlertasService } from '../../../../core/services/alertas.service';
 import {
   FormularioRegistroUnidad,
   FormularioActualizacionUnidad,
@@ -39,7 +40,8 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private propiedadService: PropiedadService
+    private propiedadService: PropiedadService,
+    private alertasService: AlertasService
   ) {
     this.formularioUnidad = this.crearFormulario();
   }
@@ -61,7 +63,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       this.propiedadId = +params['propiedadId'];
 
       if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
-        this.mostrarError('ID de propiedad inválido', 'Error de navegación');
+        this.alertasService.mostrarError('ID de propiedad inválido', 'Error de navegación');
         this.router.navigate(['/rentero']);
         return;
       }
@@ -72,7 +74,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       this.unidadId = +params['unidadId'];
 
       if (!this.unidadId || this.unidadId === 0 || isNaN(this.unidadId)) {
-        this.mostrarError('ID de unidad inválido', 'Error de navegación');
+        this.alertasService.mostrarError('ID de unidad inválido', 'Error de navegación');
         this.router.navigate(['/rentero']);
         return;
       }
@@ -87,8 +89,8 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       precio: ['', [Validators.required, Validators.min(1)]],
       terraza: [false],
       amueblado: [false],
-      caracteristicas: [''],
-      disponible: [true]
+      caracteristicas: ['']
+      // REMOVIDO: disponible: [true]
     });
   }
 
@@ -118,6 +120,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.propiedadNombre = `Propiedad ID: ${this.propiedadId}`;
+        this.alertasService.manejarErrores(error, 'carga del nombre de propiedad');
       }
     });
   }
@@ -135,7 +138,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        this.mostrarError('No se pudo cargar la unidad', 'Error');
+        this.alertasService.manejarErrores(error, 'carga de datos de la unidad');
         this.router.navigate(['/rentero']);
       }
     });
@@ -147,8 +150,8 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       precio: unidad.precio || 0,
       terraza: unidad.descripcion?.terraza || false,
       amueblado: unidad.descripcion?.amueblado || false,
-      caracteristicas: unidad.descripcion?.caracteristicas || '',
-      disponible: unidad.estado === 'libre'
+      caracteristicas: unidad.descripcion?.caracteristicas || ''
+      // REMOVIDO: disponible: unidad.estado === 'libre'
     });
 
     this.serviciosSeleccionados = unidad.descripcion?.servicios || [];
@@ -156,7 +159,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     // Cargar imágenes existentes como URLs de preview
     if (unidad.imagenes && unidad.imagenes.length > 0) {
       this.urlsPreview = [...unidad.imagenes];
-      // No agregar a imagenesSeleccionadas porque son URLs, no archivos
     }
   }
 
@@ -202,20 +204,29 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   private validarImagen(archivo: File): boolean {
     // Verificar límite de imágenes
     if (this.urlsPreview.length >= this.maxImagenes) {
-      this.mostrarError(`Solo puedes agregar hasta ${this.maxImagenes} imágenes`, 'Límite alcanzado');
+      this.alertasService.mostrarAdvertencia(
+        `Solo puedes agregar hasta ${this.maxImagenes} imágenes`,
+        'Límite alcanzado'
+      );
       return false;
     }
 
     // Validar tipo de archivo
     if (!this.formatosPermitidos.includes(archivo.type)) {
-      this.mostrarError(`Formato no permitido: ${archivo.type}. Solo se permiten JPG, PNG y WebP`, 'Formato no válido');
+      this.alertasService.mostrarError(
+        `Formato no permitido: ${archivo.type}. Solo se permiten JPG, PNG y WebP`,
+        'Formato no válido'
+      );
       return false;
     }
 
     // Validar tamaño
     const tamanoMB = archivo.size / (1024 * 1024);
     if (tamanoMB > this.maxTamanoMB) {
-      this.mostrarError(`La imagen "${archivo.name}" pesa ${tamanoMB.toFixed(1)}MB. El máximo permitido es ${this.maxTamanoMB}MB`, 'Archivo muy grande');
+      this.alertasService.mostrarError(
+        `La imagen "${archivo.name}" pesa ${tamanoMB.toFixed(1)}MB. El máximo permitido es ${this.maxTamanoMB}MB`,
+        'Archivo muy grande'
+      );
       return false;
     }
 
@@ -237,23 +248,26 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       console.log('📁 Archivo eliminado, archivos restantes:', this.imagenesSeleccionadas.length);
     }
 
-    // Limpiar URL de preview
+    // Liberar memoria y eliminar de preview
     if (this.urlsPreview[index] && this.urlsPreview[index].startsWith('blob:')) {
       URL.revokeObjectURL(this.urlsPreview[index]);
     }
     this.urlsPreview.splice(index, 1);
+
+    console.log('🖼️ Vista previa actualizada, total:', this.urlsPreview.length);
   }
 
   private limpiarPrevisualizacionesDeArchivos(): void {
-    // Solo limpiar URLs de blob (archivos nuevos), mantener URLs existentes
-    this.urlsPreview.forEach((url, index) => {
+    // Solo liberar URLs de blob (archivos nuevos), mantener URLs existentes
+    this.urlsPreview.forEach(url => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
     });
 
-    // Mantener solo las URLs que no sean blob (imágenes existentes)
-    this.urlsPreview = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+    // Limpiar solo los archivos nuevos, mantener URLs existentes si es edición
+    const urlsExistentes = this.urlsPreview.filter(url => !url.startsWith('blob:'));
+    this.urlsPreview = [...urlsExistentes];
     this.imagenesSeleccionadas = [];
   }
 
@@ -267,20 +281,15 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     this.imagenesSeleccionadas = [];
   }
 
-  // ========== GETTERS PARA EL TEMPLATE ==========
-
-  get textoBotonImagenes(): string {
-    const nuevas = this.imagenesSeleccionadas.length;
-    if (nuevas === 0) return 'No hay imágenes nuevas';
-    return `${nuevas} imagen${nuevas > 1 ? 'es' : ''} nueva${nuevas > 1 ? 's' : ''}`;
-  }
-
-  get puedeAgregarImagenes(): boolean {
-    return this.urlsPreview.length < this.maxImagenes;
-  }
+  // ========== GETTERS ==========
 
   get hayImagenes(): boolean {
     return this.urlsPreview.length > 0;
+  }
+
+  get textoBotonImagenes(): string {
+    const cantidad = this.imagenesSeleccionadas.length;
+    return cantidad === 1 ? '1 imagen seleccionada' : `${cantidad} imágenes seleccionadas`;
   }
 
   // ========== CONVERSIÓN DE IMÁGENES ==========
@@ -320,7 +329,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
 
     const token = localStorage.getItem('rentero_token') || sessionStorage.getItem('rentero_token');
     if (!token) {
-      this.mostrarError('No estás autenticado', 'Error de autenticación');
+      this.alertasService.mostrarError('No estás autenticado', 'Error de autenticación');
       this.router.navigate(['/rentero/login']);
       return;
     }
@@ -339,7 +348,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         control.markAsTouched();
       }
     });
-    this.mostrarError('Por favor completa todos los campos requeridos', 'Formulario incompleto');
+    this.alertasService.mostrarError(
+      'Por favor completa todos los campos requeridos',
+      'Formulario incompleto'
+    );
   }
 
   private async crearUnidad(): Promise<void> {
@@ -348,7 +360,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
 
     if (!this.propiedadId || this.propiedadId === 0 || isNaN(this.propiedadId)) {
       this.procesando = false;
-      this.mostrarError('ID de propiedad inválido', 'Error de datos');
+      this.alertasService.mostrarError('ID de propiedad inválido', 'Error de datos');
       return;
     }
 
@@ -381,21 +393,23 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.procesando = false;
           if (response.success || response.mensaje) {
-            this.mostrarExito(response.mensaje || 'Unidad registrada exitosamente');
+            this.alertasService.mostrarExito(
+              response.mensaje || 'Unidad registrada exitosamente'
+            );
             this.volverAPropiedades();
           } else {
-            this.mostrarError('Error al registrar la unidad', 'Error');
+            this.alertasService.mostrarError('Error al registrar la unidad');
           }
         },
         error: (error) => {
           this.procesando = false;
-          this.manejarErrorGuardado(error, 'registrar');
+          this.alertasService.manejarErrores(error, 'registro de unidad');
         }
       });
     } catch (error) {
       this.procesando = false;
       console.error('❌ Error al procesar imágenes:', error);
-      this.mostrarError('Error al procesar las imágenes', 'Error');
+      this.alertasService.mostrarError('Error al procesar las imágenes');
     }
   }
 
@@ -420,7 +434,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       const datosActualizacion: FormularioActualizacionUnidad = {
         nombre: formValue.nombre,
         precio: parseFloat(formValue.precio),
-        estado: formValue.disponible ? 'libre' : 'ocupada',
+        // REMOVIDO: estado: formValue.disponible ? 'libre' : 'ocupada',
         descripcion: {
           terraza: formValue.terraza || false,
           amueblado: formValue.amueblado || false,
@@ -439,41 +453,24 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.procesando = false;
           if (response.success || response.mensaje) {
-            this.mostrarExito(response.mensaje || 'Unidad actualizada exitosamente');
+            this.alertasService.mostrarExito(
+              response.mensaje || 'Unidad actualizada exitosamente'
+            );
             this.volverAPropiedades();
           } else {
-            this.mostrarError('Error al actualizar la unidad', 'Error');
+            this.alertasService.mostrarError('Error al actualizar la unidad');
           }
         },
         error: (error) => {
           this.procesando = false;
-          this.manejarErrorGuardado(error, 'actualizar');
+          this.alertasService.manejarErrores(error, 'actualización de unidad');
         }
       });
     } catch (error) {
       this.procesando = false;
       console.error('❌ Error al procesar imágenes:', error);
-      this.mostrarError('Error al procesar las imágenes', 'Error');
+      this.alertasService.mostrarError('Error al procesar las imágenes');
     }
-  }
-
-  private manejarErrorGuardado(error: any, operacion: string): void {
-    console.error(`❌ Error al ${operacion} unidad:`, error);
-
-    let mensaje = `Error al ${operacion} la unidad`;
-    if (error.error?.mensaje) {
-      mensaje = error.error.mensaje;
-    } else if (error.status === 413) {
-      mensaje = 'Las imágenes son demasiado grandes. Intenta con imágenes más pequeñas.';
-    } else if (error.status === 400) {
-      mensaje = 'Datos inválidos. Verifica la información ingresada.';
-    } else if (error.status === 403) {
-      mensaje = 'No tienes permisos para realizar esta acción.';
-    } else if (error.status === 404) {
-      mensaje = 'La unidad no existe.';
-    }
-
-    this.mostrarError(mensaje, 'Error del servidor');
   }
 
   // ========== NAVEGACIÓN Y UTILIDADES ==========
@@ -482,8 +479,15 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     this.router.navigate(['/rentero']);
   }
 
-  cancelar(): void {
-    if (confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) {
+  async cancelar(): Promise<void> {
+    const confirmar = await this.alertasService.confirmarAccion(
+      '¿Cancelar registro?',
+      'Se perderán todos los cambios realizados',
+      'Sí, cancelar',
+      'Continuar editando'
+    );
+
+    if (confirmar) {
       this.volverAPropiedades();
     }
   }
@@ -503,13 +507,5 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     if (err['minlength']) return `Debe tener al menos ${err['minlength'].requiredLength} caracteres`;
 
     return 'Campo inválido';
-  }
-
-  private mostrarError(mensaje: string, titulo: string): void {
-    alert(`${titulo}: ${mensaje}`);
-  }
-
-  private mostrarExito(mensaje: string): void {
-    alert(mensaje);
   }
 }

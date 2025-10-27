@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   PropiedadNueva,
   FormularioRegistroPropiedad,
@@ -75,7 +76,11 @@ export class PropiedadService {
 
   // ========== ENDPOINTS AUTENTICADOS - PROPIEDADES ==========
 
-  registrarPropiedad(datosPropiedad: FormularioRegistroPropiedad, archivo: File, tipoDocumentoId?: number): Observable<FormularioRegistroPropiedad> {
+  registrarPropiedad(
+    datosPropiedad: FormularioRegistroPropiedad,
+    archivo: File,
+    tipoDocumentoId?: number
+  ): Observable<FormularioRegistroPropiedad> {
     const formData = new FormData();
 
     // Agregar campos individuales
@@ -107,11 +112,29 @@ export class PropiedadService {
 
     return this.http.delete<EliminarPropiedadRenteroResponse>(`${this.apiUrl}/eliminar/${propiedadId}`, { headers: this.getAuthHeaders() });
   }
+  
+  obtenerPropiedadDelRenteroPorId(propiedadId: number): Observable<PropiedadNueva | any | null> {
+    const headers = this.getAuthHeaders();
+    return this.http
+      .get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers })
+      .pipe(
+        map((resp) => {
+          if (resp?.success && Array.isArray(resp.data)) {
+            return (resp.data as any[]).find(p => p.id === propiedadId) ?? null;
+          }
+          return null;
+        })
+      );
+  }
+
+  actualizarPropiedad(propiedadId: number, payload: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${propiedadId}`, payload, { headers });
+  }
 
   // ========== GESTIÓN DE UNIDADES (MÉTODOS CORREGIDOS) ==========
 
   registrarUnidad(datosUnidad: FormularioRegistroUnidad): Observable<RegistroUnidadResponse> {
-    console.log('🚀 Enviando datos de unidad al backend:', datosUnidad);
 
     // Validar datos antes de enviar
     if (!datosUnidad.propiedad_id) {
@@ -135,8 +158,6 @@ export class PropiedadService {
       imagenes: datosUnidad.imagenes || null
     };
 
-    console.log('📤 Payload final para el backend:', payload);
-
     return this.http.post<RegistroUnidadResponse>(
       `${this.apiUrl}/unidades/registrar`,
       payload,
@@ -145,7 +166,6 @@ export class PropiedadService {
   }
 
   eliminarUnidad(unidadId: number): Observable<EliminacionUnidadResponse> {
-    console.log('🗑️ Eliminando unidad ID:', unidadId);
 
     if (!unidadId || isNaN(unidadId)) {
       throw new Error('ID de unidad inválido');
@@ -183,7 +203,6 @@ export class PropiedadService {
   }
 
   obtenerUnidadesPorPropiedad(propiedadId: number): Observable<UnidadesResponse> {
-    console.log('📋 Obteniendo unidades para propiedad ID:', propiedadId);
 
     if (!propiedadId || isNaN(propiedadId)) {
       throw new Error('ID de propiedad inválido');

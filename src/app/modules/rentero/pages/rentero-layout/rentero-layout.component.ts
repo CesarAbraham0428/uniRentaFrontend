@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PropiedadService } from '../../../../core/services/propiedad.service';
+import { AlertasService } from '../../../../core/services/alertas.service'; // AGREGADO
 import { Unidad } from '../../../../interfaces/propiedad.interface';
 import Swal from 'sweetalert2';
 
@@ -33,7 +34,8 @@ export class RenteroLayoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private propiedadService: PropiedadService
+    private propiedadService: PropiedadService,
+    private alertasService: AlertasService // AGREGADO
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +59,7 @@ export class RenteroLayoutComponent implements OnInit {
       error: (error) => {
         this.error = 'Error al cargar las propiedades. Intenta de nuevo.';
         this.cargando = false;
+        this.alertasService.manejarErrores(error, 'carga de propiedades');
       }
     });
   }
@@ -73,6 +76,7 @@ export class RenteroLayoutComponent implements OnInit {
         },
         error: (error) => {
           this.unidadesPorPropiedad[propiedad.id] = 0;
+          // No mostrar error aquí para evitar spam de alertas
         }
       });
     });
@@ -104,7 +108,7 @@ export class RenteroLayoutComponent implements OnInit {
       },
       error: (error) => {
         this.cargandoUnidades = false;
-        alert('Error al cargar las unidades de esta propiedad');
+        this.alertasService.manejarErrores(error, 'carga de unidades');
       }
     });
   }
@@ -113,21 +117,31 @@ export class RenteroLayoutComponent implements OnInit {
     this.router.navigate(['/rentero/unidades', unidadId, 'editar']);
   }
 
-  eliminarUnidad(unidadId: number): void {
+  async eliminarUnidad(unidadId: number): Promise<void> {
     if (!unidadId || isNaN(unidadId)) {
-      alert('Error: ID de unidad inválido');
+      this.alertasService.mostrarError('ID de unidad inválido', 'Error');
       return;
     }
 
     const unidad = this.unidadesActuales.find(u => u.id === unidadId);
     const nombreUnidad = unidad ? unidad.nombre : `Unidad ID ${unidadId}`;
 
-    const mensaje = `¿Estás seguro de eliminar "${nombreUnidad}"?\n\n` +
-                   ` ATENCIÓN: Esta acción eliminará completamente la unidad y NO se puede deshacer.`;
+    // Usar SweetAlert2 para confirmación
+    const confirmar = await this.alertasService.confirmarEliminacion(
+      `la unidad "${nombreUnidad}"`
+    );
 
-    if (!confirm(mensaje)) {
-      return;
-    }
+    if (!confirmar) return;
+
+    // Mostrar alerta adicional por ser eliminación permanente
+    const confirmarPermanente = await this.alertasService.confirmarAccion(
+      '⚠️ Eliminación Permanente',
+      'Esta acción NO se puede deshacer. La unidad será eliminada completamente del sistema.',
+      'Sí, eliminar permanentemente',
+      'Cancelar'
+    );
+
+    if (!confirmarPermanente) return;
 
     this.propiedadService.eliminarUnidad(unidadId).subscribe({
       next: (response) => {
@@ -136,25 +150,13 @@ export class RenteroLayoutComponent implements OnInit {
           this.actualizarUITrasEliminacion(unidadId);
 
           const mensajeExito = response.mensaje || 'Unidad eliminada exitosamente';
-          alert(` ${mensajeExito}`);
+          this.alertasService.mostrarExito(mensajeExito);
         } else {
-          alert(' Error: No se pudo confirmar la eliminación');
+          this.alertasService.mostrarError('No se pudo confirmar la eliminación');
         }
       },
       error: (error) => {
-        let mensajeError = 'Error interno del servidor';
-
-        if (error.status === 404) {
-          mensajeError = 'La unidad no existe o ya fue eliminada';
-        } else if (error.status === 403) {
-          mensajeError = 'No tienes permisos para eliminar esta unidad';
-        } else if (error.status === 400) {
-          mensajeError = error.error?.mensaje || 'No se puede eliminar esta unidad';
-        } else if (error.error?.mensaje) {
-          mensajeError = error.error.mensaje;
-        }
-
-        alert(` Error al eliminar unidad: ${mensajeError}\n\nStatus: ${error.status}`);
+        this.alertasService.manejarErrores(error, 'eliminación de unidad');
       }
     });
   }
@@ -180,7 +182,7 @@ export class RenteroLayoutComponent implements OnInit {
 
   agregarUnidad(propiedadId: number): void {
     if (!propiedadId || isNaN(propiedadId)) {
-      alert('Error: ID de propiedad inválido');
+      this.alertasService.mostrarError('ID de propiedad inválido', 'Error');
       return;
     }
 
@@ -342,6 +344,7 @@ export class RenteroLayoutComponent implements OnInit {
   }
 
   recargarDatos(): void {
+    this.alertasService.mostrarInfo('Recargando datos...', 'Actualizando');
     this.cargarPropiedades();
 
     if (this.propiedadExpandida) {

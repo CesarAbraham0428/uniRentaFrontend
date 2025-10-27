@@ -52,6 +52,7 @@ export interface PropiedadBackend {
   calle: string;
   colonia: string;
   numero: string;
+  codigo_postal?: string;
   municipio: string;
   visible?: boolean;
 }
