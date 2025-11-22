@@ -114,6 +114,9 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       amueblado: [false],
       caracteristicas: [''],
       // nuevos campos para compartido (sin validadores iniciales; se activan si se marca compartido)
+      compartido: [false],
+      compartido_cantidad: [1],
+      compartido_precio: [0]
     });
   }
 
