@@ -16,7 +16,7 @@ import { LoginRenteroComponent } from './modules/rentero/pages/login-rentero/log
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    LoginRenteroComponent,
+    LoginRenteroComponent
   ],
   imports: [
     BrowserModule,

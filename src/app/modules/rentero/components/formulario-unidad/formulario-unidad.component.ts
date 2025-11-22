@@ -302,6 +302,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     return cantidad === 1 ? '1 imagen seleccionada' : `${cantidad} imágenes seleccionadas`;
   }
 
+  get esCompartido(): boolean {
+    return !!this.formularioUnidad.get('compartido')?.value;
+  }
+
   // ========== CONVERSIÓN DE IMÁGENES ==========
 
   private async convertirImagenesABase64(): Promise<string[]> {
