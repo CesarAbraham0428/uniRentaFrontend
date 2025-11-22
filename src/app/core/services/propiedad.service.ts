@@ -108,11 +108,11 @@ export class PropiedadService {
     return this.http.get<PropiedadesRenteroResponse>(`${this.apiUrl}/rentero/mis-propiedades`, { headers });
   }
 
-  eliminarPropiedd(propiedadId: number):Observable<EliminarPropiedadRenteroResponse>{
+  eliminarPropiedd(propiedadId: number): Observable<EliminarPropiedadRenteroResponse> {
 
     return this.http.delete<EliminarPropiedadRenteroResponse>(`${this.apiUrl}/eliminar/${propiedadId}`, { headers: this.getAuthHeaders() });
   }
-  
+
   obtenerPropiedadDelRenteroPorId(propiedadId: number): Observable<PropiedadNueva | any | null> {
     const headers = this.getAuthHeaders();
     return this.http
@@ -304,4 +304,20 @@ export class PropiedadService {
         return 'Estado Desconocido';
     }
   }
+
+  asignarEstudianteAUnidad(unidadId: number, email: string): Observable<any> {
+    if (!unidadId || isNaN(unidadId)) {
+      throw new Error('ID de unidad inválido');
+    }
+    if (!email) {
+      throw new Error('Email requerido');
+    }
+    const payload = { email };
+    return this.http.post<any>(
+      `${this.apiUrl}/unidades/${unidadId}/asignar-estudiante`,
+      payload,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
 }

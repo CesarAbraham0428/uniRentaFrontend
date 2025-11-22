@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { PropiedadService } from '../../../../core/services/propiedad.service';
 import { AlertasService } from '../../../../core/services/alertas.service';
 import {
@@ -36,6 +37,8 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   maxTamanoMB = 5;
   formatosPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
+  private subs: Subscription[] = [];
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -44,6 +47,25 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     private alertasService: AlertasService
   ) {
     this.formularioUnidad = this.crearFormulario();
+
+    // Suscribir cambios de "compartido" para activar/desactivar validadores
+    const sub = this.formularioUnidad.get('compartido')!.valueChanges.subscribe((v: boolean) => {
+      const cant = this.formularioUnidad.get('compartido_cantidad')!;
+      const precio = this.formularioUnidad.get('compartido_precio')!;
+      if (v) {
+        cant.setValidators([Validators.required, Validators.min(1)]);
+        precio.setValidators([Validators.required, Validators.min(0.01)]);
+      } else {
+        cant.clearValidators();
+        precio.clearValidators();
+        // valores por defecto cuando no es compartido
+        cant.setValue(1, { emitEvent: false });
+        precio.setValue(0, { emitEvent: false });
+      }
+      cant.updateValueAndValidity({ emitEvent: false });
+      precio.updateValueAndValidity({ emitEvent: false });
+    });
+    this.subs.push(sub);
   }
 
   ngOnInit(): void {
@@ -53,6 +75,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.limpiarPrevisualizaciones();
+    this.subs.forEach(s => s.unsubscribe());
   }
 
   private detectarModo(): void {
@@ -89,8 +112,11 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       precio: ['', [Validators.required, Validators.min(1)]],
       terraza: [false],
       amueblado: [false],
-      caracteristicas: ['']
-      // REMOVIDO: disponible: [true]
+      caracteristicas: [''],
+      // nuevos campos para compartido (sin validadores iniciales; se activan si se marca compartido)
+      compartido: [false],
+      compartido_cantidad: [1],
+      compartido_precio: [0]
     });
   }
 
@@ -150,8 +176,11 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       precio: unidad.precio || 0,
       terraza: unidad.descripcion?.terraza || false,
       amueblado: unidad.descripcion?.amueblado || false,
-      caracteristicas: unidad.descripcion?.caracteristicas || ''
-      // REMOVIDO: disponible: unidad.estado === 'libre'
+      caracteristicas: unidad.descripcion?.caracteristicas || '',
+      // campos de compartido (si vienen)
+      compartido: unidad.descripcion?.compartido || false,
+      compartido_cantidad: unidad.descripcion?.compartido_cantidad ?? 1,
+      compartido_precio: unidad.descripcion?.compartido_precio ?? 0
     });
 
     this.serviciosSeleccionados = unidad.descripcion?.servicios || [];
@@ -183,8 +212,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     const archivos = (event.target as HTMLInputElement).files;
     if (!archivos) return;
 
-    console.log('📁 Archivos seleccionados:', archivos.length);
-
     // Limpiar previsualizaciones anteriores de archivos (mantener URLs existentes si es edición)
     this.limpiarPrevisualizacionesDeArchivos();
 
@@ -193,7 +220,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       if (this.validarImagen(archivo)) {
         this.imagenesSeleccionadas.push(archivo);
         this.crearPreview(archivo);
-        console.log('✅ Archivo agregado:', archivo.name);
       }
     });
 
@@ -202,7 +228,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   }
 
   private validarImagen(archivo: File): boolean {
-    // Verificar límite de imágenes
     if (this.urlsPreview.length >= this.maxImagenes) {
       this.alertasService.mostrarAdvertencia(
         `Solo puedes agregar hasta ${this.maxImagenes} imágenes`,
@@ -211,7 +236,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Validar tipo de archivo
     if (!this.formatosPermitidos.includes(archivo.type)) {
       this.alertasService.mostrarError(
         `Formato no permitido: ${archivo.type}. Solo se permiten JPG, PNG y WebP`,
@@ -220,7 +244,6 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Validar tamaño
     const tamanoMB = archivo.size / (1024 * 1024);
     if (tamanoMB > this.maxTamanoMB) {
       this.alertasService.mostrarError(
@@ -239,13 +262,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   }
 
   eliminarImagen(index: number): void {
-    console.log('🗑️ Eliminando imagen en índice:', index);
-
     // Si es una imagen nueva (archivo)
     if (index >= (this.urlsPreview.length - this.imagenesSeleccionadas.length)) {
       const archivoIndex = index - (this.urlsPreview.length - this.imagenesSeleccionadas.length);
       this.imagenesSeleccionadas.splice(archivoIndex, 1);
-      console.log('📁 Archivo eliminado, archivos restantes:', this.imagenesSeleccionadas.length);
     }
 
     // Liberar memoria y eliminar de preview
@@ -253,19 +273,15 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(this.urlsPreview[index]);
     }
     this.urlsPreview.splice(index, 1);
-
-    console.log('🖼️ Vista previa actualizada, total:', this.urlsPreview.length);
   }
 
   private limpiarPrevisualizacionesDeArchivos(): void {
-    // Solo liberar URLs de blob (archivos nuevos), mantener URLs existentes
     this.urlsPreview.forEach(url => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
     });
 
-    // Limpiar solo los archivos nuevos, mantener URLs existentes si es edición
     const urlsExistentes = this.urlsPreview.filter(url => !url.startsWith('blob:'));
     this.urlsPreview = [...urlsExistentes];
     this.imagenesSeleccionadas = [];
@@ -292,6 +308,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     return cantidad === 1 ? '1 imagen seleccionada' : `${cantidad} imágenes seleccionadas`;
   }
 
+  get esCompartido(): boolean {
+    return !!this.formularioUnidad.get('compartido')?.value;
+  }
+
   // ========== CONVERSIÓN DE IMÁGENES ==========
 
   private async convertirImagenesABase64(): Promise<string[]> {
@@ -299,14 +319,11 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       return [];
     }
 
-    console.log('🔄 Convirtiendo', this.imagenesSeleccionadas.length, 'imágenes a base64...');
-
     const promesas = this.imagenesSeleccionadas.map(archivo =>
       this.convertirArchivoABase64(archivo)
     );
 
     const imagenesBase64 = await Promise.all(promesas);
-    console.log('✅ Imágenes convertidas:', imagenesBase64.length);
     return imagenesBase64;
   }
 
@@ -364,6 +381,22 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validación extra para compartido
+    if (formValue.compartido) {
+      const cantidad = Number(formValue.compartido_cantidad);
+      const precioPersona = Number(formValue.compartido_precio);
+      if (!cantidad || cantidad < 1) {
+        this.procesando = false;
+        this.alertasService.mostrarError('La cantidad de personas debe ser al menos 1', 'Validación');
+        return;
+      }
+      if (!precioPersona || precioPersona <= 0) {
+        this.procesando = false;
+        this.alertasService.mostrarError('El precio por persona debe ser mayor que 0', 'Validación');
+        return;
+      }
+    }
+
     try {
       // Convertir imágenes a base64 si hay archivos seleccionados
       let imagenesBase64: string[] = [];
@@ -371,23 +404,28 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         imagenesBase64 = await this.convertirImagenesABase64();
       }
 
+      const descripcion: any = {
+        terraza: !!formValue.terraza,
+        amueblado: !!formValue.amueblado,
+        servicios: this.serviciosSeleccionados,
+        caracteristicas: formValue.caracteristicas || ''
+      };
+
+      if (formValue.compartido) {
+        descripcion.compartido = true;
+        descripcion.compartido_cantidad = Number(formValue.compartido_cantidad) || 1;
+        descripcion.compartido_precio = Number(formValue.compartido_precio) || 0;
+      } else {
+        descripcion.compartido = false;
+      }
+
       const datosUnidad: FormularioRegistroUnidad = {
         propiedad_id: this.propiedadId,
         nombre: formValue.nombre || `Unidad ${Date.now()}`,
         precio: parseFloat(formValue.precio),
-        descripcion: {
-          terraza: formValue.terraza || false,
-          amueblado: formValue.amueblado || false,
-          servicios: this.serviciosSeleccionados,
-          caracteristicas: formValue.caracteristicas || ''
-        },
+        descripcion,
         imagenes: imagenesBase64
       };
-
-      console.log('📤 Enviando datos de unidad:', {
-        ...datosUnidad,
-        imagenes: `${imagenesBase64.length} imágenes`
-      });
 
       this.propiedadService.registrarUnidad(datosUnidad).subscribe({
         next: (response) => {
@@ -417,6 +455,22 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     this.procesando = true;
     const formValue = this.formularioUnidad.value;
 
+    // Validación extra para compartido
+    if (formValue.compartido) {
+      const cantidad = Number(formValue.compartido_cantidad);
+      const precioPersona = Number(formValue.compartido_precio);
+      if (!cantidad || cantidad < 1) {
+        this.procesando = false;
+        this.alertasService.mostrarError('La cantidad de personas debe ser al menos 1', 'Validación');
+        return;
+      }
+      if (!precioPersona || precioPersona <= 0) {
+        this.procesando = false;
+        this.alertasService.mostrarError('El precio por persona debe ser mayor que 0', 'Validación');
+        return;
+      }
+    }
+
     try {
       // Combinar imágenes existentes con nuevas
       let imagenesFinales: string[] = [];
@@ -431,23 +485,27 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         imagenesFinales = [...imagenesFinales, ...imagenesNuevas];
       }
 
+      const descripcion: any = {
+        terraza: formValue.terraza || false,
+        amueblado: formValue.amueblado || false,
+        servicios: this.serviciosSeleccionados,
+        caracteristicas: formValue.caracteristicas || ''
+      };
+
+      if (formValue.compartido) {
+        descripcion.compartido = true;
+        descripcion.compartido_cantidad = Number(formValue.compartido_cantidad) || 1;
+        descripcion.compartido_precio = Number(formValue.compartido_precio) || 0;
+      } else {
+        descripcion.compartido = false;
+      }
+
       const datosActualizacion: FormularioActualizacionUnidad = {
         nombre: formValue.nombre,
         precio: parseFloat(formValue.precio),
-        // REMOVIDO: estado: formValue.disponible ? 'libre' : 'ocupada',
-        descripcion: {
-          terraza: formValue.terraza || false,
-          amueblado: formValue.amueblado || false,
-          servicios: this.serviciosSeleccionados,
-          caracteristicas: formValue.caracteristicas || ''
-        },
+        descripcion,
         imagenes: imagenesFinales
       };
-
-      console.log('📤 Enviando actualización:', {
-        ...datosActualizacion,
-        imagenes: `${imagenesFinales.length} imágenes (${this.imagenesSeleccionadas.length} nuevas)`
-      });
 
       this.propiedadService.actualizarUnidad(this.unidadId, datosActualizacion).subscribe({
         next: (response) => {
