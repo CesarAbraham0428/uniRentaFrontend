@@ -150,6 +150,6 @@ export class RegistroRenteroComponent implements OnDestroy {
   }
 
   irALogin(): void {
-    this.router.navigate(['/rentero/login']);
+    this.router.navigate(['/login']);
   }
 }
