@@ -372,21 +372,14 @@
           <div class="grupo-campo">
             <label class="etiqueta">
               <i class="bi bi-file-earmark-arrow-up"></i>
-<<<<<<< HEAD
               Subir Documento
             </label>
 
             <!-- <CHANGE> Agregada nota informativa sobre tipos de archivos permitidos -->
-=======
-              Documento de la propiedad
-            </label>
-
->>>>>>> master
             <div class="nota-tipos-archivo">
               <div class="nota-contenido">
                 <i class="bi bi-info-circle-fill"></i>
                 <div class="nota-texto">
-<<<<<<< HEAD
                   <p class="nota-principal">
                     Solo se permiten los siguientes formatos:
                   </p>
@@ -404,65 +397,38 @@
                   <p class="nota-secundaria">
                     El documento debe ser legible y estar completo
                   </p>
-=======
-                  <p class="nota-principal">Solo se permiten los siguientes formatos:</p>
-                  <div class="tipos-permitidos">
-                    <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> PNG</span>
-                    <span class="tipo-archivo"><i class="bi bi-file-earmark-image"></i> JPG/JPEG</span>
-                    <span class="tipo-archivo"><i class="bi bi-file-earmark-pdf"></i> PDF</span>
-                  </div>
-                  <p class="nota-secundaria">Documento oficial que acredite la propiedad</p>
->>>>>>> master
                 </div>
               </div>
             </div>
 
-<<<<<<< HEAD
             <!-- <CHANGE> Mejorada la zona de carga de archivos -->
-=======
->>>>>>> master
             <div class="zona-archivo" [class.con-archivo]="archivoSeleccionado">
               <input
                 id="archivo"
                 type="file"
                 (change)="onArchivoSeleccionado($event)"
-<<<<<<< HEAD
                 accept=".pdf,.jpg,.jpeg,.png"
-=======
-                accept="image/*,.pdf"
->>>>>>> master
                 class="input-archivo"
               />
               <label for="archivo" class="etiqueta-archivo">
                 <i class="bi bi-cloud-upload icono-archivo"></i>
                 <span class="texto-principal">
-<<<<<<< HEAD
                   {{
                     archivoSeleccionado
                       ? archivoSeleccionado.name
                       : "Haz clic para seleccionar"
                   }}
-=======
-                  {{ archivoSeleccionado ? archivoSeleccionado.name : "Haz clic para seleccionar" }}
->>>>>>> master
                 </span>
                 <span class="texto-secundario">PDF o imagen (máx. 5MB)</span>
               </label>
             </div>
           </div>
 
-<<<<<<< HEAD
           <!-- <CHANGE> Mejorada la sección de previsualización -->
           <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
             <h4 class="titulo-previsualizacion">
               <i class="bi bi-eye"></i>
               Previsualización
-=======
-          <!-- Previsualización -->
-          <div *ngIf="urlPrevisualizacion" class="seccion-previsualizacion">
-            <h4 class="titulo-previsualizacion">
-              <i class="bi bi-eye"></i> Previsualización
->>>>>>> master
             </h4>
             <div class="contenedor-previsualizacion">
               <img
