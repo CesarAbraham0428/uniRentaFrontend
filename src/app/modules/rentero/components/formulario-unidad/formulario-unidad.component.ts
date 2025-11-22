@@ -327,10 +327,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const token = localStorage.getItem('rentero_token') || sessionStorage.getItem('rentero_token');
+    const token = localStorage.getItem('auth_token');
     if (!token) {
       this.alertasService.mostrarError('No estás autenticado', 'Error de autenticación');
-      this.router.navigate(['/rentero/login']);
+      this.router.navigate(['/login']);
       return;
     }
 
