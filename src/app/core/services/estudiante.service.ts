@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-<<<<<<< HEAD
+
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
-=======
-import { HttpClient } from '@angular/common/http';
->>>>>>> 50a2a9389529c64fd9e7945ea33da460fb80c3c7
+
+
 import { Observable } from 'rxjs';
 import { FormularioRegistroEstudiante, RespuestaRegistroEstudiante } from '../../interfaces/estudiante.interface';
 
@@ -15,7 +14,7 @@ export class EstudianteService {
 
   constructor(private http: HttpClient) {}
 
-<<<<<<< HEAD
+
   obtenerMisUnidades(): Observable<any> {
   return this.http.get<any>(`${this.apiUrl}/unidades`, this.getAuthHeaders());
 }
@@ -35,8 +34,6 @@ obtenerUnidadAsignada(unidadId: number): Observable<any> {
   return { headers };
 }
 
-=======
->>>>>>> 50a2a9389529c64fd9e7945ea33da460fb80c3c7
   /**
    * Registrar un nuevo estudiante
    */
