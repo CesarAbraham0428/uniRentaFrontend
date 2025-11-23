@@ -112,6 +112,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     return this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       precio: ['', [Validators.required, Validators.min(1)]],
+      visible: [true], // true = Libre, false = Ocupada
       terraza: [false],
       amueblado: [false],
       caracteristicas: [''],
@@ -199,10 +200,14 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     this.formularioUnidad.patchValue({
       nombre: unidad.nombre || '',
       precio: unidad.precio || 0,
+      visible: unidad.visible !== undefined ? unidad.visible : true,
       terraza: unidad.descripcion?.terraza || false,
       amueblado: unidad.descripcion?.amueblado || false,
       caracteristicas: unidad.descripcion?.caracteristicas || '',
-      // campos de compartido (si vienen)
+      // campos de compartido
+      compartido: unidad.descripcion?.compartido || false,
+      compartido_cantidad: unidad.descripcion?.compartido_cantidad || 1,
+      compartido_precio: unidad.descripcion?.compartido_precio || 0
     });
 
     this.serviciosSeleccionados = (unidad.descripcion?.servicios || [])
@@ -439,10 +444,20 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         caracteristicas: formValue.caracteristicas || ''
       };
 
+      // Agregar campos de compartido si está marcado
+      if (formValue.compartido) {
+        descripcion.compartido = true;
+        descripcion.compartido_cantidad = Number(formValue.compartido_cantidad) || 1;
+        descripcion.compartido_precio = Number(formValue.compartido_precio) || 0;
+      } else {
+        descripcion.compartido = false;
+      }
+
       const datosUnidad: FormularioRegistroUnidad = {
         propiedad_id: this.propiedadId,
         nombre: formValue.nombre || `Unidad ${Date.now()}`,
         precio: parseFloat(formValue.precio),
+        visible: formValue.visible, // Ya es boolean gracias a [ngValue]
         descripcion,
         imagenes: imagenesBase64
       };
@@ -523,6 +538,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       const datosActualizacion: FormularioActualizacionUnidad = {
         nombre: formValue.nombre,
         precio: parseFloat(formValue.precio),
+        visible: formValue.visible, // Ya es boolean gracias a [ngValue]
         descripcion,
         imagenes: imagenesFinales
       };

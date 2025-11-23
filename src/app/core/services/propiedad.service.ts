@@ -155,6 +155,7 @@ export class PropiedadService {
       propiedad_id: Number(datosUnidad.propiedad_id),
       nombre: datosUnidad.nombre.trim(),
       precio: Number(datosUnidad.precio),
+      visible: datosUnidad.visible !== undefined ? datosUnidad.visible : true, // Por defecto visible
       descripcion: datosUnidad.descripcion || null,
       imagenes: datosUnidad.imagenes || null
     };
@@ -191,6 +192,7 @@ export class PropiedadService {
     if (datos.nombre && datos.nombre.trim()) payload.nombre = datos.nombre.trim();
     if (datos.precio !== undefined && datos.precio > 0) payload.precio = Number(datos.precio);
     if (datos.estado) payload.estado = datos.estado;
+    if (datos.visible !== undefined) payload.visible = datos.visible; // Campo de visibilidad
     if (datos.descripcion !== undefined) payload.descripcion = datos.descripcion;
     if (datos.imagenes !== undefined) payload.imagenes = datos.imagenes;
 

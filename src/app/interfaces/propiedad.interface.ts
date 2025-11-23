@@ -83,6 +83,7 @@ export interface Unidad {
   nombre: string;
   precio: number;
   estado: 'libre' | 'ocupada' | 'mantenimiento';
+  visible?: boolean;
   descripcion?: Descripcion | null;
   imagenes?: string[] | null;
   createdAt?: string;
@@ -94,6 +95,7 @@ export interface FormularioRegistroUnidad {
   propiedad_id: number;
   nombre: string;
   precio: number;
+  visible?: boolean;
   descripcion?: Descripcion;
   imagenes?: string[];
 }
@@ -102,6 +104,7 @@ export interface FormularioActualizacionUnidad {
   nombre?: string;
   precio?: number;
   estado?: 'libre' | 'ocupada' | 'mantenimiento';
+  visible?: boolean;
   descripcion?: Descripcion;
   imagenes?: string[];
 }
@@ -112,6 +115,7 @@ export interface UnidadCompleta {
   nombre: string;
   precio: number;
   estado: 'libre' | 'ocupada' | 'mantenimiento';
+  visible?: boolean;
   descripcion?: Descripcion | null;
   imagenes?: string[] | null;
   propiedad_id: number;

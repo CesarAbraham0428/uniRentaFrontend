@@ -103,6 +103,26 @@
               </div>
             </div>
           </div>
+
+          <!-- Estado de disponibilidad -->
+          <div class="grupo-campo">
+            <label for="visible" class="etiqueta">
+              <i class="bi bi-eye"></i>
+              Estado de Disponibilidad
+            </label>
+            <select
+              id="visible"
+              formControlName="visible"
+              class="campo-entrada"
+            >
+              <option [ngValue]="true">Libre (Visible para estudiantes)</option>
+              <option [ngValue]="false">Ocupada (No visible)</option>
+            </select>
+            <small class="texto-ayuda">
+              <i class="bi bi-info-circle"></i>
+              Controla si la unidad aparece en las búsquedas de estudiantes
+            </small>
+          </div>
         </div>
 
         <!-- Características -->
