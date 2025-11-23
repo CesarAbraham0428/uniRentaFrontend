@@ -9,6 +9,7 @@ import {
   FormularioActualizacionUnidad,
   UnidadCompleta
 } from '../../../../interfaces/propiedad.interface';
+import { ServiciosService } from '../../../../core/services/servicios.service';
 
 @Component({
   selector: 'app-formulario-unidad',
@@ -24,11 +25,10 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   esEdicion = false;
   unidadActual: UnidadCompleta | null = null;
 
-  serviciosDisponibles = [
-    'Agua', 'Luz', 'Gas', 'Internet', 'Cable', 'Limpieza',
-    'Seguridad', 'Estacionamiento', 'Lavandería'
-  ];
-  serviciosSeleccionados: string[] = [];
+  serviciosCatalogo: any[] = [];
+  serviciosBase: any[] = [];
+  serviciosExtras: any[] = [];
+  serviciosSeleccionados: number[] = []; // IDs de servicios
 
   // Propiedades para manejo de archivos
   imagenesSeleccionadas: File[] = [];
@@ -44,7 +44,8 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private propiedadService: PropiedadService,
-    private alertasService: AlertasService
+    private alertasService: AlertasService,
+    private serviciosService: ServiciosService
   ) {
     this.formularioUnidad = this.crearFormulario();
 
@@ -71,6 +72,7 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.detectarModo();
     this.inicializarFormulario();
+    this.cargarServiciosCatalogo();
   }
 
   ngOnDestroy(): void {
@@ -170,6 +172,29 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
     });
   }
 
+  private cargarServiciosCatalogo(): void {
+    this.serviciosService.obtenerServiciosDisponibles().subscribe({
+      next: (resp) => {
+        // el backend devuelve { success:true, data: [...] } o directamente [...]
+        const lista = Array.isArray(resp) ? resp : (resp?.data ?? []);
+        this.serviciosCatalogo = lista;
+        this.serviciosBase = this.serviciosCatalogo.filter(s => !!s.es_base);
+        this.serviciosExtras = this.serviciosCatalogo.filter(s => !s.es_base);
+
+        // si estamos en edición y ya existe unidadActual, sincronizar selección
+        if (this.unidadActual) {
+          const serv = this.unidadActual.descripcion?.servicios || [];
+          // admitir que vengan ids (recomendado) o nombres
+          this.serviciosSeleccionados = serv.map((x: any) => Number(x)).filter((n: number) => !isNaN(n));
+        }
+      },
+      error: (err) => {
+        this.alertasService.manejarErrores(err, 'carga de servicios');
+      }
+    });
+  }
+
+
   private llenarFormularioConDatos(unidad: UnidadCompleta): void {
     this.formularioUnidad.patchValue({
       nombre: unidad.nombre || '',
@@ -180,7 +205,9 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
       // campos de compartido (si vienen)
     });
 
-    this.serviciosSeleccionados = unidad.descripcion?.servicios || [];
+    this.serviciosSeleccionados = (unidad.descripcion?.servicios || [])
+      .map((s: any) => (typeof s === 'object' ? s.id : Number(s)))
+      .filter((n: number) => !isNaN(n));
 
     // Cargar imágenes existentes como URLs de preview
     if (unidad.imagenes && unidad.imagenes.length > 0) {
@@ -190,18 +217,17 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
 
   // ========== MANEJO DE SERVICIOS ==========
 
-  toggleServicio(servicio: string): void {
-    const index = this.serviciosSeleccionados.indexOf(servicio);
-    if (index === -1) {
-      this.serviciosSeleccionados.push(servicio);
-    } else {
-      this.serviciosSeleccionados.splice(index, 1);
-    }
+  toggleServicio(servicioId: number): void {
+    const id = Number(servicioId);
+    const idx = this.serviciosSeleccionados.indexOf(id);
+    if (idx === -1) this.serviciosSeleccionados.push(id);
+    else this.serviciosSeleccionados.splice(idx, 1);
   }
 
-  isServicioSeleccionado(servicio: string): boolean {
-    return this.serviciosSeleccionados.includes(servicio);
+  isServicioSeleccionado(servicioId: number): boolean {
+    return this.serviciosSeleccionados.includes(Number(servicioId));
   }
+
 
   // ========== MANEJO DE IMÁGENES ==========
 
@@ -401,10 +427,15 @@ export class FormularioUnidadComponent implements OnInit, OnDestroy {
         imagenesBase64 = await this.convertirImagenesABase64();
       }
 
+      const serviciosObj = this.serviciosSeleccionados
+        .map(id => this.serviciosCatalogo.find((s: any) => Number(s.id) === Number(id)))
+        .filter((s: any) => !!s)
+        .map((s: any) => ({ id: s.id, nombre: s.nombre, precio: s.precio, es_base: !!s.es_base }));
+
       const descripcion: any = {
         terraza: !!formValue.terraza,
         amueblado: !!formValue.amueblado,
-        servicios: this.serviciosSeleccionados,
+        servicios: serviciosObj,
         caracteristicas: formValue.caracteristicas || ''
       };
 
