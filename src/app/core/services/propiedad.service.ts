@@ -230,7 +230,7 @@ export class PropiedadService {
   // ========== MÉTODOS AUXILIARES ==========
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('rentero_token') || sessionStorage.getItem('rentero_token');
+    const token = localStorage.getItem('auth_token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -238,7 +238,7 @@ export class PropiedadService {
   }
 
   private getMultipartAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('rentero_token') || sessionStorage.getItem('rentero_token');
+    const token = localStorage.getItem('auth_token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
       // No incluir Content-Type para FormData - el navegador lo establece automáticamente
