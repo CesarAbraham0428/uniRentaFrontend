@@ -6,10 +6,14 @@
       <span class="title-text">{{ unidad.nombre }}</span>
     </h1>
     <div class="header-meta">
-      <p class="location-info" *ngIf="unidad.propiedad?.nombre">
-        <i class="fas fa-map-marker-alt"></i>
-        {{ unidad.propiedad.nombre }}
-      </p>
+      <div class="property-location">
+        <div class="location-icon-wrapper">
+          <i class="fas fa-house"></i>
+        </div>
+        <span>
+          <strong>{{ unidad.propiedad.nombre }}</strong> 
+        </span>
+      </div>
     </div>
   </div>
 

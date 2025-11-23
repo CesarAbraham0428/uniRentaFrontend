@@ -117,8 +117,8 @@
     }
 
     .btn-details {
-      background: var(--color-accent);
-      color: white;
+      background: #265f00;
+      color: rgb(255, 255, 255);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
   }
@@ -216,9 +216,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  background: #819200;
   border: none;
-  color: white;
+  color: rgb(255, 255, 255);
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
